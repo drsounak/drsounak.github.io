@@ -1,130 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Research — Sounak Sadhukhan</title>
   <link rel="stylesheet" href="assets/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>𝑆</text></svg>">
 </head>
 <body>
-<div id="prog"></div>
-<nav class="nav solid">
-  <a href="index.html" class="nav-logo">Sounak Sadhukhan</a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li><li><a href="research.html" class="active">Research</a></li>
-    <li><a href="resource.html">Resource</a></li><li><a href="cv.html">CV</a></li>
-  </ul>
-  <a href="mailto:sounaks.cse@gmail.com" class="nav-cta">Contact</a>
-  <button class="ham" aria-label="Menu"><span></span><span></span><span></span></button>
+
+<nav class="nav">
+  <a href="index.html" class="nav-name">Sounak Sadhukhan</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="research.html" class="active">Research</a>
+    <a href="resource.html">Resource</a>
+    <a href="cv.html">CV</a>
+  </div>
+  <button class="nav-ham" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
-<div class="mob">
-  <a href="index.html">Home</a><a href="research.html" class="active">Research</a>
-  <a href="resource.html">Resource</a><a href="cv.html">CV</a>
+<div class="mob-menu">
+  <a href="index.html">Home</a>
+  <a href="research.html" class="active">Research</a>
+  <a href="resource.html">Resource</a>
+  <a href="cv.html">CV</a>
 </div>
 
-<div class="w pt">
-  <!-- Header -->
-  <section style="padding:72px 0 40px">
-    <p class="eyebrow r">Academic Research</p>
-    <h1 class="ht r d1" style="font-size:clamp(3rem,6vw,5.5rem);margin-bottom:20px">
-      Publications &amp;<br><em>Research Areas</em>
-    </h1>
-    <p class="lead r d2" style="margin-bottom:28px">
-      16+ publications across leading journals and conferences. Work spanning mathematical oncology,
-      ML in medicine, disaster analytics, and more.
+<div class="page">
+
+  <h1 class="page-title">Research</h1>
+
+  <!-- Research Interests -->
+  <h2 class="sec-heading">Research Interests</h2>
+  <div class="about-text">
+    <p>
+      My research is broadly categorised under <strong>Mathematical Oncology</strong>, with a focus on the
+      modelling of cancer progression and therapeutics. Mathematical and computational models — supported
+      by theoretical biology, machine learning, and deep learning — are developed to investigate
+      <strong>tumour growth dynamics</strong>, microenvironment interactions, and treatment responses.
     </p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap" class="r d3">
-      <a href="https://scholar.google.com/citations?user=btgAMX8AAAAJ&hl=en" target="_blank" class="btn btn-dark" rel="noopener">Google Scholar ↗</a>
-      <a href="https://www.researchgate.net/profile/Sounak-Sadhukhan?ev=hdr_xprf&_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6ImhvbWUiLCJwYWdlIjoiaG9tZSIsInBvc2l0aW9uIjoiZ2xvYmFsSGVhZGVyIn19" target="_blank" class="btn btn-outline" rel="noopener">ResearchGate ↗</a>
-    </div>
-  </section>
+    <p>
+      Multi-scale hybrid models are designed to support non-invasive, patient-specific treatment planning
+      through the integration of clinical data, biomarkers, and medical imaging, contributing to
+      <strong>precision medicine</strong> and optimised therapeutic strategies.
+    </p>
+  </div>
+  <ul class="interests-list" style="margin-top:12px">
+    <li>Mathematical and computational modelling of tumour growth (avascular and vascular)</li>
+    <li>Multi-scale agent-based and continuum models for cancer invasion and metastasis</li>
+    <li>Cellular automata, anomalous diffusion, and fractal geometry in biological systems</li>
+    <li>Deep learning for medical imaging — histopathology, retinal segmentation, radiomics</li>
+    <li>Explainable AI (XAI) for clinical decision support</li>
+    <li>Precision oncology — patient-specific, non-invasive treatment planning</li>
+    <li>Disaster risk reduction and humanitarian logistics optimisation</li>
+  </ul>
 
-  <!-- Research areas bento -->
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:64px" class="r d1" data-stagger>
-    <div class="card" style="padding:30px 34px">
-      <div style="font-size:1.8rem;margin-bottom:14px">🧬</div>
-      <h3 style="font-family:var(--fd);font-size:1.3rem;font-weight:400;margin-bottom:10px">Mathematical Oncology</h3>
-      <p style="font-size:.85rem;color:var(--fog);line-height:1.7">Multi-scale models for tumour growth, avascular &amp; vascular progression, invasion and metastasis — using cellular automata, anomalous diffusion, fractal geometry.</p>
-    </div>
-    <div class="card card-dark" style="padding:30px 34px">
-      <div style="font-size:1.8rem;margin-bottom:14px">🤖</div>
-      <h3 style="font-family:var(--fd);font-size:1.3rem;font-weight:400;margin-bottom:10px;color:var(--sand)">ML &amp; Deep Learning</h3>
-      <p style="font-size:.85rem;color:rgba(201,169,110,.55);line-height:1.7">CNNs, autoencoders, XAI for medical imaging, histopathology, retinal vessel segmentation, hyperspectral document analysis.</p>
-    </div>
-    <div class="card card-sand" style="padding:30px 34px">
-      <div style="font-size:1.8rem;margin-bottom:14px">🔬</div>
-      <h3 style="font-family:var(--fd);font-size:1.3rem;font-weight:400;margin-bottom:10px">Hybrid Modelling</h3>
-      <p style="font-size:.85rem;color:var(--fog);line-height:1.7">Agent-based and continuum models at cellular and tissue scale, integrating microenvironment interactions and patient-specific parameters.</p>
-    </div>
-    <div class="card" style="padding:30px 34px">
-      <div style="font-size:1.8rem;margin-bottom:14px">🏥</div>
-      <h3 style="font-family:var(--fd);font-size:1.3rem;font-weight:400;margin-bottom:10px">Precision Medicine</h3>
-      <p style="font-size:.85rem;color:var(--fog);line-height:1.7">Non-invasive, patient-specific treatment planning through integration of clinical data, biomarkers, and medical imaging.</p>
-    </div>
+  <!-- Profile links -->
+  <div class="profile-links" style="margin-top:20px;margin-bottom:8px">
+    <a href="https://scholar.google.com/citations?user=btgAMX8AAAAJ&hl=en" target="_blank" rel="noopener" class="pl-link">Google Scholar</a>
+    <a href="https://www.researchgate.net/profile/Sounak-Sadhukhan?ev=hdr_xprf" target="_blank" rel="noopener" class="pl-link">ResearchGate</a>
   </div>
 
-  <hr class="rule">
+  <!-- JOURNALS -->
+  <p class="pub-section-label">Journal Articles</p>
+  <div class="pub-list">
 
-  <!-- Filter -->
-  <div class="pub-filter-row r">
-    <button class="pf active" data-f="all">All (16)</button>
-    <button class="pf" data-f="journal">Journals (7)</button>
-    <button class="pf" data-f="conference">Conferences (6)</button>
-    <button class="pf" data-f="chapter">Book Chapters (3)</button>
+    <div class="pub-item">
+      <span class="pub-num">7</span>
+      <div class="pub-content">
+        <p class="pub-title">Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images</p>
+        <p class="pub-authors">Singh, P. S., Karthikeyan, S., Upadhayay, G. M., <strong>Sadhukhan, S.</strong>, Soni, P. K., &amp; Malche, T.</p>
+        <p class="pub-venue">Discover Computing, 28, 333 &nbsp;(2025)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Hyperspectral Imaging</span><span class="pub-tag">Deep Learning</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">6</span>
+      <div class="pub-content">
+        <p class="pub-title">Multi-scale agent-based model for tumour cell invasion</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
+        <p class="pub-venue">Medical &amp; Biological Engineering &amp; Computing, 60, 1075–1098 &nbsp;(2022)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Cancer Modelling</span><span class="pub-tag">Agent-Based</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">5</span>
+      <div class="pub-content">
+        <p class="pub-title">The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
+        <p class="pub-venue">Chaos, Solitons &amp; Fractals, 155, 111717 &nbsp;(2021)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Fractals</span><span class="pub-tag">Angiogenesis</span><span class="pub-tag">Cellular Automata</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">4</span>
+      <div class="pub-content">
+        <p class="pub-title">A multi-scale agent-based model for avascular tumour growth</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Mishra, P. K., Basu, S. K., &amp; Mandal, J. K.</p>
+        <p class="pub-venue">Biosystems, 206, 104450 &nbsp;(2021)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Tumour Growth</span><span class="pub-tag">Agent-Based</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">3</span>
+      <div class="pub-content">
+        <p class="pub-title">Avascular tumour growth models based on anomalous diffusion</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Basu, S. K.</p>
+        <p class="pub-venue">Journal of Biological Physics, 46, 67–94 &nbsp;(2020)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Anomalous Diffusion</span><span class="pub-tag">Tumour Growth</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">2</span>
+      <div class="pub-content">
+        <p class="pub-title">A cost optimization model and solutions for shelter allocation and relief distribution in flood scenario</p>
+        <p class="pub-authors">Mollah, A. K., <strong>Sadhukhan, S.*</strong>, Das, P., &amp; Anis, M. Z.</p>
+        <p class="pub-venue">International Journal of Disaster Risk Reduction, 31, 1187–1198 &nbsp;(2018)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Optimisation</span><span class="pub-tag">Disaster Management</span></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <span class="pub-num">1</span>
+      <div class="pub-content">
+        <p class="pub-title">An analytics dashboard visualization for flood decision support system</p>
+        <p class="pub-authors">Saha, S., Shekhar, S., <strong>Sadhukhan, S.*</strong>, &amp; Das, P.</p>
+        <p class="pub-venue">Journal of Visualization, 21, 295–307 &nbsp;(2018)</p>
+        <div class="pub-tags-row"><span class="pub-tag">Visualisation</span><span class="pub-tag">Flood Analytics</span></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ── Journals ── -->
-  <div class="pub-sec-hdr r"><h2>Peer-Reviewed Journals</h2><span class="tag tag-sand">7 papers</span></div>
+  <!-- CONFERENCES -->
+  <p class="pub-section-label">Conference Papers</p>
+  <div class="pub-list">
 
-  <div class="pub-card r" data-t="journal"><span class="pub-i">7</span><div class="pub-main"><p class="pub-t">Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images</p><p class="pub-a">Singh, P. S., Karthikeyan, S., Upadhayay, G. M., <strong>Sadhukhan, S.</strong>, Soni, P. K., &amp; Malche, T.</p><p class="pub-v">Discover Computing, 28, 333</p><div class="pub-meta"><span class="tag tag-ink">Hyperspectral</span><span class="tag tag-ink">Deep Learning</span></div></div><span class="pub-yr">2025</span></div>
+    <div class="pub-item">
+      <span class="pub-num">6</span>
+      <div class="pub-content">
+        <p class="pub-title">Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection</p>
+        <p class="pub-authors">Tarafdar, A.*, Haldar, A., Das, S., &amp; <strong>Sadhukhan, S.</strong></p>
+        <p class="pub-venue">2025 5th Asian Conference on Innovation in Technology (ASIANCON), Pimpri, India &nbsp;(2025)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d1" data-t="journal"><span class="pub-i">6</span><div class="pub-main"><p class="pub-t">Multi-scale agent-based model for tumour cell invasion</p><p class="pub-a"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p><p class="pub-v">Medical &amp; Biological Engineering &amp; Computing, 60, 1075–1098</p><div class="pub-meta"><span class="tag tag-sand">Cancer Modelling</span><span class="tag tag-ink">Agent-Based</span></div></div><span class="pub-yr">2022</span></div>
+    <div class="pub-item">
+      <span class="pub-num">5</span>
+      <div class="pub-content">
+        <p class="pub-title">Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Das, S., Tarafdar, A., &amp; Singh, A.</p>
+        <p class="pub-venue">IEEE INDISCON 2025 — 6th India Council International Subsections Conference, Rourkela &nbsp;(2025)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d2" data-t="journal"><span class="pub-i">5</span><div class="pub-main"><p class="pub-t">The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata</p><p class="pub-a"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p><p class="pub-v">Chaos, Solitons &amp; Fractals, 155, 111717</p><div class="pub-meta"><span class="tag tag-sand">Fractals</span><span class="tag tag-sand">Angiogenesis</span><span class="tag tag-ink">Cellular Automata</span></div></div><span class="pub-yr">2021</span></div>
+    <div class="pub-item">
+      <span class="pub-num">4</span>
+      <div class="pub-content">
+        <p class="pub-title">A Hybrid Mutual Information-Based Feature Selection Framework with Redundancy Reduction through Clustering and Voting</p>
+        <p class="pub-authors">Prajapati, A., <strong>Sadhukhan, S.*</strong>, &amp; Singh, P. S.</p>
+        <p class="pub-venue">IEEE INDISCON 2025 — 6th India Council International Subsections Conference, Rourkela &nbsp;(2025)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r" data-t="journal"><span class="pub-i">4</span><div class="pub-main"><p class="pub-t">A multi-scale agent-based model for avascular tumour growth</p><p class="pub-a"><strong>Sadhukhan, S.*</strong>, Mishra, P. K., Basu, S. K., &amp; Mandal, J. K.</p><p class="pub-v">Biosystems, 206, 104450</p><div class="pub-meta"><span class="tag tag-sand">Tumour Growth</span><span class="tag tag-ink">Agent-Based</span></div></div><span class="pub-yr">2021</span></div>
+    <div class="pub-item">
+      <span class="pub-num">3</span>
+      <div class="pub-content">
+        <p class="pub-title">A continuum model and numerical simulation for avascular tumor growth</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Basu, S. K., &amp; Kumar, N.</p>
+        <p class="pub-venue">ICETE 2019 — Springer, Learning and Analytics in Intelligent Systems, vol. 3, pp. 57–65</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d1" data-t="journal"><span class="pub-i">3</span><div class="pub-main"><p class="pub-t">Avascular tumour growth models based on anomalous diffusion</p><p class="pub-a"><strong>Sadhukhan, S.*</strong> &amp; Basu, S. K.</p><p class="pub-v">Journal of Biological Physics, 46, 67–94</p><div class="pub-meta"><span class="tag tag-sand">Anomalous Diffusion</span></div></div><span class="pub-yr">2020</span></div>
+    <div class="pub-item">
+      <span class="pub-num">2</span>
+      <div class="pub-content">
+        <p class="pub-title">Scheme for unstructured knowledge representation in medical expert system for low back pain management</p>
+        <p class="pub-authors">Santra, D., <strong>Sadhukhan, S.*</strong>, Basu, S. K., Das, S., Sinha, S., &amp; Goswami, S.</p>
+        <p class="pub-venue">Smart Intelligent Computing and Applications — Springer, SIST vol. 105, pp. 33–41 &nbsp;(2019)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d2" data-t="journal"><span class="pub-i">2</span><div class="pub-main"><p class="pub-t">A cost optimization model and solutions for shelter allocation and relief distribution in flood scenario</p><p class="pub-a">Mollah, A. K., <strong>Sadhukhan, S.*</strong>, Das, P., &amp; Anis, M. Z.</p><p class="pub-v">International Journal of Disaster Risk Reduction, 31, 1187–1198</p><div class="pub-meta"><span class="tag tag-ink">Optimization</span><span class="tag tag-ink">Disaster Management</span></div></div><span class="pub-yr">2018</span></div>
+    <div class="pub-item">
+      <span class="pub-num">1</span>
+      <div class="pub-content">
+        <p class="pub-title">A solution of degree-constrained spanning tree using hybrid GA with directed mutation</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Sen Sharma, S.</p>
+        <p class="pub-venue">Advanced Computing, Networking and Informatics — Springer, SIST vol. 27, pp. 653–660 &nbsp;(2014)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r" data-t="journal"><span class="pub-i">1</span><div class="pub-main"><p class="pub-t">An analytics dashboard visualization for flood decision support system</p><p class="pub-a">Saha, S., Shekhar, S., <strong>Sadhukhan, S.*</strong>, &amp; Das, P.</p><p class="pub-v">Journal of Visualization, 21, 295–307</p><div class="pub-meta"><span class="tag tag-ink">Visualization</span><span class="tag tag-ink">Analytics</span></div></div><span class="pub-yr">2018</span></div>
+  </div>
 
-  <!-- ── Conferences ── -->
-  <div class="pub-sec-hdr r"><h2>Conference Proceedings</h2><span class="tag tag-ink">6 papers</span></div>
+  <!-- BOOK CHAPTERS -->
+  <p class="pub-section-label">Book Chapters</p>
+  <div class="pub-list">
 
-  <div class="pub-card r" data-t="conference"><span class="pub-i">6</span><div class="pub-main"><p class="pub-t">Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection</p><p class="pub-a">Tarafdar, A.*, Haldar, A., Das, S., &amp; <strong>Sadhukhan, S.</strong></p><p class="pub-v">ASIANCON 2025 · Pimpri, India</p><div class="pub-meta"><span class="tag tag-sand">Oral Cancer</span><span class="tag tag-ink">Histopathology</span></div></div><span class="pub-yr">2025</span></div>
+    <div class="pub-item">
+      <span class="pub-num">3</span>
+      <div class="pub-content">
+        <p class="pub-title">Radiomics: Cropping More from Images</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong></p>
+        <p class="pub-venue">Cancer Diagnostics and Therapeutics: Current Trends, Challenges, and Future Perspectives — Springer, Singapore, pp. 461–470 &nbsp;(2022)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d1" data-t="conference"><span class="pub-i">5</span><div class="pub-main"><p class="pub-t">Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach</p><p class="pub-a"><strong>Sadhukhan, S.*</strong>, Das, S., Tarafdar, A., &amp; Singh, A.</p><p class="pub-v">IEEE INDISCON 2025 · Rourkela, India</p><div class="pub-meta"><span class="tag tag-sand">Retinal Segmentation</span><span class="tag tag-ink">XAI</span></div></div><span class="pub-yr">2025</span></div>
+    <div class="pub-item">
+      <span class="pub-num">2</span>
+      <div class="pub-content">
+        <p class="pub-title">Biology, Chemistry, and Physics of Cancer Cell Invasion and Metastasis</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Dey, S.</p>
+        <p class="pub-venue">Cancer Diagnostics and Therapeutics: Current Trends, Challenges, and Future Perspectives — Springer, Singapore, pp. 81–109 &nbsp;(2021)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r d2" data-t="conference"><span class="pub-i">4</span><div class="pub-main"><p class="pub-t">A Hybrid Mutual Information-Based Feature Selection Framework with Redundancy Reduction through Clustering and Voting</p><p class="pub-a">Prajapati, A., <strong>Sadhukhan, S.*</strong>, &amp; Singh, P. S.</p><p class="pub-v">IEEE INDISCON 2025 · Rourkela, India</p><div class="pub-meta"><span class="tag tag-ink">Feature Selection</span><span class="tag tag-ink">Clustering</span></div></div><span class="pub-yr">2025</span></div>
+    <div class="pub-item">
+      <span class="pub-num">1</span>
+      <div class="pub-content">
+        <p class="pub-title">Producing better disaster management plan in post-disaster situation using social media mining</p>
+        <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Banerjee, S., Das, P., &amp; Sangaiah, A. K.</p>
+        <p class="pub-venue">Computational Intelligence for Multimedia Big Data on the Cloud with Engineering Applications — Academic Press, pp. 171–183 &nbsp;(2018)</p>
+      </div>
+    </div>
 
-  <div class="pub-card r" data-t="conference"><span class="pub-i">3</span><div class="pub-main"><p class="pub-t">A continuum model and numerical simulation for avascular tumor growth</p><p class="pub-a"><strong>Sadhukhan, S.*</strong>, Basu, S. K., &amp; Kumar, N.</p><p class="pub-v">ICETE 2019 · Springer LAIS vol 3, pp. 57–65</p><div class="pub-meta"><span class="tag tag-sand">Continuum Model</span></div></div><span class="pub-yr">2019</span></div>
+  </div>
 
-  <div class="pub-card r d1" data-t="conference"><span class="pub-i">2</span><div class="pub-main"><p class="pub-t">Scheme for unstructured knowledge representation in medical expert system for low back pain management</p><p class="pub-a">Santra, D., <strong>Sadhukhan, S.*</strong>, Basu, S. K., Das, S., Sinha, S., &amp; Goswami, S.</p><p class="pub-v">Smart Intelligent Computing · Springer SIST vol 105, pp. 33–41</p><div class="pub-meta"><span class="tag tag-ink">Medical Expert System</span></div></div><span class="pub-yr">2019</span></div>
-
-  <div class="pub-card r d2" data-t="conference"><span class="pub-i">1</span><div class="pub-main"><p class="pub-t">A solution of degree-constrained spanning tree using hybrid GA with directed mutation</p><p class="pub-a"><strong>Sadhukhan, S.*</strong> &amp; Sen Sharma, S.</p><p class="pub-v">Advanced Computing · Springer SIST vol 27, pp. 653–660</p><div class="pub-meta"><span class="tag tag-ink">Genetic Algorithm</span></div></div><span class="pub-yr">2014</span></div>
-
-  <!-- ── Book Chapters ── -->
-  <div class="pub-sec-hdr r"><h2>Book Chapters</h2><span class="tag tag-cream">3 chapters</span></div>
-
-  <div class="pub-card r" data-t="chapter"><span class="pub-i">3</span><div class="pub-main"><p class="pub-t">Radiomics: Cropping More from Images</p><p class="pub-a"><strong>Sadhukhan, S.*</strong></p><p class="pub-v">Cancer Diagnostics and Therapeutics · Springer, Singapore, pp. 461–470</p><div class="pub-meta"><span class="tag tag-sand">Radiomics</span></div></div><span class="pub-yr">2022</span></div>
-
-  <div class="pub-card r d1" data-t="chapter"><span class="pub-i">2</span><div class="pub-main"><p class="pub-t">Biology, Chemistry, and Physics of Cancer Cell Invasion and Metastasis</p><p class="pub-a"><strong>Sadhukhan, S.*</strong> &amp; Dey, S.</p><p class="pub-v">Cancer Diagnostics and Therapeutics · Springer, Singapore, pp. 81–109</p><div class="pub-meta"><span class="tag tag-sand">Metastasis</span><span class="tag tag-ink">Cancer Biology</span></div></div><span class="pub-yr">2021</span></div>
-
-  <div class="pub-card r d2" data-t="chapter"><span class="pub-i">1</span><div class="pub-main"><p class="pub-t">Producing better disaster management plan in post-disaster situation using social media mining</p><p class="pub-a"><strong>Sadhukhan, S.*</strong>, Banerjee, S., Das, P., &amp; Sangaiah, A. K.</p><p class="pub-v">Computational Intelligence for Multimedia Big Data · Academic Press, pp. 171–183</p><div class="pub-meta"><span class="tag tag-ink">Social Media Mining</span></div></div><span class="pub-yr">2018</span></div>
-
-  <div style="height:80px"></div>
-</div>
+</div><!-- /page -->
 
 <footer class="footer">
-  <div class="footer-top">
-    <div><p class="ft-brand">Sounak<br>Sadhukhan</p><p class="ft-sub">Assistant Professor &amp; Researcher<br>Kolkata, West Bengal, India</p></div>
-    <div><p class="ft-col-title">Navigation</p><div class="ft-links"><a href="index.html">Home</a><a href="research.html">Research</a><a href="resource.html">Resource</a><a href="cv.html">CV</a></div></div>
-    <div><p class="ft-col-title">Contact</p><div class="ft-links"><a href="mailto:sounaks.cse@gmail.com">sounaks.cse@gmail.com</a><a href="https://scholar.google.com/citations?user=btgAMX8AAAAJ&hl=en">Google Scholar</a><a href="https://www.researchgate.net/profile/Sounak-Sadhukhan?ev=hdr_xprf&_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6ImhvbWUiLCJwYWdlIjoiaG9tZSIsInBvc2l0aW9uIjoiZ2xvYmFsSGVhZGVyIn19">ResearchGate</a></div></div>
-  </div>
-  <div class="footer-bottom"><span class="fc">&copy; 2025 Sounak Sadhukhan · GitHub Pages</span><span class="fc">16+ Publications</span></div>
+  &copy; 2025 Sounak Sadhukhan &nbsp;|&nbsp; Department of CSE, Techno International New Town, Kolkata
 </footer>
+
 <script src="assets/main.js"></script>
 </body>
 </html>
