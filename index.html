@@ -6,6 +6,20 @@
   <title>Sounak Sadhukhan</title>
   <meta name="description" content="Sounak Sadhukhan — Assistant Professor, Dept. of CSE, Techno International New Town, Kolkata. Researcher in Mathematical Oncology and Machine Learning.">
   <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .pub-title-wrap{position:relative;display:inline}
+    .pub-title-link{color:#1a1b1e;font-weight:600;font-size:.93rem;line-height:1.45;cursor:pointer;border-bottom:1px dotted #c9a96e;transition:color .15s}
+    .pub-title-link:hover{color:#8a6d3b;text-decoration:none}
+    .abstract-popup{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:200;width:clamp(260px,52vw,520px);background:#fff;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:4px;padding:14px 18px;box-shadow:0 6px 28px rgba(26,27,30,.13);font-size:.82rem;font-weight:400;line-height:1.7;color:#444;pointer-events:none}
+    .abstract-popup::before{content:'Abstract';display:block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#c9a96e;margin-bottom:7px}
+    .pub-title-wrap:hover .abstract-popup{display:block}
+    .pub-links{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:7px}
+    .pdf-link{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;font-size:.75rem;font-weight:700;letter-spacing:.04em;color:#8a6d3b;border:1px solid #c9a96e;border-radius:3px;background:#fdf6ea;transition:background .15s,color .15s}
+    .pdf-link:hover{background:#c9a96e;color:#1a1b1e;text-decoration:none}
+    .doi-label{font-size:.76rem;font-weight:600;color:#bbb;margin-right:2px}
+    .doi-link{font-size:.78rem;color:#8a6d3b}
+    .doi-link:hover{text-decoration:underline}
+  </style>
 </head>
 <body>
 
@@ -15,6 +29,7 @@
   <div class="nav-links">
     <a href="index.html" class="active">Home</a>
     <a href="research.html">Research</a>
+    <a href="projects.html">Projects</a>
     <a href="resource.html">Resource</a>
     <a href="cv.html">CV</a>
   </div>
@@ -25,7 +40,8 @@
 <div class="mob-menu">
   <a href="index.html" class="active">Home</a>
   <a href="research.html">Research</a>
-  <a href="resource.html">Resource</a>
+  <a href="projects.html">Projects</a>
+    <a href="resource.html">Resource</a>
   <a href="cv.html">CV</a>
 </div>
 
@@ -43,7 +59,7 @@
         Department of Computer Science &amp; Engineering<br>
         <a href="https://www.tint.edu.in/" target="_blank" rel="noopener">Techno International New Town</a>, Kolkata, India<br>
         <br>
-        <em>Formerly:</em> Bennett University, Noida &nbsp;|&nbsp; PricewaterhouseCoopers LLP India
+        <em>Formerly:</em> Bennett University, Noida &nbsp;|&nbsp; PricewaterhouseCoopers India
       </div>
 
       <div class="contact-row">
@@ -126,50 +142,84 @@
 
   <!-- RECENT PUBLICATIONS -->
   <h2 class="sec-heading">Selected Recent Publications</h2>
+  <p style="font-size:0.82rem;color:#aaa;margin-bottom:14px"><em>Hover over a title to read its abstract.</em></p>
   <div class="pub-list">
 
     <div class="pub-item">
       <span class="pub-num">2025</span>
       <div class="pub-content">
-        <p class="pub-title">Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection</p>
+        <p><span class="pub-title-wrap">
+          <span class="pub-title-link" style="cursor:default">Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection</span>
+          <span class="abstract-popup">This paper evaluates multiple deep learning architectures for automated detection of oral cancer from histopathological images, benchmarking state-of-the-art CNNs on a labelled dataset and analysing accuracy, precision, recall, and AUC to identify the most effective model for clinical deployment in early-stage oral cancer screening.</span>
+        </span></p>
         <p class="pub-authors">Tarafdar, A., Haldar, A., Das, S., &amp; <strong>Sadhukhan, S.</strong></p>
-        <p class="pub-venue">2025 5th Asian Conference on Innovation in Technology (ASIANCON), Pimpri, India</p>
+        <p class="pub-venue">ASIANCON 2025, Pimpri, India</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/tarafdar2025-oral-cancer.pdf" target="_blank" class="pdf-link"><svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>PDF</a>
+        </div>
       </div>
     </div>
 
     <div class="pub-item">
       <span class="pub-num">2025</span>
       <div class="pub-content">
-        <p class="pub-title">Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach</p>
+        <p><span class="pub-title-wrap">
+          <span class="pub-title-link" style="cursor:default">Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach</span>
+          <span class="abstract-popup">An explainable deep learning framework for retinal vessel segmentation combining high segmentation accuracy with interpretability through gradient-based attribution methods, providing visual explanations of model decisions suitable for clinical settings where transparency is essential.</span>
+        </span></p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Das, S., Tarafdar, A., &amp; Singh, A.</p>
-        <p class="pub-venue">IEEE INDISCON 2025 — 6th India Council International Subsections Conference, Rourkela</p>
+        <p class="pub-venue">IEEE INDISCON 2025, Rourkela, India</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2025-retinal-segmentation.pdf" target="_blank" class="pdf-link"><svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>PDF</a>
+        </div>
       </div>
     </div>
 
     <div class="pub-item">
       <span class="pub-num">2025</span>
       <div class="pub-content">
-        <p class="pub-title">Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images</p>
+        <p><span class="pub-title-wrap">
+          <a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener" class="pub-title-link">Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images</a>
+          <span class="abstract-popup">An unsupervised deep autoencoder-based reconstruction approach for non-destructive ink mismatch detection in hyperspectral document images. The method captures spectral characteristics of different inks to identify mismatches even when inks appear visually identical, offering a promising non-destructive tool for forensic document analysis and authentication.</span>
+        </span></p>
         <p class="pub-authors">Singh, P. S., Karthikeyan, S., Upadhayay, G. M., <strong>Sadhukhan, S.</strong>, Soni, P. K., &amp; Malche, T.</p>
-        <p class="pub-venue">Discover Computing, 28, 333</p>
+        <p class="pub-venue">Discover Computing, 28, 333 &nbsp;(2025)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/singh2025-ink-mismatch.pdf" target="_blank" class="pdf-link"><svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>PDF</a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener" class="doi-link">10.1007/s10791-025-09837-2</a></span>
+        </div>
       </div>
     </div>
 
     <div class="pub-item">
       <span class="pub-num">2022</span>
       <div class="pub-content">
-        <p class="pub-title">Multi-scale agent-based model for tumour cell invasion</p>
+        <p><span class="pub-title-wrap">
+          <a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener" class="pub-title-link">Multi-scale agent-based model for tumour cell invasion</a>
+          <span class="abstract-popup">A hybrid multi-scale model for solid tumour cell invasion into healthy tissue, studying tumour heterogeneity through phenotypic transformations. The three-layer model (intracellular, cellular, extracellular) treats each cell as an agent controlled by protein expressions and microenvironment, incorporating EGF-EGFR signalling and matrix degrading enzymes that remodel the ECM for tumour invasion.</span>
+        </span></p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
-        <p class="pub-venue">Medical &amp; Biological Engineering &amp; Computing, 60, 1075–1098</p>
+        <p class="pub-venue">Medical &amp; Biological Engineering &amp; Computing, 60, 1075–1098 &nbsp;(2022)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2022-tumour-invasion.pdf" target="_blank" class="pdf-link"><svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>PDF</a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener" class="doi-link">10.1007/s11517-022-02514-2</a></span>
+        </div>
       </div>
     </div>
 
     <div class="pub-item">
       <span class="pub-num">2021</span>
       <div class="pub-content">
-        <p class="pub-title">The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata</p>
+        <p><span class="pub-title-wrap">
+          <a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener" class="pub-title-link">The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata</a>
+          <span class="abstract-popup">A cellular automata-based discrete model mimicking tumour angiogenesis that demonstrates the fractal nature of growing capillary sprouts. Effects of various biological factors on capillary sprout formation are studied in 2D tissue space, capturing anastomoses and branching phenomena. Fractal dimension estimated by the box-counting method closely matches previously measured experimental ranges.</span>
+        </span></p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
-        <p class="pub-venue">Chaos, Solitons &amp; Fractals, 155, 111717</p>
+        <p class="pub-venue">Chaos, Solitons &amp; Fractals, 155, 111717 &nbsp;(2022)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2022-fractals-angiogenesis.pdf" target="_blank" class="pdf-link"><svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>PDF</a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener" class="doi-link">10.1016/j.chaos.2021.111717</a></span>
+        </div>
       </div>
     </div>
 

@@ -6,11 +6,77 @@
   <title>Research — Sounak Sadhukhan</title>
   <link rel="stylesheet" href="assets/style.css">
   <style>
-    .doi-row { margin-top: 5px; }
-    .doi-label { font-size: 0.78rem; font-weight: 600; color: #aaa; margin-right: 3px; }
-    .doi-link { font-size: 0.8rem; color: #8a6d3b; }
-    .doi-link:hover { text-decoration: underline; color: #6b5229; }
-    .doi-pending { font-size: 0.8rem; color: #bbb; font-style: italic; }
+    /* ── PDF badge ── */
+    .pub-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 7px; }
+    .pdf-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+      color: #8a6d3b;
+      border: 1px solid #c9a96e;
+      border-radius: 3px;
+      background: #fdf6ea;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pdf-link:hover { background: #c9a96e; color: #1a1b1e; text-decoration: none; }
+    .pdf-link svg { flex-shrink: 0; }
+
+    .doi-label { font-size: 0.76rem; font-weight: 600; color: #bbb; margin-right: 2px; }
+    .doi-link { font-size: 0.78rem; color: #8a6d3b; }
+    .doi-link:hover { text-decoration: underline; }
+    .doi-pending { font-size: 0.78rem; color: #ccc; font-style: italic; }
+
+    /* ── Abstract tooltip ── */
+    .pub-title-wrap { position: relative; display: inline; }
+
+    .pub-title-link {
+      color: #1a1b1e;
+      font-weight: 600;
+      font-size: 0.93rem;
+      line-height: 1.45;
+      cursor: pointer;
+      border-bottom: 1px dotted #c9a96e;
+      transition: color 0.15s;
+    }
+    .pub-title-link:hover { color: #8a6d3b; text-decoration: none; }
+
+    .abstract-popup {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 200;
+      width: clamp(280px, 55vw, 560px);
+      background: #fff;
+      border: 1px solid #e0d4bc;
+      border-left: 3px solid #c9a96e;
+      border-radius: 4px;
+      padding: 14px 18px;
+      box-shadow: 0 6px 28px rgba(26,27,30,0.13);
+      font-size: 0.83rem;
+      font-weight: 400;
+      line-height: 1.7;
+      color: #444;
+      text-align: left;
+      pointer-events: none;
+    }
+    .abstract-popup::before {
+      content: 'Abstract';
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #c9a96e;
+      margin-bottom: 7px;
+    }
+    /* Show on hover of the wrapper */
+    .pub-title-wrap:hover .abstract-popup { display: block; }
+
+    /* Keep popup on screen when near right edge */
+    @media (max-width: 700px) {
+      .abstract-popup { width: 90vw; left: 0; }
+    }
   </style>
 </head>
 <body>
@@ -20,6 +86,7 @@
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="research.html" class="active">Research</a>
+    <a href="projects.html">Projects</a>
     <a href="resource.html">Resource</a>
     <a href="cv.html">CV</a>
   </div>
@@ -28,6 +95,7 @@
 <div class="mob-menu">
   <a href="index.html">Home</a>
   <a href="research.html" class="active">Research</a>
+  <a href="projects.html">Projects</a>
   <a href="resource.html">Resource</a>
   <a href="cv.html">CV</a>
 </div>
@@ -36,6 +104,11 @@
 
   <h1 class="page-title">Research</h1>
 
+  <p style="font-size:0.85rem;color:#888;margin-bottom:20px">
+    <em>Hover over any paper title to read its abstract. Click the title or DOI to open the paper. Click [PDF] to download.</em>
+  </p>
+
+  <!-- Research Interests -->
   <h2 class="sec-heading">Research Interests</h2>
   <div class="about-text">
     <p>
@@ -65,241 +138,458 @@
     <a href="https://www.researchgate.net/profile/Sounak-Sadhukhan?ev=hdr_xprf" target="_blank" rel="noopener" class="pl-link">ResearchGate</a>
   </div>
 
-  <!-- ════════════ JOURNAL ARTICLES ════════════ -->
+  <!-- ════ JOURNAL ARTICLES ════ -->
   <p class="pub-section-label">Journal Articles</p>
   <div class="pub-list">
 
+    <!-- 7 -->
     <div class="pub-item">
       <span class="pub-num">7</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener">
-            Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener" class="pub-title-link">
+              Unsupervised deep autoencoder-based reconstruction for ink mismatch detection in hyperspectral document images
+            </a>
+            <span class="abstract-popup">
+              Ink analysis is crucial for finding ink mismatches in handwritten documents to determine their authenticity and identify potential forgery. Traditional chemical-based methods such as thin layer chromatography are destructive, irreversible, and time-consuming. Hyperspectral document images capture spectral information in multiple bands and can reveal material composition, allowing identification of different inks by their distinct spectral characteristics even when inks appear visually identical. This paper proposes an unsupervised deep autoencoder-based reconstruction approach for non-destructive ink mismatch detection in hyperspectral document images, offering a promising method for forensic document analysis and authentication.
+            </span>
+          </span>
         </p>
         <p class="pub-authors">Singh, P. S., Karthikeyan, S., Upadhayay, G. M., <strong>Sadhukhan, S.</strong>, Soni, P. K., &amp; Malche, T.</p>
         <p class="pub-venue">Discover Computing, 28, 333 &nbsp;(2025)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener" class="doi-link">10.1007/s10791-025-09837-2</a></div>
+        <div class="pub-links">
+          <!--
+            TODO: Upload this paper's PDF to assets/pdfs/ folder on GitHub and update the href below.
+            Example: href="assets/pdfs/singh2025-ink-mismatch.pdf"
+          -->
+          <a href="assets/pdfs/singh2025-ink-mismatch.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s10791-025-09837-2" target="_blank" rel="noopener" class="doi-link">10.1007/s10791-025-09837-2</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Hyperspectral Imaging</span><span class="pub-tag">Deep Learning</span></div>
       </div>
     </div>
 
+    <!-- 6 -->
     <div class="pub-item">
       <span class="pub-num">6</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener">
-            Multi-scale agent-based model for tumour cell invasion
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener" class="pub-title-link">
+              Multi-scale agent-based model for tumour cell invasion
+            </a>
+            <span class="abstract-popup">
+              A hybrid model is developed based on the multi-scale concept for solid tumour cell invasion into a healthy tissue. The aim is to study tumour heterogeneity due to the geometry of a growing tumour caused by phenotypic transformations of cells. An early vascular growth is considered after angiogenesis, making the solid tumour microenvironment rich in oxygen and nutrients. The model consists of three layers — intracellular (subcellular), cellular, and extracellular (tissue) — integrating simultaneous events to identify underlying diversity. Every cell is represented as an agent whose characteristics are controlled by intracellular protein expressions and the surrounding microenvironment. A cell cycle model is adapted, influenced by EGF-EGFR signalling and external oxygen and nutrients. Migratory and hybrid cells secrete matrix degrading enzymes (MDEs) that remodel the ECM for local tumour invasion.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
         <p class="pub-venue">Medical &amp; Biological Engineering &amp; Computing, 60, 1075–1098 &nbsp;(2022)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener" class="doi-link">10.1007/s11517-022-02514-2</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2022-tumour-invasion.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s11517-022-02514-2" target="_blank" rel="noopener" class="doi-link">10.1007/s11517-022-02514-2</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Cancer Modelling</span><span class="pub-tag">Agent-Based</span></div>
       </div>
     </div>
 
+    <!-- 5 -->
     <div class="pub-item">
       <span class="pub-num">5</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener">
-            The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener" class="pub-title-link">
+              The Notion of Fractals in Tumour Angiogenic Sprout Initiation Model Based on Cellular Automata
+            </a>
+            <span class="abstract-popup">
+              Tumour growth is considered chaotic and poorly controlled, with cells and vasculatures irregular in shape. The vascular system of a tumour forms a complex network whose architectural complexity cannot be defined by Euclidean geometry; fractal geometry is therefore well suited to quantify these morphological characteristics. A cellular automata (CA) based discrete model is developed that mimics all features and makes useful predictions of tumour angiogenesis using computer-coded rules. From interactions of several species in 2D tissue space, the effects of various biological factors on capillary sprout formation are studied. The model captures anastomoses and branching phenomena. The fractal properties of growing capillary sprouts are investigated using the box-counting method, showing that the estimated fractal dimension closely matches previously measured ranges.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Mishra, P. K.</p>
         <p class="pub-venue">Chaos, Solitons &amp; Fractals, 155, 111717 &nbsp;(2022)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener" class="doi-link">10.1016/j.chaos.2021.111717</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2022-fractals-angiogenesis.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.chaos.2021.111717" target="_blank" rel="noopener" class="doi-link">10.1016/j.chaos.2021.111717</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Fractals</span><span class="pub-tag">Angiogenesis</span><span class="pub-tag">Cellular Automata</span></div>
       </div>
     </div>
 
+    <!-- 4 -->
     <div class="pub-item">
       <span class="pub-num">4</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1016/j.biosystems.2021.104450" target="_blank" rel="noopener">
-            A multi-scale agent-based model for avascular tumour growth
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1016/j.biosystems.2021.104450" target="_blank" rel="noopener" class="pub-title-link">
+              A multi-scale agent-based model for avascular tumour growth
+            </a>
+            <span class="abstract-popup">
+              A multi-scale, lattice-free, agent-based model of avascular tumour growth in epithelial tissue is developed. The model integrates intracellular, cellular, and extracellular layer dynamics. Every cell is treated as an agent that may proliferate, spawn identical daughter agents, or transform into other phenotypes depending on internal protein activity and the external microenvironment. Intracellular events are regulated by p27 gene expression, which controls overall tumour growth dynamics via external oxygen and nutrients modelled by reaction-diffusion equations. The model considers cancer stem cells, progenitor cells, and differentiated cells with complex microenvironment interactions, and is validated against immunohistochemistry and histopathology data. Results show that pure chemo-drug treatment increases the population of cancer stem cells, leading to treatment failure.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Mishra, P. K., Basu, S. K., &amp; Mandal, J. K.</p>
         <p class="pub-venue">Biosystems, 206, 104450 &nbsp;(2021)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.biosystems.2021.104450" target="_blank" rel="noopener" class="doi-link">10.1016/j.biosystems.2021.104450</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2021-avascular-agentbased.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.biosystems.2021.104450" target="_blank" rel="noopener" class="doi-link">10.1016/j.biosystems.2021.104450</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Tumour Growth</span><span class="pub-tag">Agent-Based</span></div>
       </div>
     </div>
 
+    <!-- 3 -->
     <div class="pub-item">
       <span class="pub-num">3</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/s10867-020-09541-w" target="_blank" rel="noopener">
-            Avascular tumour growth models based on anomalous diffusion
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/s10867-020-09541-w" target="_blank" rel="noopener" class="pub-title-link">
+              Avascular tumour growth models based on anomalous diffusion
+            </a>
+            <span class="abstract-popup">
+              Avascular tumour growth in epithelial tissue is modelled to understand how a tumour interacts with its microenvironment and what physical changes occur within the tumour spheroid before angiogenesis. In biological systems, most diffusive processes through cellular membranes are heterogeneous due to their porous nature. A spherical model is first developed based on simple diffusion, then upgraded with fractional diffusion equations to express the anomalous nature of the biological system. Two types of fractional models are developed — one of fixed order and one of variable order — both including a memory formalism technique. Results show that anomalous diffusion-based models offer more realistic and insightful information of the tumour microenvironment at the macroscopic level, closely approximating clinical facts compared to the simple diffusion model.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Basu, S. K.</p>
         <p class="pub-venue">Journal of Biological Physics, 46, 67–94 &nbsp;(2020)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s10867-020-09541-w" target="_blank" rel="noopener" class="doi-link">10.1007/s10867-020-09541-w</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2020-anomalous-diffusion.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <!-- Open access PMC version available -->
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7098400/" target="_blank" rel="noopener" class="pdf-link" style="background:#e8f5e9;border-color:#4caf50;color:#2e7d32">
+            PMC Free
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s10867-020-09541-w" target="_blank" rel="noopener" class="doi-link">10.1007/s10867-020-09541-w</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Anomalous Diffusion</span><span class="pub-tag">Tumour Growth</span></div>
       </div>
     </div>
 
+    <!-- 2 -->
     <div class="pub-item">
       <span class="pub-num">2</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1016/j.ijdrr.2017.11.018" target="_blank" rel="noopener">
-            A cost optimization model and solutions for shelter allocation and relief distribution in flood scenario
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1016/j.ijdrr.2017.11.018" target="_blank" rel="noopener" class="pub-title-link">
+              A cost optimization model and solutions for shelter allocation and relief distribution in flood scenario
+            </a>
+            <span class="abstract-popup">
+              This paper addresses humanitarian logistics and relief distribution during floods, considering cost and time constraints. The primary goal is to attend the most affected regions to reduce casualties, carry out humanitarian operations efficiently, and reallocate displaced people to temporary shelters. Unlike other disasters, floods also give rise to water-borne and vector-borne diseases. A cost optimization model is developed for shelter allocation and relief distribution, formulated as a geographic optimisation problem involving multiple sites, strict constraints, and a discrete feasible domain. Evolutionary optimisation techniques are employed and validated against real flood scenario data from Kolkata, India.
+            </span>
+          </span>
         </p>
         <p class="pub-authors">Mollah, A. K., <strong>Sadhukhan, S.*</strong>, Das, P., &amp; Anis, M. Z.</p>
         <p class="pub-venue">International Journal of Disaster Risk Reduction, 31, 1187–1198 &nbsp;(2018)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.ijdrr.2017.11.018" target="_blank" rel="noopener" class="doi-link">10.1016/j.ijdrr.2017.11.018</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/mollah2018-shelter-allocation.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/j.ijdrr.2017.11.018" target="_blank" rel="noopener" class="doi-link">10.1016/j.ijdrr.2017.11.018</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Optimisation</span><span class="pub-tag">Disaster Management</span></div>
       </div>
     </div>
 
+    <!-- 1 -->
     <div class="pub-item">
       <span class="pub-num">1</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/s12650-017-0453-3" target="_blank" rel="noopener">
-            An analytics dashboard visualization for flood decision support system
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/s12650-017-0453-3" target="_blank" rel="noopener" class="pub-title-link">
+              An analytics dashboard visualization for flood decision support system
+            </a>
+            <span class="abstract-popup">
+              A visual analytics dashboard is developed for a flood decision support system aimed at identifying and visualising risk zones and vulnerable areas before a disaster occurs. The dashboard integrates geographical map visualisation to extract, integrate, and view diverse information rapidly. By identifying at-risk zones in advance, rescuers gain more time to prepare, enabling better planning for rescue operations and reallocation of people to safe areas. The system is designed for time-sensitive environments and reduces overhead in data integration and visualisation for efficient decision making during flood emergencies.
+            </span>
+          </span>
         </p>
         <p class="pub-authors">Saha, S., Shekhar, S., <strong>Sadhukhan, S.*</strong>, &amp; Das, P.</p>
         <p class="pub-venue">Journal of Visualization, 21, 295–307 &nbsp;(2018)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s12650-017-0453-3" target="_blank" rel="noopener" class="doi-link">10.1007/s12650-017-0453-3</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/saha2018-flood-dashboard.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/s12650-017-0453-3" target="_blank" rel="noopener" class="doi-link">10.1007/s12650-017-0453-3</a></span>
+        </div>
         <div class="pub-tags-row"><span class="pub-tag">Visualisation</span><span class="pub-tag">Flood Analytics</span></div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /journal articles -->
 
-  <!-- ════════════ CONFERENCE PAPERS ════════════ -->
+  <!-- ════ CONFERENCE PAPERS ════ -->
   <p class="pub-section-label">Conference Papers</p>
   <div class="pub-list">
 
+    <!-- 6 -->
     <div class="pub-item">
       <span class="pub-num">6</span>
       <div class="pub-content">
-        <p class="pub-title">Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection</p>
+        <p>
+          <span class="pub-title-wrap">
+            <span class="pub-title-link" style="cursor:default;border-bottom:1px dotted #c9a96e">
+              Evaluating Deep Learning Models for Histopathologic Oral Cancer Detection
+            </span>
+            <span class="abstract-popup">
+              This paper evaluates multiple deep learning architectures for automated detection of oral cancer from histopathological images. The study benchmarks state-of-the-art convolutional neural network models on a labelled histopathology dataset, analysing performance metrics including accuracy, precision, recall, and AUC to identify the most effective model for clinical deployment in early-stage oral cancer screening.
+            </span>
+          </span>
+        </p>
         <p class="pub-authors">Tarafdar, A.*, Haldar, A., Das, S., &amp; <strong>Sadhukhan, S.</strong></p>
         <p class="pub-venue">2025 5th Asian Conference on Innovation in Technology (ASIANCON), Pimpri, India &nbsp;(2025)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><span class="doi-pending">To appear on IEEE Xplore — update link once available</span></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/tarafdar2025-oral-cancer.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span class="doi-pending">DOI: To appear on IEEE Xplore — update once available</span>
+        </div>
       </div>
     </div>
 
+    <!-- 5 -->
     <div class="pub-item">
       <span class="pub-num">5</span>
       <div class="pub-content">
-        <p class="pub-title">Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach</p>
+        <p>
+          <span class="pub-title-wrap">
+            <span class="pub-title-link" style="cursor:default;border-bottom:1px dotted #c9a96e">
+              Towards Explainable Retinal Vessel Segmentation: A Deep Learning Approach
+            </span>
+            <span class="abstract-popup">
+              Retinal vessel segmentation is a critical step in diagnosing diseases such as diabetic retinopathy and glaucoma. This paper proposes an explainable deep learning framework for retinal vessel segmentation, combining high segmentation accuracy with interpretability through gradient-based attribution methods. The approach provides visual explanations of model decisions, making it suitable for clinical settings where transparency is essential for physician trust and adoption.
+            </span>
+          </span>
+        </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Das, S., Tarafdar, A., &amp; Singh, A.</p>
         <p class="pub-venue">IEEE INDISCON 2025 — 6th India Council International Subsections Conference, Rourkela, India &nbsp;(2025)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><span class="doi-pending">To appear on IEEE Xplore — update link once available</span></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2025-retinal-segmentation.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span class="doi-pending">DOI: To appear on IEEE Xplore — update once available</span>
+        </div>
       </div>
     </div>
 
+    <!-- 4 -->
     <div class="pub-item">
       <span class="pub-num">4</span>
       <div class="pub-content">
-        <p class="pub-title">A Hybrid Mutual Information-Based Feature Selection Framework with Redundancy Reduction through Clustering and Voting</p>
+        <p>
+          <span class="pub-title-wrap">
+            <span class="pub-title-link" style="cursor:default;border-bottom:1px dotted #c9a96e">
+              A Hybrid Mutual Information-Based Feature Selection Framework with Redundancy Reduction through Clustering and Voting
+            </span>
+            <span class="abstract-popup">
+              Feature selection is critical for building efficient and accurate machine learning models, particularly on high-dimensional biomedical datasets. This paper proposes a hybrid framework that combines mutual information-based feature scoring with redundancy reduction through clustering and an ensemble voting scheme. The approach identifies the most informative and non-redundant features, improving classification performance while reducing computational overhead compared to conventional filter and wrapper methods.
+            </span>
+          </span>
+        </p>
         <p class="pub-authors">Prajapati, A., <strong>Sadhukhan, S.*</strong>, &amp; Singh, P. S.</p>
         <p class="pub-venue">IEEE INDISCON 2025 — 6th India Council International Subsections Conference, Rourkela, India &nbsp;(2025)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><span class="doi-pending">To appear on IEEE Xplore — update link once available</span></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/prajapati2025-feature-selection.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span class="doi-pending">DOI: To appear on IEEE Xplore — update once available</span>
+        </div>
       </div>
     </div>
 
+    <!-- 3 -->
     <div class="pub-item">
       <span class="pub-num">3</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/978-3-030-24322-7_8" target="_blank" rel="noopener">
-            A continuum model and numerical simulation for avascular tumor growth
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/978-3-030-24322-7_8" target="_blank" rel="noopener" class="pub-title-link">
+              A continuum model and numerical simulation for avascular tumor growth
+            </a>
+            <span class="abstract-popup">
+              A spatio-temporal continuum model for avascular tumour growth in two dimensions is developed using fractional advection-diffusion equations. Biological transportation is inherently heterogeneous, making fractional calculus a natural framework. The model is numerically simulated and validated against experimental data for tumour radius and volume doubling time. Two fractional models are developed — one of fixed order and one of variable order — providing realistic macroscopic-level descriptions of avascular tumour growth dynamics.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Basu, S. K., &amp; Kumar, N.</p>
         <p class="pub-venue">Advances in Decision Sciences, Image Processing, Security and Computer Vision — Springer, LAIS vol. 3, pp. 57–65 &nbsp;(2020)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-3-030-24322-7_8" target="_blank" rel="noopener" class="doi-link">10.1007/978-3-030-24322-7_8</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2020-continuum-model.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-3-030-24322-7_8" target="_blank" rel="noopener" class="doi-link">10.1007/978-3-030-24322-7_8</a></span>
+        </div>
       </div>
     </div>
 
+    <!-- 2 -->
     <div class="pub-item">
       <span class="pub-num">2</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/978-981-13-1921-1_4" target="_blank" rel="noopener">
-            Scheme for unstructured knowledge representation in medical expert system for low back pain management
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/978-981-13-1921-1_4" target="_blank" rel="noopener" class="pub-title-link">
+              Scheme for unstructured knowledge representation in medical expert system for low back pain management
+            </a>
+            <span class="abstract-popup">
+              A scheme for unstructured knowledge representation is proposed for a medical expert system designed to assist in the management of low back pain. The system integrates patient symptom data with a rule-based reasoning engine built on an unstructured knowledge base. The approach enables more flexible and comprehensive diagnostic reasoning compared to structured knowledge representation techniques, and is evaluated against clinical case records.
+            </span>
+          </span>
         </p>
         <p class="pub-authors">Santra, D., <strong>Sadhukhan, S.*</strong>, Basu, S. K., Das, S., Sinha, S., &amp; Goswami, S.</p>
         <p class="pub-venue">Smart Intelligent Computing and Applications — Springer, SIST vol. 105, pp. 33–41 &nbsp;(2019)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-13-1921-1_4" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-13-1921-1_4</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/santra2019-expert-system.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-13-1921-1_4" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-13-1921-1_4</a></span>
+        </div>
       </div>
     </div>
 
+    <!-- 1 -->
     <div class="pub-item">
       <span class="pub-num">1</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/978-3-319-07353-8_75" target="_blank" rel="noopener">
-            A solution of degree-constrained spanning tree using hybrid GA with directed mutation
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/978-3-319-07353-8_75" target="_blank" rel="noopener" class="pub-title-link">
+              A solution of degree-constrained spanning tree using hybrid GA with directed mutation
+            </a>
+            <span class="abstract-popup">
+              The degree-constrained minimum spanning tree (d-MST) problem is an NP-hard combinatorial optimisation problem with applications in network design. A hybrid genetic algorithm (GA) with a directed mutation operator is proposed to solve the d-MST problem efficiently. The directed mutation mechanism guides the search towards feasible, high-quality solutions by intelligently modifying chromosome representations. The approach is benchmarked against standard GA and other meta-heuristics, demonstrating competitive performance on standard problem instances.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Sen Sharma, S.</p>
         <p class="pub-venue">Advanced Computing, Networking and Informatics — Springer, SIST vol. 27, pp. 653–660 &nbsp;(2014)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-3-319-07353-8_75" target="_blank" rel="noopener" class="doi-link">10.1007/978-3-319-07353-8_75</a></div>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2014-spanning-tree.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-3-319-07353-8_75" target="_blank" rel="noopener" class="doi-link">10.1007/978-3-319-07353-8_75</a></span>
+        </div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /conference papers -->
 
-  <!-- ════════════ BOOK CHAPTERS ════════════ -->
+  <!-- ════ BOOK CHAPTERS ════ -->
   <p class="pub-section-label">Book Chapters</p>
   <div class="pub-list">
 
+    <!-- 3 -->
     <div class="pub-item">
       <span class="pub-num">3</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/978-981-16-5759-4_20" target="_blank" rel="noopener">
-            Radiomics: Cropping More from Images
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/978-981-16-5759-4_20" target="_blank" rel="noopener" class="pub-title-link">
+              Radiomics: Cropping More from Images
+            </a>
+            <span class="abstract-popup">
+              Radiomics is a rapidly emerging field that extracts large amounts of quantitative features from medical images using automated algorithms, converting images into mineable high-dimensional data. This chapter reviews the radiomics workflow — from image acquisition and segmentation to feature extraction, selection, and model building — and discusses how radiomics can provide non-invasive biomarkers for cancer diagnosis, prognosis, and treatment response prediction, contributing to personalised precision oncology.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong></p>
-        <p class="pub-venue">Cancer Diagnostics and Therapeutics: Current Trends, Challenges, and Future Perspectives — Springer, Singapore, pp. 461–470 &nbsp;(2022)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-16-5759-4_20" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-16-5759-4_20</a></div>
+        <p class="pub-venue">Cancer Diagnostics and Therapeutics — Springer, Singapore, pp. 461–470 &nbsp;(2022)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2022-radiomics.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-16-5759-4_20" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-16-5759-4_20</a></span>
+        </div>
       </div>
     </div>
 
+    <!-- 2 -->
     <div class="pub-item">
       <span class="pub-num">2</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1007/978-981-16-5759-4_4" target="_blank" rel="noopener">
-            Biology, Chemistry, and Physics of Cancer Cell Invasion and Metastasis
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1007/978-981-16-5759-4_4" target="_blank" rel="noopener" class="pub-title-link">
+              Biology, Chemistry, and Physics of Cancer Cell Invasion and Metastasis
+            </a>
+            <span class="abstract-popup">
+              This chapter provides a comprehensive, interdisciplinary review of the mechanisms underpinning cancer cell invasion and metastasis from biological, chemical, and physical perspectives. Key topics include epithelial-to-mesenchymal transition (EMT), extracellular matrix remodelling by matrix metalloproteinases, the role of physical forces and tissue stiffness in tumour invasion, and the biochemical signalling cascades that drive metastatic dissemination. The chapter situates these mechanisms within the broader context of cancer progression and targeted therapeutic intervention.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong> &amp; Dey, S.</p>
-        <p class="pub-venue">Cancer Diagnostics and Therapeutics: Current Trends, Challenges, and Future Perspectives — Springer, Singapore, pp. 81–109 &nbsp;(2021)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-16-5759-4_4" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-16-5759-4_4</a></div>
+        <p class="pub-venue">Cancer Diagnostics and Therapeutics — Springer, Singapore, pp. 81–109 &nbsp;(2021)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2021-invasion-metastasis.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1007/978-981-16-5759-4_4" target="_blank" rel="noopener" class="doi-link">10.1007/978-981-16-5759-4_4</a></span>
+        </div>
       </div>
     </div>
 
+    <!-- 1 -->
     <div class="pub-item">
       <span class="pub-num">1</span>
       <div class="pub-content">
-        <p class="pub-title">
-          <a href="https://doi.org/10.1016/B978-0-12-813314-9.00009-8" target="_blank" rel="noopener">
-            Producing better disaster management plan in post-disaster situation using social media mining
-          </a>
+        <p>
+          <span class="pub-title-wrap">
+            <a href="https://doi.org/10.1016/B978-0-12-813314-9.00009-8" target="_blank" rel="noopener" class="pub-title-link">
+              Producing better disaster management plan in post-disaster situation using social media mining
+            </a>
+            <span class="abstract-popup">
+              Social media platforms generate vast amounts of real-time, geo-located information during disaster events. This chapter demonstrates how social media mining — including sentiment analysis, location extraction, and topic modelling — can be harnessed to produce improved disaster management plans in post-disaster situations. A framework is presented that processes social media streams to identify affected areas, resource needs, and population displacement patterns, enabling faster and more targeted emergency response.
+            </span>
+          </span>
         </p>
         <p class="pub-authors"><strong>Sadhukhan, S.*</strong>, Banerjee, S., Das, P., &amp; Sangaiah, A. K.</p>
-        <p class="pub-venue">Computational Intelligence for Multimedia Big Data on the Cloud with Engineering Applications — Academic Press, pp. 171–183 &nbsp;(2018)</p>
-        <div class="doi-row"><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/B978-0-12-813314-9.00009-8" target="_blank" rel="noopener" class="doi-link">10.1016/B978-0-12-813314-9.00009-8</a></div>
+        <p class="pub-venue">Computational Intelligence for Multimedia Big Data on the Cloud — Academic Press, pp. 171–183 &nbsp;(2018)</p>
+        <div class="pub-links">
+          <a href="assets/pdfs/sadhukhan2018-social-media-disaster.pdf" target="_blank" class="pdf-link">
+            <svg width="11" height="13" viewBox="0 0 24 28" fill="currentColor"><path d="M14 0H2C.9 0 0 .9 0 2v24c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8L14 0zm0 2l6 6h-6V2zM4 20h16v2H4v-2zm0-4h16v2H4v-2zm0-4h9v2H4v-2z"/></svg>
+            PDF
+          </a>
+          <span><span class="doi-label">DOI:</span><a href="https://doi.org/10.1016/B978-0-12-813314-9.00009-8" target="_blank" rel="noopener" class="doi-link">10.1016/B978-0-12-813314-9.00009-8</a></span>
+        </div>
       </div>
     </div>
 
+  </div><!-- /book chapters -->
+
+  <!-- PDF upload note -->
+  <div class="setup-note" style="margin-top:36px">
+    <strong>To activate PDF downloads:</strong> Create a folder called <code>pdfs</code> inside your <code>assets</code> folder on GitHub, then upload each paper's PDF with the filename shown in the link (e.g. <code>sadhukhan2022-tumour-invasion.pdf</code>). The download button will work automatically once the file is in place.
   </div>
 
 </div><!-- /page -->

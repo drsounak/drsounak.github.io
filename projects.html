@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — Sounak Sadhukhan</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    /* ── Blog post cards ── */
+    .blog-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .blog-card {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 0 28px;
+      padding: 28px 0;
+      border-bottom: 1px solid #f0e8d8;
+      align-items: start;
+      transition: padding-left 0.25s ease;
+    }
+    .blog-card:hover { padding-left: 8px; }
+    .blog-card:first-child { padding-top: 0; }
+    .blog-card:last-child { border-bottom: none; }
+
+    .blog-date-col {
+      text-align: right;
+      padding-top: 3px;
+    }
+    .blog-month {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c9a96e;
+    }
+    .blog-year {
+      font-size: 0.78rem;
+      color: #bbb;
+      font-weight: 500;
+    }
+
+    .blog-body {}
+    .blog-category {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8a6d3b;
+      background: #fdf6ea;
+      border: 1px solid #e0d4bc;
+      border-radius: 3px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+    }
+    .blog-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1a1b1e;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .blog-title a { color: inherit; }
+    .blog-title a:hover { color: #8a6d3b; text-decoration: none; }
+
+    .blog-excerpt {
+      font-size: 0.875rem;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .blog-meta {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+    .blog-read-more {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8a6d3b;
+    }
+    .blog-read-more:hover { text-decoration: underline; }
+
+    /* ── Full post view ── */
+    .blog-post-header {
+      border-bottom: 1px solid #e0d4bc;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .blog-post-header .blog-category { margin-bottom: 12px; }
+    .blog-post-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 600;
+      color: #1a1b1e;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .blog-post-meta {
+      font-size: 0.83rem;
+      color: #aaa;
+    }
+
+    .blog-post-body {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: #333;
+    }
+    .blog-post-body p { margin-bottom: 18px; }
+    .blog-post-body h3 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1a1b1e;
+      margin: 32px 0 12px;
+    }
+    .blog-post-body ul {
+      padding-left: 20px;
+      margin-bottom: 18px;
+    }
+    .blog-post-body ul li {
+      list-style: disc;
+      padding: 4px 0;
+      font-size: 0.92rem;
+      color: #444;
+    }
+    .blog-post-body blockquote {
+      border-left: 3px solid #c9a96e;
+      padding: 10px 20px;
+      margin: 24px 0;
+      background: #fdf6ea;
+      font-style: italic;
+      color: #666;
+      font-size: 0.93rem;
+    }
+
+    /* ── Placeholder / empty state ── */
+    .no-posts {
+      text-align: center;
+      padding: 60px 20px;
+      color: #bbb;
+    }
+    .no-posts h3 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #ccc;
+      margin-bottom: 10px;
+    }
+    .no-posts p { font-size: 0.875rem; line-height: 1.7; max-width: 400px; margin: 0 auto 20px; }
+
+    /* Add post guide */
+    .add-post-guide {
+      background: #fdf6ea;
+      border: 1px solid #e0d4bc;
+      border-left: 3px solid #c9a96e;
+      border-radius: 3px;
+      padding: 18px 22px;
+      margin-top: 40px;
+      font-size: 0.875rem;
+      color: #666;
+      line-height: 1.75;
+    }
+    .add-post-guide strong { color: #1a1b1e; }
+    .add-post-guide code {
+      font-size: 0.8rem;
+      background: #f0e4cc;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: #8a6d3b;
+    }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .filter-tab {
+      padding: 5px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #e0d4bc;
+      border-radius: 100px;
+      color: #888;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover { border-color: #c9a96e; color: #8a6d3b; }
+    .filter-tab.active { background: #c9a96e; color: #1a1b1e; border-color: #c9a96e; }
+
+    @media (max-width: 600px) {
+      .blog-card { grid-template-columns: 1fr; gap: 6px; }
+      .blog-date-col { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-name">Sounak Sadhukhan</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="research.html">Research</a>
+    <a href="projects.html" class="active">Projects</a>
+    <a href="resource.html">Resource</a>
+    <a href="cv.html">CV</a>
+  </div>
+  <button class="nav-ham" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mob-menu">
+  <a href="index.html">Home</a>
+  <a href="research.html">Research</a>
+  <a href="projects.html" class="active">Projects</a>
+  <a href="resource.html">Resource</a>
+  <a href="cv.html">CV</a>
+</div>
+
+<div class="page">
+
+  <h1 class="page-title">Projects &amp; Blog</h1>
+
+  <div class="about-text" style="margin-bottom:28px">
+    <p>
+      This page documents ongoing research projects, work-in-progress ideas, and commentary
+      on topics at the intersection of Mathematical Oncology, Machine Learning, and Computational Biology.
+      Posts range from short technical notes to longer project write-ups.
+    </p>
+  </div>
+
+  <!-- Category filter -->
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterPosts('all', this)">All</button>
+    <button class="filter-tab" onclick="filterPosts('oncology', this)">Oncology</button>
+    <button class="filter-tab" onclick="filterPosts('ml', this)">Machine Learning</button>
+    <button class="filter-tab" onclick="filterPosts('teaching', this)">Teaching</button>
+    <button class="filter-tab" onclick="filterPosts('misc', this)">Miscellaneous</button>
+  </div>
+
+  <!-- ════════════ BLOG POSTS ════════════
+       HOW TO ADD A NEW POST:
+       Copy one of the <div class="blog-card"> blocks below,
+       update the date, category, title, excerpt, and reading time.
+       Change data-cat to: oncology | ml | teaching | misc
+       For a full post, link it to a separate .html file or a Notion page.
+  ════════════════════════════════════════ -->
+
+  <div class="blog-grid" id="blog-grid">
+
+    <!-- ══ SAMPLE POST 1 ══ -->
+    <div class="blog-card" data-cat="oncology">
+      <div class="blog-date-col">
+        <div class="blog-month">Apr</div>
+        <div class="blog-year">2025</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Mathematical Oncology</span>
+        <h2 class="blog-title">
+          <!-- Link to a Notion page or a separate HTML file. Replace # with the URL. -->
+          <a href="#">Why Does Tumour Growth Stall? The Role of Avascular Phases in Cancer Progression</a>
+        </h2>
+        <p class="blog-excerpt">
+          Before a tumour can grow beyond 1–2mm in diameter, it faces a fundamental constraint: without a blood supply,
+          oxygen and nutrients must diffuse in from the surrounding tissue. This diffusion limit is why avascular tumour
+          growth eventually stalls — and why modelling this phase mathematically tells us so much about cancer behaviour.
+          In this post, I discuss the mathematics behind this stalling and what our anomalous diffusion models revealed.
+        </p>
+        <div class="blog-meta">5 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+    <!-- ══ SAMPLE POST 2 ══ -->
+    <div class="blog-card" data-cat="ml">
+      <div class="blog-date-col">
+        <div class="blog-month">Mar</div>
+        <div class="blog-year">2025</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Machine Learning</span>
+        <h2 class="blog-title">
+          <a href="#">Explainability in Medical AI: Why "Black Box" Models Are Not Enough for Clinicians</a>
+        </h2>
+        <p class="blog-excerpt">
+          When a deep learning model predicts a patient has diabetic retinopathy, a clinician needs to know <em>why</em> —
+          not just that it said so. Explainable AI (XAI) methods such as Grad-CAM and SHAP provide visual and numerical
+          justifications for model decisions. This post walks through the XAI techniques we used in our retinal vessel
+          segmentation work and why interpretability matters as much as accuracy in clinical settings.
+        </p>
+        <div class="blog-meta">7 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+    <!-- ══ SAMPLE POST 3 ══ -->
+    <div class="blog-card" data-cat="oncology">
+      <div class="blog-date-col">
+        <div class="blog-month">Feb</div>
+        <div class="blog-year">2025</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Mathematical Oncology</span>
+        <h2 class="blog-title">
+          <a href="#">Fractals in Biology: How Tumour Blood Vessel Networks Defy Euclidean Geometry</a>
+        </h2>
+        <p class="blog-excerpt">
+          The branching, chaotic network of blood vessels that a tumour builds for itself cannot be described by
+          smooth, Euclidean shapes — its fractal dimension tells a richer story. In this post, I explain what fractal
+          dimension means in a biological context, how we measured it using the box-counting method in our cellular
+          automata model of tumour angiogenesis, and why the fractal properties of tumour vasculature matter for
+          drug delivery and treatment planning.
+        </p>
+        <div class="blog-meta">8 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+    <!-- ══ SAMPLE POST 4 ══ -->
+    <div class="blog-card" data-cat="ml">
+      <div class="blog-date-col">
+        <div class="blog-month">Jan</div>
+        <div class="blog-year">2025</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Machine Learning</span>
+        <h2 class="blog-title">
+          <a href="#">Feature Selection in Biomedical Data: A Practical Guide to Mutual Information Methods</a>
+        </h2>
+        <p class="blog-excerpt">
+          High-dimensional biomedical datasets — genomics, proteomics, clinical records — are plagued by irrelevant
+          and redundant features that degrade model performance. Mutual information (MI) measures how much knowing one
+          variable reduces uncertainty about another, making it a powerful, model-agnostic feature relevance criterion.
+          This post walks through the hybrid MI-based framework we developed and why clustering was the key to
+          eliminating redundancy without sacrificing relevant features.
+        </p>
+        <div class="blog-meta">6 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+    <!-- ══ SAMPLE POST 5 ══ -->
+    <div class="blog-card" data-cat="teaching">
+      <div class="blog-date-col">
+        <div class="blog-month">Dec</div>
+        <div class="blog-year">2024</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Teaching</span>
+        <h2 class="blog-title">
+          <a href="#">How I Teach Soft Computing: Moving from Equations to Intuition</a>
+        </h2>
+        <p class="blog-excerpt">
+          Soft computing — fuzzy logic, neural networks, genetic algorithms — can feel abstract when taught purely
+          from a mathematical standpoint. Over several semesters, I have refined an approach that builds intuition first
+          and formalism second. This post describes the sequence, the analogies I use, and the in-class exercises that
+          consistently produce the clearest "aha" moments for students encountering fuzzy sets for the first time.
+        </p>
+        <div class="blog-meta">4 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+    <!-- ══ SAMPLE POST 6 ══ -->
+    <div class="blog-card" data-cat="misc">
+      <div class="blog-date-col">
+        <div class="blog-month">Nov</div>
+        <div class="blog-year">2024</div>
+      </div>
+      <div class="blog-body">
+        <span class="blog-category">Miscellaneous</span>
+        <h2 class="blog-title">
+          <a href="#">From PwC to Academia: What Industry Data Science Taught Me About Research</a>
+        </h2>
+        <p class="blog-excerpt">
+          Two years as a Data Scientist at PricewaterhouseCoopers gave me something no PhD programme could —
+          a visceral understanding of what "working at scale" means and how fast a model needs to go from
+          prototype to production. When I returned to academia, I found that this industry experience had quietly
+          sharpened my research instincts in ways I did not expect. Here is what changed.
+        </p>
+        <div class="blog-meta">6 min read &nbsp;·&nbsp; <a href="#" class="blog-read-more">Read more →</a></div>
+      </div>
+    </div>
+
+  </div><!-- /blog-grid -->
+
+  <!-- Guide for adding posts -->
+  <div class="add-post-guide">
+    <strong>Adding a new blog post</strong><br>
+    To add a new post, open <code>projects.html</code> on GitHub (pencil icon ✏️), copy one of the
+    <code>&lt;div class="blog-card"&gt;</code> blocks, and update the date, category (<code>data-cat</code>),
+    title, excerpt, and the <code>href</code> link (point it to a Notion page or a new HTML file).
+    Change <code>data-cat</code> to <code>oncology</code>, <code>ml</code>, <code>teaching</code>, or <code>misc</code>
+    to make the category filter work automatically.
+  </div>
+
+</div><!-- /page -->
+
+<footer class="footer">
+  &copy; 2025 Sounak Sadhukhan &nbsp;|&nbsp; Department of CSE, Techno International New Town, Kolkata
+</footer>
+
+<script src="assets/main.js"></script>
+<script>
+  function filterPosts(cat, btn) {
+    // Update active tab
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    // Show/hide cards
+    document.querySelectorAll('.blog-card').forEach(card => {
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
