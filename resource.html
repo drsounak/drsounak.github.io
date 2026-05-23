@@ -5,6 +5,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resource — Sounak Sadhukhan</title>
   <link rel="stylesheet" href="assets/style.css">
+  <style>
+    /* ── Tab switcher ── */
+    .tab-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #e8dcc8;
+      margin-bottom: 36px;
+    }
+    .tab-btn {
+      padding: 10px 26px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: #999;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: color .15s, border-color .15s;
+    }
+    .tab-btn:hover { color: #555; }
+    .tab-btn.active { color: #1a1b1e; border-bottom-color: #c9a96e; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Subject section ── */
+    .subject-section { margin-bottom: 40px; }
+    .subject-heading {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #1a1b1e;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e8dcc8;
+      margin-bottom: 12px;
+    }
+    .subject-heading span { font-size: 1.1rem; }
+
+    /* ── E-book row ── */
+    .book-list { display: flex; flex-direction: column; gap: 0; }
+    .book-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f5f0e8;
+      flex-wrap: wrap;
+    }
+    .book-row:last-child { border-bottom: none; }
+    .book-info { flex: 1; min-width: 200px; }
+    .book-name {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #1a1b1e;
+      margin-bottom: 2px;
+      line-height: 1.35;
+    }
+    .book-author {
+      font-size: .78rem;
+      color: #999;
+    }
+    .book-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 14px;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      color: #8a6d3b;
+      border: 1px solid #c9a96e;
+      border-radius: 3px;
+      background: #fdf6ea;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background .15s, color .15s;
+    }
+    .book-dl:hover { background: #c9a96e; color: #1a1b1e; text-decoration: none; }
+
+    /* ── Tutorial row ── */
+    .tut-list { display: flex; flex-direction: column; gap: 0; }
+    .tut-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f0e8;
+      flex-wrap: wrap;
+    }
+    .tut-row:last-child { border-bottom: none; }
+    .tut-row-info { flex: 1; min-width: 200px; }
+    .tut-row-title {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #1a1b1e;
+      margin-bottom: 3px;
+      line-height: 1.35;
+    }
+    .tut-row-meta {
+      font-size: .76rem;
+      color: #aaa;
+    }
+    .tut-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 14px;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      color: #1a1b1e;
+      border: 1px solid #c9a96e;
+      border-radius: 3px;
+      background: #fff;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+    .tut-open:hover { background: #fdf6ea; text-decoration: none; }
+
+    /* ── Notes ── */
+    .resource-note {
+      font-size: .82rem;
+      color: #aaa;
+      background: #fdf6ea;
+      border: 1px solid #e8dcc8;
+      border-radius: 3px;
+      padding: 10px 14px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .resource-note code {
+      font-size: .78rem;
+      background: #f0e4cc;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: #8a6d3b;
+    }
+    .resource-note strong { color: #555; }
+  </style>
 </head>
 <body>
 
@@ -13,8 +161,8 @@
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="research.html">Research</a>
+    <a href="projects.html">Projects</a>
     <a href="resource.html" class="active">Resource</a>
-    <a href="blog.html" class="active">Blog</a>
     <a href="cv.html">CV</a>
   </div>
   <button class="nav-ham" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -22,8 +170,8 @@
 <div class="mob-menu">
   <a href="index.html">Home</a>
   <a href="research.html">Research</a>
+  <a href="projects.html">Projects</a>
   <a href="resource.html" class="active">Resource</a>
-  <a href="blog.html" class="active">Blog</a>
   <a href="cv.html">CV</a>
 </div>
 
@@ -31,126 +179,394 @@
 
   <h1 class="page-title">Resource</h1>
 
-  <div class="about-text">
-    <p>
-      This page hosts freely available study material — including recommended e-books and
-      my own lecture notes — shared via <strong>Notion</strong> for open access.
-      All resources are intended for students and researchers in computer science,
-      artificial intelligence, and mathematical oncology.
-    </p>
+  <!-- Tab switcher -->
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('ebooks', this)">E-Books</button>
+    <button class="tab-btn" onclick="switchTab('tutorials', this)">Tutorials</button>
   </div>
 
-  <!-- E-BOOKS -->
-  <div class="resource-section">
-    <h2 class="sec-heading">E-Books &amp; Reference Texts</h2>
-    <p style="font-size:0.88rem;color:#555;margin-bottom:14px">
-      Recommended textbooks and reference materials used in my courses. Click a card to access.
-    </p>
+  <!-- ══════════════════════════════════════
+       TAB 1 — E-BOOKS
+  ══════════════════════════════════════ -->
+  <div id="tab-ebooks" class="tab-panel active">
 
-    <div class="resource-grid">
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <!-- TODO: Replace # with Notion link for this e-book collection -->
-        <p class="resource-card-title">Artificial Intelligence — Core Texts</p>
-        <p class="resource-card-desc">Russell &amp; Norvig, and other standard AI references used in undergraduate and postgraduate teaching.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Machine Learning — Reference Books</p>
-        <p class="resource-card-desc">Bishop's Pattern Recognition &amp; Machine Learning, Hastie's Elements of Statistical Learning, and supporting texts.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Design &amp; Analysis of Algorithms</p>
-        <p class="resource-card-desc">CLRS (Introduction to Algorithms) and supplementary references for algorithm design and complexity theory.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Soft Computing</p>
-        <p class="resource-card-desc">Standard textbooks on fuzzy logic, neural networks, genetic algorithms, and swarm intelligence.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Mathematical Oncology — Reading List</p>
-        <p class="resource-card-desc">Key texts on mathematical biology and tumour modelling for researchers entering the field.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Data Science &amp; Python</p>
-        <p class="resource-card-desc">Practical books on NumPy, Pandas, Scikit-Learn, and applied machine learning for data science projects.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
+    <div class="resource-note">
+      <strong>How to download:</strong> Click the PDF button next to any book.
+      <!-- TODO: Upload each PDF to assets/books/ on GitHub and update href values below. -->
+      If the button is inactive, the file has not been uploaded yet.
     </div>
-  </div>
 
-  <!-- LECTURE NOTES -->
-  <div class="resource-section">
-    <h2 class="sec-heading">Lecture Notes</h2>
-    <p style="font-size:0.88rem;color:#555;margin-bottom:14px">
-      My own course notes, shared openly for students. Updated regularly each semester.
-    </p>
-
-    <div class="resource-grid">
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Artificial Intelligence</p>
-        <p class="resource-card-desc">Complete notes covering search, logic, knowledge representation, planning, and introductory ML — suitable for B.Tech/M.Tech exam preparation.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Machine Learning</p>
-        <p class="resource-card-desc">Theory and derivations for supervised and unsupervised learning, including gradient descent, SVMs, decision trees, and neural networks.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Soft Computing</p>
-        <p class="resource-card-desc">Lecture slides and notes on fuzzy sets, fuzzy inference systems, genetic algorithms, and swarm intelligence — with worked examples.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">Design &amp; Analysis of Algorithms</p>
-        <p class="resource-card-desc">Asymptotic analysis, divide &amp; conquer, dynamic programming, greedy algorithms, graph algorithms, and NP-completeness — with practice problems.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
+    <!-- Artificial Intelligence -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🤖</span> Artificial Intelligence</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Artificial Intelligence: A Modern Approach (4th ed.)</p>
+            <p class="book-author">Russell, S. &amp; Norvig, P.</p>
+          </div>
+          <!-- TODO: href="assets/books/russell-norvig-aima-4e.pdf" -->
+          <a href="#" class="book-dl">
+            <svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            PDF
+          </a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Artificial Intelligence (3rd ed.)</p>
+            <p class="book-author">Luger, G. F.</p>
+          </div>
+          <a href="#" class="book-dl">
+            <svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            PDF
+          </a>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- EXAM PREP -->
-  <div class="resource-section">
-    <h2 class="sec-heading">Exam Preparation</h2>
-    <div class="resource-grid">
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">UGC-NET (Computer Science) Preparation</p>
-        <p class="resource-card-desc">Topic-wise notes, previous year questions, and strategy guide based on my own experience qualifying UGC-NET JRF and SRF.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
-      <a href="#" target="_blank" rel="noopener" class="resource-card">
-        <p class="resource-card-title">GATE (CS/IT) Preparation</p>
-        <p class="resource-card-desc">Structured notes and problem sets for GATE Computer Science, covering all major topics from the syllabus.</p>
-        <span class="resource-card-link">Open in Notion →</span>
-      </a>
-
+    <!-- Machine Learning -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>📈</span> Machine Learning</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Pattern Recognition and Machine Learning</p>
+            <p class="book-author">Bishop, C. M.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">The Elements of Statistical Learning (2nd ed.)</p>
+            <p class="book-author">Hastie, T., Tibshirani, R., &amp; Friedman, J.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">An Introduction to Statistical Learning</p>
+            <p class="book-author">James, G., Witten, D., Hastie, T., &amp; Tibshirani, R.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- Deep Learning -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🧠</span> Deep Learning</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Deep Learning</p>
+            <p class="book-author">Goodfellow, I., Bengio, Y., &amp; Courville, A.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow (3rd ed.)</p>
+            <p class="book-author">Géron, A.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Soft Computing -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🔮</span> Soft Computing</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Fuzzy Logic with Engineering Applications (4th ed.)</p>
+            <p class="book-author">Ross, T. J.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Principles of Soft Computing (2nd ed.)</p>
+            <p class="book-author">Sivanandam, S. N. &amp; Deepa, S. N.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Introduction to Genetic Algorithms</p>
+            <p class="book-author">Sivanandam, S. N. &amp; Deepa, S. N.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Algorithms -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🔢</span> Design &amp; Analysis of Algorithms</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Introduction to Algorithms, 4th ed. (CLRS)</p>
+            <p class="book-author">Cormen, Leiserson, Rivest, &amp; Stein</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Algorithm Design</p>
+            <p class="book-author">Kleinberg, J. &amp; Tardos, É.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mathematical Oncology -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🧬</span> Mathematical Oncology</h2>
+      <div class="book-list">
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">Mathematical Biology I &amp; II (3rd ed.)</p>
+            <p class="book-author">Murray, J. D.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+        <div class="book-row">
+          <div class="book-info">
+            <p class="book-name">An Introduction to Mathematical Oncology</p>
+            <p class="book-author">Enderling, H. &amp; Chaplain, M. A. J.</p>
+          </div>
+          <a href="#" class="book-dl"><svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-ebooks -->
+
+  <!-- ══════════════════════════════════════
+       TAB 2 — TUTORIALS
+  ══════════════════════════════════════ -->
+  <div id="tab-tutorials" class="tab-panel">
+
+    <div class="resource-note">
+      Each subject below links to a set of notes divided into chapters and topics.
+      <!-- TODO: Replace href="#" on each row with a Notion page URL, or keep as
+           tutorial-SUBJECT.html to use the local HTML tutorial pages. -->
+    </div>
+
+    <!-- Artificial Intelligence -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🤖</span> Artificial Intelligence</h2>
+      <div class="tut-list">
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 1 — Introduction, Intelligent Agents &amp; Turing Test</p>
+            <p class="tut-row-meta">Definition of AI · Types · Foundations · Applications</p>
+          </div>
+          <a href="tutorial-ai.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 2 — Search Algorithms</p>
+            <p class="tut-row-meta">Uninformed search · Informed search · Heuristics · A*</p>
+          </div>
+          <a href="tutorial-ai-ch2-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 3 — Knowledge Representation &amp; Logic</p>
+            <p class="tut-row-meta">Propositional logic · First-order logic · Knowledge bases</p>
+          </div>
+          <a href="tutorial-ai-ch3-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 4 — Planning &amp; Uncertainty</p>
+            <p class="tut-row-meta">Planning · STRIPS · Probability · Bayesian networks</p>
+          </div>
+          <a href="tutorial-ai-ch4-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 5 — Machine Learning Fundamentals (in AI)</p>
+            <p class="tut-row-meta">Supervised learning basics · Decision trees · Neural nets overview</p>
+          </div>
+          <a href="tutorial-ai-ch5-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 6 — NLP &amp; Computer Vision Basics</p>
+            <p class="tut-row-meta">Language models · Parsing · Image recognition overview</p>
+          </div>
+          <a href="tutorial-ai-ch6-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Machine Learning -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>📈</span> Machine Learning</h2>
+      <div class="tut-list">
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 1 — Introduction, Types of Learning &amp; Bias-Variance</p>
+            <p class="tut-row-meta">Definitions · Supervised / Unsupervised / RL · Bias-variance tradeoff</p>
+          </div>
+          <a href="tutorial-ml.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 2 — Regression &amp; Gradient Descent</p>
+            <p class="tut-row-meta">Linear regression · Logistic regression · Gradient descent</p>
+          </div>
+          <a href="tutorial-ml-ch2-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 3 — Support Vector Machines</p>
+            <p class="tut-row-meta">Maximal margin classifier · Kernel trick · Soft margin SVM</p>
+          </div>
+          <a href="tutorial-ml-ch3-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 4 — Tree Methods &amp; Ensemble Learning</p>
+            <p class="tut-row-meta">Decision trees · Random forests · Boosting (AdaBoost, XGBoost)</p>
+          </div>
+          <a href="tutorial-ml-ch4-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 5 — Clustering &amp; Dimensionality Reduction</p>
+            <p class="tut-row-meta">K-means · Hierarchical · PCA · t-SNE</p>
+          </div>
+          <a href="tutorial-ml-ch5-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 6 — Neural Networks &amp; Backpropagation</p>
+            <p class="tut-row-meta">Perceptron · MLP · Activation functions · Backprop derivation</p>
+          </div>
+          <a href="tutorial-ml-ch6-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 7 — Model Evaluation &amp; Regularisation</p>
+            <p class="tut-row-meta">Metrics · Cross-validation · L1/L2 regularisation · Dropout</p>
+          </div>
+          <a href="tutorial-ml-ch7-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Soft Computing -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🔮</span> Soft Computing</h2>
+      <div class="tut-list">
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 1 — Introduction to Soft Computing</p>
+            <p class="tut-row-meta">Hard vs. soft computing · Constituents · Applications</p>
+          </div>
+          <a href="tutorial-softcomputing.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 2 — Fuzzy Logic</p>
+            <p class="tut-row-meta">Fuzzy sets · Membership functions · Operations · FIS · Defuzzification</p>
+          </div>
+          <a href="tutorial-sc-ch2-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 3 — Artificial Neural Networks</p>
+            <p class="tut-row-meta">Perceptron · MLP · Backpropagation · RBF networks</p>
+          </div>
+          <a href="tutorial-sc-ch3-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 4 — Genetic Algorithms</p>
+            <p class="tut-row-meta">Representation · Selection · Crossover · Mutation · Applications</p>
+          </div>
+          <a href="tutorial-sc-ch4-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 5 — Swarm Intelligence</p>
+            <p class="tut-row-meta">Particle Swarm Optimisation · Ant Colony Optimisation</p>
+          </div>
+          <a href="tutorial-sc-ch5-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Algorithms -->
+    <div class="subject-section">
+      <h2 class="subject-heading"><span>🔢</span> Design &amp; Analysis of Algorithms</h2>
+      <div class="tut-list">
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 1 — Introduction &amp; Asymptotic Analysis</p>
+            <p class="tut-row-meta">Complexity · Big-O · Ω · Θ notation · Recurrences · Master theorem</p>
+          </div>
+          <a href="tutorial-algorithms.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 2 — Divide &amp; Conquer</p>
+            <p class="tut-row-meta">Merge sort · Quick sort · Binary search · Strassen's algorithm</p>
+          </div>
+          <a href="tutorial-algo-ch2-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 3 — Dynamic Programming</p>
+            <p class="tut-row-meta">Principles · Knapsack · LCS · Matrix chain · Floyd-Warshall</p>
+          </div>
+          <a href="tutorial-algo-ch3-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 4 — Greedy Algorithms</p>
+            <p class="tut-row-meta">Activity selection · Huffman coding · Fractional knapsack</p>
+          </div>
+          <a href="tutorial-algo-ch4-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 5 — Graph Algorithms</p>
+            <p class="tut-row-meta">BFS · DFS · Dijkstra · Bellman-Ford · MST · Topological sort</p>
+          </div>
+          <a href="tutorial-algo-ch5-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+        <div class="tut-row">
+          <div class="tut-row-info">
+            <p class="tut-row-title">Chapter 6 — Complexity Theory</p>
+            <p class="tut-row-meta">P, NP, NP-Hard, NP-Complete · Reductions · Approximation</p>
+          </div>
+          <a href="tutorial-algo-ch6-p1.html" class="tut-open">Open Notes →</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-tutorials -->
 
 </div><!-- /page -->
 
 <footer class="footer">
   &copy; 2025 Sounak Sadhukhan &nbsp;|&nbsp; Department of CSE, Techno International New Town, Kolkata
 </footer>
-
 <script src="assets/main.js"></script>
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+  }
+</script>
 </body>
 </html>
