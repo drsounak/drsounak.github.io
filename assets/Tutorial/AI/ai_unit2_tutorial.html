@@ -493,3 +493,653 @@ footer{background:var(--ink);color:rgba(255,255,255,0.4);padding:40px 60px;font-
     <div class="quiz-feedback" id="q2fb">✅ Correct! Standard BFS: O(b^(d+1)) = 4^9 ≈ 262,144 nodes. Bidirectional: O(2·b^(d/2)) = 2×4^4 = 2×256 = 512 nodes. That is 262,144 / 512 = 512 times fewer. The exponential gap grows with d — this is the whole power of bidirectional search.</div>
   </div>
 </section>
+
+<!-- S3: HEURISTIC SEARCH & A* -->
+<section id="s3">
+  <div class="section-header">
+    <span class="section-num">Section 03</span>
+    <h2 class="section-title">Heuristic Search Strategies &amp; A*</h2>
+  </div>
+  <p>Uniform search strategies are reliable but blind — they treat every direction as equally promising. Knowing that Bucharest lies east of Arad should steer us away from roads heading west. <strong>Informed (heuristic) search</strong> uses a function <code>h(n)</code> — a cheap estimate of remaining cost — to guide the frontier toward the goal and avoid wasted exploration.</p>
+  <p>This section covers three informed strategies in order of sophistication: <strong>Greedy Best-First Search</strong> (fast but suboptimal), <strong>A*</strong> (optimal and complete), and <strong>memory-bounded variants</strong> (IDA*, SMA*) that scale A* to large state spaces.</p>
+
+  <div class="definition">
+    <div class="definition-term">Heuristic Function h(n)</div>
+    <p><strong>h(n)</strong> = estimated cost of the cheapest path from state n to a goal. Two key properties govern its quality:</p>
+    <p><strong>Admissible:</strong> h(n) ≤ h*(n) for all n — never overestimates the true cost. Required for A* optimality.</p>
+    <p><strong>Consistent (monotone):</strong> h(n) ≤ c(n,a,n') + h(n') for every edge. This is the triangle inequality; consistency implies admissibility.</p>
+    <p>Best heuristics come from <em>relaxed problems</em> — remove one or more constraints. 8-puzzle: allow tiles to move anywhere (not just to the adjacent blank) → Manhattan distance h(n) = Σ(|Δrow| + |Δcol|). A tighter (higher) admissible heuristic always expands fewer nodes.</p>
+  </div>
+
+  <h3>Greedy Best-First Search</h3>
+  <div class="math-block">
+    <span class="math-label">Greedy Evaluation Function</span>
+    f(n) = h(n)   ← heuristic only; actual cost g(n) completely ignored
+
+    Complete: NO   Optimal: NO
+    Romania: Greedy picks Fagaras (h=178) → path 140+99+211 = 450 km  ❌
+    Optimal is 418 km — Greedy is 7.7% worse
+  </div>
+
+  <h3>A* Search — Optimal and Complete</h3>
+  <div class="definition">
+    <div class="definition-term">A* Search — f(n) = g(n) + h(n)</div>
+    <p>A* expands the node minimising <strong>f(n) = g(n) + h(n)</strong>: actual cost already incurred g(n) plus admissible estimate of remaining cost h(n). The sum f(n) estimates total path cost through n.</p>
+    <div class="math-block">
+      <span class="math-label">A* Properties</span>
+      f(n) = g(n) + h(n)
+      Complete: YES   Optimal: YES (admissible h)
+      Time/Space: O(b^d)  — exponential worst case; much better with tight h
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">A* on Romania Map — Full f=g+h Trace</span>
+    </div>
+    <div class="example-body">
+      <p>Heuristic: h(n) = SLD to Bucharest (admissible because road ≥ straight-line always).</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Step</th><th>Expanded</th><th>g(n)</th><th>h(n)</th><th>f=g+h</th><th>Next frontier (by f)</th></tr>
+          <tr><td>1</td><td>Arad</td><td>0</td><td>366</td><td>366</td><td>Sibiu(393), Timisoara(447), Zerind(449)</td></tr>
+          <tr><td>2</td><td>Sibiu</td><td>140</td><td>253</td><td>393</td><td>RimnicuVilcea(413), Fagaras(415)…</td></tr>
+          <tr><td>3</td><td>RimnicuVilcea</td><td>220</td><td>193</td><td>413</td><td>Fagaras(415), Pitesti(417)…</td></tr>
+          <tr><td>4</td><td>Fagaras</td><td>239</td><td>178</td><td>417</td><td>Pitesti(417), Bucharest-via-Fagaras(450)…</td></tr>
+          <tr><td>5</td><td>Pitesti</td><td>317</td><td>98</td><td>417</td><td>Bucharest-via-Pitesti(418)!, …</td></tr>
+          <tr class="highlight-row"><td>6</td><td><strong>Bucharest</strong></td><td>418</td><td>0</td><td><strong>418 ✓</strong></td><td>Optimal path found!</td></tr>
+        </table>
+      </div>
+      <div class="callout green">
+        <span class="callout-label">Final Answer</span>
+        <p>Optimal: <strong>Arad(0)→Sibiu(140)→RimnicuVilcea(220)→Pitesti(317)→Bucharest(418 km)</strong>. A* rejects Fagaras→Bucharest (total 450 km) because it tracks g(n). Only 6 nodes expanded to find the global optimum.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Memory-Bounded Heuristic Search</h3>
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">IDA* (Iterative Deepening A*)</div>
+      <div class="measure-formula">f-limit iterations</div>
+      <div class="measure-desc">Iterative deepening on f-value instead of depth. Each pass expands nodes with f(n) ≤ threshold; threshold grows to minimum f that exceeded cutoff. Space: O(bd). Complete and optimal. Best for memory-limited problems with admissible h.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">SMA* (Simplified Memory-Bounded A*)</div>
+      <div class="measure-formula">Drop worst leaf when full</div>
+      <div class="measure-desc">Uses all available memory M. When full, drops the leaf with the highest f-value and backs its f up to its parent. Complete if the optimal solution path fits in M nodes. Optimal when memory allows.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Heuristic Dominance</div>
+      <div class="measure-formula">h₂ ≥ h₁ → h₂ dominates</div>
+      <div class="measure-desc">A tighter admissible heuristic always expands fewer nodes. 8-puzzle: Manhattan (h₂) dominates Misplaced Tiles (h₁) — h₂(n) ≥ h₁(n) always. Use max(h₁,h₂) when you have multiple admissible heuristics.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Weighted A* Trade-off</div>
+      <div class="measure-formula">f(n) = g(n) + w·h(n), w&gt;1</div>
+      <div class="measure-desc">Deliberately overweight h to expand fewer nodes, trading optimality for speed. Solution cost ≤ w × C*. Controls speed/quality: w=1 = standard A*; w=∞ = Greedy Best-First.</div>
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Classic Example</span>
+      <span class="example-title">Admissible Heuristics for the 8-Puzzle — Dominance Check</span>
+    </div>
+    <div class="example-body">
+      <p>State: [[7,2,4],[5,_,6],[8,3,1]], Goal: [[1,2,3],[4,5,6],[7,8,_]]</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Tile</th><th>Current (r,c)</th><th>Goal (r,c)</th><th>Misplaced?</th><th>Manhattan dist</th></tr>
+          <tr><td>1</td><td>(2,2)</td><td>(0,0)</td><td>✗</td><td>4</td></tr>
+          <tr><td>2</td><td>(0,1)</td><td>(0,1)</td><td>✓ In place</td><td>0</td></tr>
+          <tr><td>3</td><td>(2,1)</td><td>(0,2)</td><td>✗</td><td>3</td></tr>
+          <tr><td>4</td><td>(0,2)</td><td>(1,0)</td><td>✗</td><td>3</td></tr>
+          <tr><td>5</td><td>(1,0)</td><td>(1,1)</td><td>✗</td><td>1</td></tr>
+          <tr><td>6</td><td>(1,2)</td><td>(1,2)</td><td>✓ In place</td><td>0</td></tr>
+          <tr><td>7</td><td>(0,0)</td><td>(2,0)</td><td>✗</td><td>2</td></tr>
+          <tr><td>8</td><td>(2,0)</td><td>(2,1)</td><td>✗</td><td>1</td></tr>
+          <tr class="highlight-row"><td colspan="3"><strong>Totals</strong></td><td><strong>h₁ = 6</strong></td><td><strong>h₂ = 14 (dominates!)</strong></td></tr>
+        </table>
+      </div>
+      <p>Manhattan distance h₂=14 provides a much tighter lower bound than h₁=6. A* with h₂ expands approximately <strong>32× fewer nodes</strong> than A* with h₁ at depth 14.</p>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A* with an inadmissible heuristic (one that sometimes overestimates h*) is guaranteed to:</div>
+    <div class="quiz-opts" id="q3">
+      <button class="quiz-opt" onclick="checkQ('q3',0,'q3fb','wrong')">A. Run faster and still find the optimal solution</button>
+      <button class="quiz-opt" onclick="checkQ('q3',1,'q3fb','correct')">B. Possibly return a suboptimal solution — optimality is no longer guaranteed</button>
+      <button class="quiz-opt" onclick="checkQ('q3',2,'q3fb','wrong')">C. Fail to find any solution</button>
+      <button class="quiz-opt" onclick="checkQ('q3',3,'q3fb','wrong')">D. Expand more nodes but still return the optimal solution</button>
+    </div>
+    <div class="quiz-feedback" id="q3fb">✅ Correct! Admissibility (h(n) ≤ h*(n)) is the requirement for A* optimality. If h overestimates, A* may assign f(n) &gt; C* to an optimal-path node and skip it, returning a more expensive solution instead. Intentional overweighting (Weighted A*, f = g + w·h, w&gt;1) is used as a controlled speed/quality tradeoff — it guarantees solution cost ≤ w × C*.</div>
+  </div>
+</section>
+
+<!-- S4: LOCAL SEARCH -->
+<section id="s4">
+  <div class="section-header">
+    <span class="section-num">Section 04</span>
+    <h2 class="section-title">Local Search &amp; Optimisation</h2>
+  </div>
+  <p>All algorithms so far maintain a complete path from start to goal. But many real problems — factory scheduling, protein folding, microchip layout — only care about the <em>final configuration</em>. Their state spaces are too vast for systematic exploration. <strong>Local search</strong> keeps only the current state and moves to neighbouring states to improve an objective function, using almost no memory. The trade-off: most landscapes have many local peaks that are not the global optimum.</p>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 210" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="la1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#aaa" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="20" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#3d3530" text-anchor="middle">Objective Function Landscape — Core Challenge of Local Search</text>
+      <path d="M60 175 Q110 173 140 160 Q160 150 170 138 Q180 126 192 134 Q204 144 225 150 Q248 156 262 138 Q278 115 298 93 Q318 68 336 50 Q354 30 372 40 Q386 52 396 68 Q408 86 424 103 Q440 120 458 133 Q475 144 496 138 Q518 128 536 108 Q554 84 572 61 Q588 36 604 22 Q620 8 636 22 Q652 40 664 60 Q678 84 694 108 Q708 130 722 148 Q738 165 762 172 Q788 178 810 180" fill="none" stroke="#2980b9" stroke-width="2.5"/>
+      <path d="M60 175 Q110 173 140 160 Q160 150 170 138 Q180 126 192 134 Q204 144 225 150 Q248 156 262 138 Q278 115 298 93 Q318 68 336 50 Q354 30 372 40 Q386 52 396 68 Q408 86 424 103 Q440 120 458 133 Q475 144 496 138 Q518 128 536 108 Q554 84 572 61 Q588 36 604 22 Q620 8 636 22 Q652 40 664 60 Q678 84 694 108 Q708 130 722 148 Q738 165 762 172 Q788 178 810 180 L810 195 L60 195 Z" fill="rgba(41,128,185,0.07)"/>
+      <line x1="60" y1="180" x2="810" y2="180" stroke="#c5b8a8" stroke-width="1"/>
+      <circle cx="336" cy="50" r="6" fill="#e67e22"/>
+      <text x="336" y="38" font-family="'Source Serif 4',serif" font-size="11" fill="#e67e22" text-anchor="middle">Local max</text>
+      <circle cx="604" cy="22" r="8" fill="#27ae60" stroke="#1a6b38" stroke-width="2"/>
+      <text x="604" y="10" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#1a6b38" text-anchor="middle">Global max ★</text>
+      <circle cx="192" cy="134" r="5" fill="#c0392b"/>
+      <text x="192" y="122" font-family="'JetBrains Mono',monospace" font-size="9" fill="#c0392b" text-anchor="middle">local min</text>
+      <circle cx="278" cy="115" r="7" fill="#e67e22" stroke="#7d5a00" stroke-width="2"/>
+      <text x="278" y="103" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22" text-anchor="middle">agent</text>
+      <path d="M288 112 Q312 78 330 54" fill="none" stroke="#e67e22" stroke-width="1.5" marker-end="url(#la1)"/>
+      <text x="250" y="150" font-family="'Source Serif 4',serif" font-size="11" fill="#e67e22" text-anchor="middle">Hill climb → local max</text>
+      <path d="M352 48 Q460 5 580 24" fill="none" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#la1)"/>
+      <text x="460" y="10" font-family="'JetBrains Mono',monospace" font-size="10" fill="#27ae60" text-anchor="middle">SA / GA escape to global max</text>
+      <text x="458" y="150" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">plateau</text>
+    </svg>
+    <div class="diagram-caption">Figure 4.1 — Objective function landscape. Hill climbing (orange) gets stuck at the local maximum. Simulated Annealing and Genetic Algorithms (green dashed) escape via controlled randomness and reach the global maximum (★).</div>
+  </div>
+
+  <h3>Hill Climbing (Steepest Ascent)</h3>
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Hill Climbing — Steepest Ascent</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p>Set <code>current</code> = initial state.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p>Compute <code>best_neighbour</code> = highest-valued neighbour of <code>current</code>.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p>If <code>VALUE(best_neighbour) ≤ VALUE(current)</code> → return <code>current</code> (local maximum). Else set <code>current = best_neighbour</code> → go to Step 2.</p></div></div>
+    </div>
+  </div>
+  <div class="callout red">
+    <span class="callout-label">Three Failure Modes of Hill Climbing</span>
+    <p><strong>Local maxima:</strong> Better than all neighbours but not global best — halts prematurely.<br>
+    <strong>Ridges:</strong> Sequence of local maxima forming a ridge — diagonal moves needed to traverse.<br>
+    <strong>Plateaus:</strong> All neighbours have equal value — random sideways moves needed to escape.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Hill Climbing on 8-Queens — Minimise h = attacking pairs</span>
+    </div>
+    <div class="example-body">
+      <div class="table-wrap">
+        <table>
+          <tr><th>Iteration</th><th>Move</th><th>h (attacking pairs)</th><th>Status</th></tr>
+          <tr><td>Start</td><td>Random placement</td><td>17</td><td>Initialise</td></tr>
+          <tr><td>1</td><td>Move col-3 queen: row 4 → row 1</td><td>12</td><td>↓ Improved</td></tr>
+          <tr><td>2</td><td>Move col-6 queen: row 7 → row 3</td><td>7</td><td>↓ Improved</td></tr>
+          <tr><td>3</td><td>Move col-2 queen: row 5 → row 2</td><td>4</td><td>↓ Improved</td></tr>
+          <tr><td>4</td><td>No single move reduces h below 4</td><td>4</td><td><strong>Local min — STUCK</strong></td></tr>
+          <tr class="highlight-row"><td>Restart</td><td>New random start → hill climb</td><td>0</td><td><strong>Goal found! ✓</strong></td></tr>
+        </table>
+      </div>
+      <p>86% of random starts reach a local min. <strong>Random-restart hill climbing</strong> succeeds after ≈ 7 restarts on average. Success after k restarts = 1 − 0.86^k → very reliable.</p>
+    </div>
+  </div>
+
+  <h3>Simulated Annealing</h3>
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Simulated Annealing (Kirkpatrick et al., 1983)</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p>Set <code>current</code> = initial state; temperature <code>T = T₀</code> (high).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p>Pick a <em>random</em> neighbour <code>next</code>. Compute <code>ΔE = VALUE(next) − VALUE(current)</code>.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p>If <code>ΔE &gt; 0</code> → accept. If <code>ΔE ≤ 0</code> → accept with probability <code>P = e^(ΔE/T)</code>.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p>Cool: <code>T = α·T</code> (e.g. α=0.99). If T ≈ 0 → return <code>current</code>. Else go to Step 2.</p></div></div>
+    </div>
+  </div>
+  <div class="math-block">
+    <span class="math-label">SA Acceptance Probability  P = e^(ΔE / T)</span>
+    ΔE = −5:   T=1000 → P≈0.995 (explore widely)
+               T=10   → P≈0.607
+               T=1    → P≈0.007 (nearly hill climbing)
+               T→0    → P→0     (pure hill climbing)
+  </div>
+
+  <h3>Local Beam Search &amp; Genetic Algorithms</h3>
+  <div class="definition">
+    <div class="definition-term">Local Beam Search</div>
+    <p>Maintain <strong>k states</strong> simultaneously. Generate all successors of all k states; keep the k best. Unlike k independent hill climbs, beams share information — successful beams attract others. <strong>Stochastic beam search</strong> selects k survivors probabilistically (∝ VALUE) to avoid all k converging on the same local max.</p>
+  </div>
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Genetic Algorithm (Holland, 1975) — Overview</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Initialise:</strong> k random individuals (encoded strings). Evaluate fitness f(x).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Select:</strong> Pairs of parents proportional to fitness (roulette wheel). Higher fitness = higher reproduction chance.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Crossover:</strong> Swap tails at a random cut-point to produce two children. e.g. <code>11010|001</code> + <code>00110|111</code> → <code>11010|111</code> and <code>00110|001</code>.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Mutate:</strong> Flip each bit with small probability p_m ≈ 0.01 — maintains diversity.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p><strong>Replace &amp; repeat</strong> until termination criterion (max generations or sufficient fitness).</p></div></div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Algorithm</th><th>Memory</th><th>Escapes Local Optima?</th><th>Optimal?</th><th>Best Application</th></tr>
+      <tr><td>Hill Climbing</td><td>O(1)</td><td>❌ No</td><td>❌ No</td><td>Quick; use with random restarts</td></tr>
+      <tr><td>Simulated Annealing</td><td>O(1)</td><td>✅ Yes (probabilistic)</td><td>✅ Slow cooling</td><td>TSP, VLSI layout, scheduling</td></tr>
+      <tr><td>Local Beam Search</td><td>O(k·b)</td><td>✅ Partially</td><td>❌ No</td><td>k parallel searches sharing info</td></tr>
+      <tr class="highlight-row"><td>Genetic Algorithms</td><td>O(population)</td><td>✅ Yes (crossover)</td><td>❌ No (practice)</td><td>Design optimisation, feature selection</td></tr>
+    </table>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: In Simulated Annealing, as temperature T decreases toward 0, the probability of accepting a worse state:</div>
+    <div class="quiz-opts" id="q4">
+      <button class="quiz-opt" onclick="checkQ('q4',0,'q4fb','wrong')">A. Increases — cold temperatures encourage wider exploration</button>
+      <button class="quiz-opt" onclick="checkQ('q4',1,'q4fb','correct')">B. Decreases toward 0 — the algorithm converges to pure hill climbing</button>
+      <button class="quiz-opt" onclick="checkQ('q4',2,'q4fb','wrong')">C. Stays constant — temperature only affects speed of convergence</button>
+      <button class="quiz-opt" onclick="checkQ('q4',3,'q4fb','wrong')">D. Fluctuates randomly regardless of temperature</button>
+    </div>
+    <div class="quiz-feedback" id="q4fb">✅ Correct! P = e^(ΔE/T). As T→0 with ΔE &lt; 0: ΔE/T → −∞, so e^(ΔE/T) → 0. No worse moves are accepted — the algorithm becomes steepest-ascent hill climbing. This controlled transition from wide exploration at high T to pure exploitation at T≈0 is exactly what allows SA to escape local optima and converge to the global optimum given a sufficiently slow cooling schedule.</div>
+  </div>
+</section>
+
+<!-- S5: CSP -->
+<section id="s5">
+  <div class="section-header">
+    <span class="section-num">Section 05</span>
+    <h2 class="section-title">Constraint Satisfaction Problems</h2>
+  </div>
+  <p>Standard search treats states as black boxes with no internal structure. <strong>Constraint Satisfaction Problems (CSPs)</strong> exploit that structure: each state is an assignment of values to variables, and solutions must satisfy a set of constraints. This enables <em>constraint propagation</em> — reasoning that prunes impossible values before search even begins — making exponential problems tractable in practice.</p>
+  <p>CSPs arise everywhere: Sudoku (variables=cells, domains=1–9, constraints=no row/col/box repeats), map colouring, timetabling, circuit layout, frequency assignment, and crossword puzzles.</p>
+
+  <div class="definition">
+    <div class="definition-term">Constraint Satisfaction Problem — Formal Definition</div>
+    <p>A CSP has three elements:</p>
+    <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+      <li><strong>Variables X = {X₁ … Xₙ}:</strong> What we must assign values to.</li>
+      <li><strong>Domains D = {D₁ … Dₙ}:</strong> Set of legal values for each variable.</li>
+      <li><strong>Constraints C:</strong> Relations restricting which value combinations are legal.</li>
+    </ol>
+    <p style="margin-top:8px;"><strong>Solution</strong> = a <em>complete</em> (all variables assigned) and <em>consistent</em> (no constraint violated) assignment.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Classic Example</span>
+      <span class="example-title">Australia Map Colouring — Full CSP Formulation</span>
+    </div>
+    <div class="example-body">
+      <p>Colour 7 Australian regions so no two adjacent regions share a colour, using {Red, Green, Blue}.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Variable</th><th>Domain</th><th>Neighbours (≠ constraints with)</th><th>Degree (# constraints)</th></tr>
+          <tr><td>WA</td><td>{R,G,B}</td><td>NT, SA</td><td>2</td></tr>
+          <tr><td>NT</td><td>{R,G,B}</td><td>WA, SA, Q</td><td>3</td></tr>
+          <tr><td>Q</td><td>{R,G,B}</td><td>NT, SA, NSW</td><td>3</td></tr>
+          <tr class="highlight-row"><td><strong>SA</strong></td><td>{R,G,B}</td><td><strong>WA, NT, Q, NSW, V, T</strong></td><td><strong>6 — assign FIRST (MRV)</strong></td></tr>
+          <tr><td>NSW</td><td>{R,G,B}</td><td>Q, SA, V</td><td>3</td></tr>
+          <tr><td>V</td><td>{R,G,B}</td><td>SA, NSW</td><td>2</td></tr>
+          <tr><td>T</td><td>{R,G,B}</td><td>None (island)</td><td>0 — assign anytime</td></tr>
+        </table>
+      </div>
+      <p><strong>Valid solution:</strong> WA=Red, NT=Green, Q=Red, SA=Blue, NSW=Green, V=Red, T=Green. SA is assigned first (most constrained — 6 neighbours restrict its choices most).</p>
+    </div>
+  </div>
+
+  <h3>Backtracking Search for CSPs</h3>
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Backtracking Search for CSP (with MRV + LCV + Forward Checking)</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p>If all variables assigned → return assignment (success).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p>Select unassigned variable X by <strong>MRV</strong> (fewest remaining legal values — "fail first").</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p>Order values in DOMAIN(X) by <strong>LCV</strong> (least constraining value — rules out fewest neighbour values).</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p>For each value v: if X=v is consistent → assign it. Apply <strong>forward checking</strong>: remove v from neighbours' domains. If any domain empties → undo, try next v.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p>Recurse. If success → return. Else remove X=v and try next. If all values fail → return failure (backtrack).</p></div></div>
+    </div>
+  </div>
+
+  <h3>Local Search for CSPs — Min-Conflicts</h3>
+  <div class="definition">
+    <div class="definition-term">Min-Conflicts Heuristic</div>
+    <p>Start with a complete but possibly inconsistent assignment. Repeatedly select a <em>conflicted variable</em> and reassign it to the value minimising the number of violated constraints. Halt when no conflicts remain.</p>
+    <p>For N-Queens: solves N=1,000,000 in roughly the same number of steps as N=100 — essentially constant in N. This is one of the most striking results in local search for CSPs.</p>
+  </div>
+
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">MRV Heuristic</div>
+      <div class="measure-formula">min |domain(X)|</div>
+      <div class="measure-desc">"Fail-first": assign the most constrained variable first to detect failures early and prune large subtrees before more variables are committed.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Degree Heuristic</div>
+      <div class="measure-formula">max constraints on X</div>
+      <div class="measure-desc">Tiebreaker for MRV. Pick the variable involved in the most constraints on remaining unassigned variables. Also "fail-first" in spirit.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">LCV Heuristic</div>
+      <div class="measure-formula">min domain-eliminations</div>
+      <div class="measure-desc">"Fail-last" for values: choose the value that rules out fewest choices for neighbours. Leaves maximum future flexibility for subsequent assignments.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Arc Consistency (AC-3)</div>
+      <div class="measure-formula">∀(X,Y): D(X) pruned</div>
+      <div class="measure-desc">For every arc (X→Y), remove values from D(X) with no consistent value in D(Y). Stronger than forward checking. O(e·d³) time. Often reduces domains dramatically before search begins.</div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: In backtracking CSP search, MRV selects the most constrained variable. This "fail-first" strategy is beneficial because:</div>
+    <div class="quiz-opts" id="q5">
+      <button class="quiz-opt" onclick="checkQ('q5',0,'q5fb','wrong')">A. It guarantees the first complete assignment will be valid</button>
+      <button class="quiz-opt" onclick="checkQ('q5',1,'q5fb','wrong')">B. It avoids failures by assigning easy variables first</button>
+      <button class="quiz-opt" onclick="checkQ('q5',2,'q5fb','correct')">C. It causes failures to be detected early, pruning large subtrees before many variables are committed</button>
+      <button class="quiz-opt" onclick="checkQ('q5',3,'q5fb','wrong')">D. It reduces the number of constraints in the problem</button>
+    </div>
+    <div class="quiz-feedback" id="q5fb">✅ Correct! "Fail-first" means: if a branch is going to fail, discover it with as few committed variables as possible. By assigning the most constrained variable first (fewest remaining legal values), any inconsistency is detected before many other variables have been assigned — pruning the entire subtree below that conflict immediately. Counter-intuitively, assigning the <em>hardest</em> variable first leads to faster overall search.</div>
+  </div>
+</section>
+
+<!-- S6: ADVERSARIAL SEARCH -->
+<section id="s6">
+  <div class="section-header">
+    <span class="section-num">Section 06</span>
+    <h2 class="section-title">Adversarial Search &amp; Game Playing</h2>
+  </div>
+  <p>Until now the environment was benign — static or merely stochastic. Games introduce a rational <strong>adversary</strong> who actively minimises our utility. A move that looks excellent may be catastrophic if the opponent responds optimally. Adversarial search provides the mathematical framework for reasoning under strategic opposition.</p>
+
+  <div class="definition">
+    <div class="definition-term">Two-Player Zero-Sum Perfect-Information Game</div>
+    <p>Defined by: <strong>S₀</strong> (initial state), <strong>PLAYER(s)</strong> (MAX or MIN), <strong>ACTIONS(s)</strong>, <strong>RESULT(s,a)</strong>, <strong>TERMINAL-TEST(s)</strong>, <strong>UTILITY(s,p)</strong>: +1 win / 0 draw / −1 loss for player p. Zero-sum: what MAX gains, MIN loses. Both play perfectly rational.</p>
+  </div>
+
+  <h3>The Minimax Algorithm</h3>
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Minimax (Von Neumann 1928 / Shannon 1950)</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p>If TERMINAL-TEST(s) → return UTILITY(s).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p>If PLAYER(s) = MAX → return <code>max over a of MINIMAX(RESULT(s,a))</code>.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p>If PLAYER(s) = MIN → return <code>min over a of MINIMAX(RESULT(s,a))</code>.</p></div></div>
+    </div>
+  </div>
+  <div class="math-block">
+    <span class="math-label">Minimax Complexity</span>
+    Time: O(b^m)   Space: O(b·m)   Complete: YES   Optimal: YES vs optimal opponent
+    Chess: b≈35, m≈100 → 35^100 ≈ 10^154 — complete search impossible
+    Solution: depth-limited + evaluation function EVAL(s) for non-terminal states
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Minimax Trace — 3-Ply Game Tree with Leaf Values</span>
+    </div>
+    <div class="example-body">
+      <div class="diagram-wrap">
+        <svg class="diagram" viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- Leaves d=3 -->
+          <rect x="42" y="258" width="34" height="32" rx="3" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/><text x="59" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">3</text>
+          <rect x="84" y="258" width="34" height="32" rx="3" fill="#d0e8f5" stroke="#2980b9" stroke-width="1.5"/><text x="101" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a5f87" text-anchor="middle">5</text>
+          <rect x="130" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="147" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">2</text>
+          <rect x="202" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="219" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">9</text>
+          <rect x="244" y="258" width="34" height="32" rx="3" fill="#d0e8f5" stroke="#2980b9" stroke-width="1.5"/><text x="261" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a5f87" text-anchor="middle">1</text>
+          <rect x="370" y="258" width="34" height="32" rx="3" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/><text x="387" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">6</text>
+          <rect x="412" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="429" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">4</text>
+          <rect x="502" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="519" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">7</text>
+          <rect x="544" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="561" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">5</text>
+          <rect x="632" y="258" width="34" height="32" rx="3" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/><text x="649" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#7d5a00" text-anchor="middle">6</text>
+          <rect x="718" y="258" width="34" height="32" rx="3" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/><text x="735" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">9</text>
+          <rect x="760" y="258" width="34" height="32" rx="3" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/><text x="777" y="279" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">7</text>
+          <!-- MIN nodes d=2 -->
+          <circle cx="101" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="101" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=2</text>
+          <text x="101" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">2</text>
+          <circle cx="237" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="237" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=1</text>
+          <text x="237" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">1</text>
+          <circle cx="415" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="415" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=4</text>
+          <text x="415" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">4</text>
+          <circle cx="535" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="535" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=5</text>
+          <text x="535" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">5</text>
+          <circle cx="649" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="649" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=6</text>
+          <text x="649" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">6</text>
+          <circle cx="749" cy="194" r="24" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+          <text x="749" y="190" font-family="'JetBrains Mono',monospace" font-size="9" fill="#7d5a00" text-anchor="middle">MIN=7</text>
+          <text x="749" y="205" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">7</text>
+          <!-- MAX d=1 -->
+          <circle cx="166" cy="116" r="26" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+          <text x="166" y="112" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a5f87" text-anchor="middle">MAX=2</text>
+          <text x="166" y="127" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">2</text>
+          <circle cx="475" cy="116" r="26" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+          <text x="475" y="112" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a5f87" text-anchor="middle">MAX=5</text>
+          <text x="475" y="127" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">5</text>
+          <circle cx="700" cy="116" r="26" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+          <text x="700" y="112" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a5f87" text-anchor="middle">MAX=7</text>
+          <text x="700" y="127" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">7</text>
+          <!-- Root MIN d=0 -->
+          <circle cx="430" cy="44" r="30" fill="#fce8e8" stroke="#c0392b" stroke-width="3"/>
+          <text x="430" y="40" font-family="'JetBrains Mono',monospace" font-size="9" fill="#c0392b" text-anchor="middle">MIN(root)=2</text>
+          <text x="430" y="56" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle">2</text>
+          <!-- Edges root→MAX -->
+          <line x1="403" y1="66" x2="192" y2="108" stroke="#ccc" stroke-width="1"/>
+          <line x1="430" y1="74" x2="475" y2="90" stroke="#e67e22" stroke-width="2.5"/>
+          <line x1="457" y1="66" x2="674" y2="108" stroke="#ccc" stroke-width="1"/>
+          <!-- Edges MAX→MIN -->
+          <line x1="143" y1="136" x2="114" y2="182" stroke="#ccc" stroke-width="1"/>
+          <line x1="189" y1="136" x2="224" y2="182" stroke="#ccc" stroke-width="1"/>
+          <line x1="450" y1="136" x2="428" y2="182" stroke="#ccc" stroke-width="1"/>
+          <line x1="500" y1="136" x2="522" y2="182" stroke="#ccc" stroke-width="1"/>
+          <line x1="676" y1="136" x2="656" y2="182" stroke="#ccc" stroke-width="1"/>
+          <line x1="724" y1="136" x2="738" y2="182" stroke="#ccc" stroke-width="1"/>
+          <!-- Edges MIN→leaves (sample) -->
+          <line x1="82" y1="216" x2="76" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="101" y1="218" x2="101" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="120" y1="216" x2="145" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="218" y1="216" x2="218" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="256" y1="216" x2="259" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="396" y1="216" x2="385" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="434" y1="216" x2="427" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="516" y1="216" x2="518" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="554" y1="216" x2="558" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="640" y1="216" x2="647" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="732" y1="216" x2="733" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <line x1="766" y1="216" x2="773" y2="256" stroke="#ccc" stroke-width="0.8"/>
+          <!-- depth labels -->
+          <text x="14" y="48" font-family="'JetBrains Mono',monospace" font-size="9" fill="#999">d=0 MIN</text>
+          <text x="14" y="120" font-family="'JetBrains Mono',monospace" font-size="9" fill="#999">d=1 MAX</text>
+          <text x="14" y="198" font-family="'JetBrains Mono',monospace" font-size="9" fill="#999">d=2 MIN</text>
+          <text x="14" y="278" font-family="'JetBrains Mono',monospace" font-size="9" fill="#999">d=3 leaf</text>
+        </svg>
+        <div class="diagram-caption">Figure 6.1 — Minimax 3-ply tree. Leaves propagate up: MIN takes minimum, MAX takes maximum. Root (MIN) returns 2. Orange path shows the chosen branch.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Alpha-Beta Pruning</h3>
+  <div class="definition">
+    <div class="definition-term">Alpha-Beta Pruning — Two Bounds</div>
+    <p><strong>α</strong> = best value MAX has guaranteed so far (init −∞). Updated at MAX nodes.<br>
+    <strong>β</strong> = best value MIN has guaranteed so far (init +∞). Updated at MIN nodes.<br>
+    <strong>Prune at MAX node:</strong> if value ≥ β → cut (MIN won't allow this).<br>
+    <strong>Prune at MIN node:</strong> if value ≤ α → cut (MAX has better elsewhere).</p>
+    <div class="math-block">
+      <span class="math-label">Alpha-Beta Complexity</span>
+      Best case (perfect ordering): O(b^(m/2))  — doubles searchable depth!
+      Average:                      O(b^(3m/4))
+      Worst:                        O(b^m)        — no pruning
+
+      Chess b=35, m=8:
+        Full minimax: 35^8 ≈ 2.25 trillion nodes
+        α-β best:     35^4 ≈ 1.5 million nodes  → 1.5M times fewer!
+    </div>
+  </div>
+
+  <h3>Additional Refinements</h3>
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">Evaluation Function</div>
+      <div class="measure-formula">EVAL(s) ≈ UTILITY(s)</div>
+      <div class="measure-desc">Heuristic estimate of state value for non-terminal states at the depth cutoff. Chess: weighted sum of material balance, mobility, king safety, pawn structure. Must be fast and correlated with winning probability.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Quiescence Search</div>
+      <div class="measure-formula">Extend on non-quiet positions</div>
+      <div class="measure-desc">Continue searching beyond depth limit when the position is volatile (captures, checks). Prevents the "horizon effect" — calling EVAL on positions where a decisive move lurks just out of sight.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Move Ordering</div>
+      <div class="measure-formula">Best moves first</div>
+      <div class="measure-desc">Alpha-beta achieves O(b^(m/2)) only with good move ordering. Heuristics: try captures first, killer moves (caused cutoff in sibling), history table. Better ordering = more pruning.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Iterative Deepening (Games)</div>
+      <div class="measure-formula">depth 1, 2, 3… till time</div>
+      <div class="measure-desc">Run alpha-beta to depth 1, then 2, then 3… until time budget runs out. Always has a best move ready. Previous iteration informs move ordering for next. Used in all serious chess engines.</div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Note — Modern Game AI: AlphaZero</span>
+    <p>Traditional engines (Deep Blue, Stockfish) use handcrafted EVAL + alpha-beta + iterative deepening. <strong>AlphaZero (2017)</strong> replaced EVAL with a deep neural network trained by self-play and replaced alpha-beta with Monte Carlo Tree Search (MCTS). It beat world-champion engines in chess, Go, and Shogi after hours of self-play. Yet the core principle — search guided by value estimates — is unchanged since Shannon 1950.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: Alpha-beta with perfect move ordering gives O(b^(m/2)). For b=35 and m=8, approximately how many times fewer nodes does alpha-beta examine than full minimax?</div>
+    <div class="quiz-opts" id="q6">
+      <button class="quiz-opt" onclick="checkQ('q6',0,'q6fb','wrong')">A. About 35 times fewer — proportional to the branching factor</button>
+      <button class="quiz-opt" onclick="checkQ('q6',1,'q6fb','wrong')">B. About 1225 times fewer (35^2)</button>
+      <button class="quiz-opt" onclick="checkQ('q6',2,'q6fb','correct')">C. About 1.5 million times fewer — 35^4 ≈ 1.5M vs 35^8 ≈ 2.25 trillion</button>
+      <button class="quiz-opt" onclick="checkQ('q6',3,'q6fb','wrong')">D. The same — alpha-beta only reduces space, not time</button>
+    </div>
+    <div class="quiz-feedback" id="q6fb">✅ Correct! Full minimax: 35^8 ≈ 2.25×10^12. Alpha-beta best case: 35^4 ≈ 1.5×10^6. Ratio: 2.25T / 1.5M ≈ 1.5 million times fewer nodes. This is the difference between "cannot finish in the lifetime of the universe" and "runs in milliseconds." With realistic (imperfect) ordering, the improvement is about 35^6 ≈ 10^9 — still over a billion times fewer than full minimax.</div>
+  </div>
+</section>
+
+<!-- S7: EXAM SUMMARY -->
+<section id="s7">
+  <div class="section-header">
+    <span class="section-num">Section 07</span>
+    <h2 class="section-title">Exam Preparation Summary</h2>
+  </div>
+  <p>This section consolidates every algorithm, formula, and comparison from Unit II. Work through all tables and the final challenge quiz before your exam.</p>
+
+  <h3>Master Algorithm Comparison</h3>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Algorithm</th><th>Complete?</th><th>Optimal?</th><th>Time</th><th>Space</th><th>Key Idea</th></tr>
+      <tr><td>BFS</td><td>✅ Yes¹</td><td>✅ Yes²</td><td>O(b^(d+1))</td><td>O(b^(d+1))</td><td>FIFO; shallowest first</td></tr>
+      <tr><td>Uniform-Cost</td><td>✅ Yes³</td><td>✅ Yes</td><td>O(b^(C*/ε))</td><td>O(b^(C*/ε))</td><td>Priority queue by g; cheapest first</td></tr>
+      <tr><td>DFS</td><td>❌ No</td><td>❌ No</td><td>O(b^m)</td><td>O(b·m)</td><td>LIFO; deep first; low memory</td></tr>
+      <tr><td>Depth-Limited</td><td>❌ No⁴</td><td>❌ No</td><td>O(b^ℓ)</td><td>O(b·ℓ)</td><td>DFS with cap ℓ</td></tr>
+      <tr class="highlight-row"><td>IDDFS ★</td><td>✅ Yes</td><td>✅ Yes²</td><td>O(b^d)</td><td>O(b·d)</td><td>Best uninformed: BFS quality + DFS space</td></tr>
+      <tr><td>Bidirectional</td><td>✅ Yes</td><td>✅ Yes²</td><td>O(b^(d/2))</td><td>O(b^(d/2))</td><td>Two frontiers meet in middle</td></tr>
+      <tr><td>Greedy Best-First</td><td>❌ No</td><td>❌ No</td><td>O(b^m)</td><td>O(b^m)</td><td>Priority by h only; fast, suboptimal</td></tr>
+      <tr class="highlight-row"><td>A* ★</td><td>✅ Yes</td><td>✅ Yes (adm. h)</td><td>O(b^d)</td><td>O(b^d)</td><td>f=g+h; best informed; complete + optimal</td></tr>
+      <tr><td>IDA*</td><td>✅ Yes</td><td>✅ Yes</td><td>O(b^d)</td><td>O(b·d)</td><td>A* with DFS-level memory</td></tr>
+      <tr><td>Hill Climbing</td><td>❌ No</td><td>❌ No</td><td>—</td><td>O(1)</td><td>Greedy local; stuck at local optima</td></tr>
+      <tr><td>Simulated Annealing</td><td>✅ Yes⁵</td><td>✅ Yes⁵</td><td>—</td><td>O(1)</td><td>P=e^(ΔE/T) acceptance; escapes optima</td></tr>
+      <tr><td>Local Beam</td><td>❌ No</td><td>❌ No</td><td>—</td><td>O(k·b)</td><td>k parallel states sharing info</td></tr>
+      <tr><td>Genetic Algorithm</td><td>❌ No</td><td>❌ No</td><td>—</td><td>O(pop)</td><td>Selection + crossover + mutation</td></tr>
+      <tr><td>Backtracking CSP</td><td>✅ Yes</td><td>N/A</td><td>—</td><td>O(n·d)</td><td>DFS + constraint check + backtrack</td></tr>
+      <tr><td>Minimax</td><td>✅ Yes</td><td>✅ Yes</td><td>O(b^m)</td><td>O(b·m)</td><td>Max/min alternating; game trees</td></tr>
+      <tr class="highlight-row"><td>Alpha-Beta ★</td><td>✅ Yes</td><td>✅ Yes</td><td>O(b^(m/2)) best</td><td>O(b·m)</td><td>Minimax + pruning; same result, fewer nodes</td></tr>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--ink3);">¹ b finite; ² uniform cost; ³ costs≥ε&gt;0; ⁴ yes if ℓ≥d; ⁵ logarithmic cooling schedule; ★ = recommended for each category</p>
+
+  <h3>Key Formulas</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Formula</th><th>Meaning</th><th>Used In</th></tr>
+      <tr><td><code>f(n) = h(n)</code></td><td>Heuristic only; ignores g(n)</td><td>Greedy Best-First</td></tr>
+      <tr><td><code>f(n) = g(n) + h(n)</code></td><td>Actual + estimated remaining cost</td><td>A*, IDA*</td></tr>
+      <tr><td><code>h(n) ≤ h*(n) ∀n</code></td><td>Admissibility — never overestimate</td><td>A* optimality proof</td></tr>
+      <tr><td><code>h(n) ≤ c(n,a,n') + h(n')</code></td><td>Consistency (triangle inequality)</td><td>A* no re-expansion</td></tr>
+      <tr><td><code>P = e^(ΔE/T)</code></td><td>SA acceptance probability for worse state</td><td>Simulated Annealing</td></tr>
+      <tr><td><code>V(MAX node) = max_a V(child)</code></td><td>MAX picks highest child</td><td>Minimax</td></tr>
+      <tr><td><code>V(MIN node) = min_a V(child)</code></td><td>MIN picks lowest child</td><td>Minimax</td></tr>
+      <tr class="highlight-row"><td><code>O(b^(d/2))</code></td><td>Alpha-beta best case; doubles searchable depth</td><td>Alpha-Beta</td></tr>
+    </table>
+  </div>
+
+  <h3>Common Exam Mistakes</h3>
+  <div class="callout red">
+    <span class="callout-label">Watch Out!</span>
+    <p><strong>Mistake 1:</strong> Calling DFS "complete" — NOT complete in infinite-depth or cyclic spaces.</p>
+    <p><strong>Mistake 2:</strong> Saying BFS is optimal for weighted graphs — only optimal for uniform step costs. Use UCS for varying costs.</p>
+    <p><strong>Mistake 3:</strong> Confusing admissibility and consistency — consistency is stronger; consistent ⟹ admissible, not vice versa.</p>
+    <p><strong>Mistake 4:</strong> Saying alpha-beta finds a <em>better</em> solution than minimax — it finds the <em>same</em> solution faster by pruning irrelevant branches.</p>
+    <p><strong>Mistake 5:</strong> Confusing MRV (which variable next in CSP) with LCV (which value to try next) — different decisions, different heuristics.</p>
+    <p><strong>Mistake 6:</strong> Saying SA is always globally optimal — only with a logarithmically slow cooling schedule (impractically slow). In practice it finds near-optimal solutions.</p>
+  </div>
+
+  <h3>One-Line Summaries</h3>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Best Uninformed</div>
+      <div class="summary-val">IDDFS</div>
+      <div class="summary-sub">BFS completeness + optimality + DFS O(bd) space. Overhead ≈ b/(b−1): negligible.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Best Informed</div>
+      <div class="summary-val">A*</div>
+      <div class="summary-sub">Optimal + complete with admissible h. Memory bottleneck → IDA* for space-limited settings.</div>
+    </div>
+    <div class="summary-card green">
+      <div class="summary-title">Optimisation</div>
+      <div class="summary-val">Sim. Annealing</div>
+      <div class="summary-sub">O(1) memory. Escapes local optima via P=e^(ΔE/T). Best for TSP, scheduling, layout.</div>
+    </div>
+    <div class="summary-card gold">
+      <div class="summary-title">CSP Solver</div>
+      <div class="summary-val">MRV + FC + AC-3</div>
+      <div class="summary-sub">Fail-first variable selection + forward checking + arc consistency = tractable CSP solving.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Game Playing</div>
+      <div class="summary-val">Alpha-Beta</div>
+      <div class="summary-sub">Minimax result at O(b^(m/2)) vs O(b^m). Move ordering is critical for full benefit.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Bidirectional</div>
+      <div class="summary-val">O(b^(d/2))</div>
+      <div class="summary-sub">Exponential saving vs one-directional BFS for long paths. Two frontiers meet in middle.</div>
+    </div>
+  </div>
+
+  <h3>Challenge Quiz</h3>
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Challenge: A factory scheduling AI must assign 50 jobs to machines. A* runs out of memory. Hill climbing gets stuck at suboptimal schedules. Which approach would you recommend?</div>
+    <div class="quiz-opts" id="q7">
+      <button class="quiz-opt" onclick="checkQ('q7',0,'q7fb','wrong')">A. BFS — complete and will eventually find an optimal schedule</button>
+      <button class="quiz-opt" onclick="checkQ('q7',1,'q7fb','correct')">B. IDA* for feasibility search + Simulated Annealing for optimisation — IDA* uses O(bd) memory; SA escapes local optima in the vast optimisation landscape</button>
+      <button class="quiz-opt" onclick="checkQ('q7',2,'q7fb','wrong')">C. Greedy Best-First — fastest heuristic search, guaranteed near-optimal</button>
+      <button class="quiz-opt" onclick="checkQ('q7',3,'q7fb','wrong')">D. Full Minimax — scheduling is a two-player game between jobs and machines</button>
+    </div>
+    <div class="quiz-feedback" id="q7fb">✅ Correct! This is a classic two-phase approach. <strong>Phase 1 (feasibility):</strong> IDA* finds a feasible schedule (satisfying hard constraints like deadlines) using only O(b·d) memory — unlike A* which exhausted memory, or BFS which cannot scale to 50 variables. <strong>Phase 2 (optimisation):</strong> Simulated Annealing improves the feasible solution (minimise makespan or cost) — it uses O(1) memory, escapes the local optima that trapped hill climbing, and handles the astronomically large optimisation landscape. CSP backtracking with MRV + FC is also excellent for Phase 1 when constraints are dense.</div>
+  </div>
+</section>
+
+</div><!-- end .page -->
+
+<footer>
+  <p>Tutorial compiled from: Russell, S. J., &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach, 4th Edition</em>. Pearson. Chapters 3–6.</p>
+  <p style="margin-top:12px;">Unit II · B.Tech 3rd Year · Artificial Intelligence · 13 Lectures</p>
+</footer>
+
+<script>
+function checkQ(cid,ci,fid,res){
+  var c=document.getElementById(cid);
+  var bs=c.querySelectorAll('.quiz-opt');
+  bs.forEach(function(b){b.disabled=true;b.style.cursor='default';});
+  bs[ci].classList.add(res);
+  var f=document.getElementById(fid);
+  f.classList.add('show');
+}
+</script>
+</body>
+</html>
