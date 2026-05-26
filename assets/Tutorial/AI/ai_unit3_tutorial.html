@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit III: Knowledge &amp; Reasoning — Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1410;--ink2:#3d3530;--ink3:#6b5f58;--paper:#faf7f2;--paper2:#f2ede4;--paper3:#e8e0d4;--accent:#c0392b;--accent2:#e67e22;--accent3:#2980b9;--accent4:#27ae60;--gold:#d4a017;--rule:#c5b8a8;--highlight:#fff3cd;--highlight2:#d5edda;--highlight3:#d0e8f5;--highlight4:#fce8e8;--code-bg:#1e1e2e;--code-fg:#cdd6f4;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:17px;}
+.cover{background:var(--ink);color:var(--paper);padding:80px 60px 60px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border:2px solid rgba(255,255,255,0.06);border-radius:50%;}
+.cover::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border:1px solid rgba(255,255,255,0.04);border-radius:50%;}
+.cover-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:24px;display:block;}
+.cover h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;line-height:1.1;margin-bottom:12px;max-width:700px;}
+.cover h1 span{color:#e67e22;}
+.cover .subtitle{font-size:20px;color:rgba(255,255,255,0.6);font-weight:300;font-style:italic;margin-bottom:40px;}
+.cover-meta{display:flex;gap:32px;flex-wrap:wrap;}
+.cover-meta-item{display:flex;flex-direction:column;gap:2px;}
+.cover-meta-item .meta-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.cover-meta-item .meta-val{font-size:14px;color:rgba(255,255,255,0.85);}
+.toc-bar{background:var(--ink2);padding:0;display:flex;overflow-x:auto;gap:0;position:sticky;top:0;z-index:100;}
+.toc-bar a{color:rgba(255,255,255,0.65);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;padding:14px 20px;white-space:nowrap;transition:all 0.2s;border-bottom:2px solid transparent;}
+.toc-bar a:hover{color:#fff;background:rgba(255,255,255,0.05);border-bottom-color:var(--accent2);}
+.page{max-width:900px;margin:0 auto;padding:0 40px 80px;}
+section{padding-top:72px;}
+section+section{border-top:1px solid var(--rule);}
+.section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;}
+.section-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:var(--accent);text-transform:uppercase;letter-spacing:2px;flex-shrink:0;}
+.section-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1.15;color:var(--ink);}
+h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin:40px 0 16px;color:var(--ink);}
+h4{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;margin:28px 0 10px;color:var(--ink2);}
+p{margin-bottom:16px;}
+.callout{border-left:3px solid var(--accent2);background:var(--highlight);padding:16px 20px;border-radius:0 6px 6px 0;margin:24px 0;}
+.callout.blue{border-left-color:var(--accent3);background:var(--highlight3);}
+.callout.green{border-left-color:var(--accent4);background:var(--highlight2);}
+.callout.red{border-left-color:var(--accent);background:var(--highlight4);}
+.callout-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block;}
+.callout p:last-child{margin-bottom:0;}
+.definition{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:20px 24px;margin:24px 0;}
+.definition-term{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--accent);margin-bottom:8px;}
+.definition p:last-child{margin-bottom:0;}
+.example-box{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:28px 0;}
+.example-header{background:var(--ink);color:var(--paper);padding:10px 20px;display:flex;align-items:center;gap:10px;}
+.example-badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--accent2);color:var(--ink);padding:2px 8px;border-radius:3px;}
+.example-title{font-size:14px;font-weight:400;}
+.example-body{padding:20px 24px;background:var(--paper);}
+.example-body p:last-child{margin-bottom:0;}
+.table-wrap{overflow-x:auto;margin:24px 0;}
+table{width:100%;border-collapse:collapse;font-size:15px;}
+th{background:var(--ink);color:var(--paper);padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;font-weight:500;}
+td{padding:9px 14px;border-bottom:1px solid var(--paper3);vertical-align:middle;}
+tr:nth-child(even) td{background:var(--paper2);}
+tr:hover td{background:var(--highlight3);}
+.highlight-row td{background:var(--highlight)!important;font-weight:600;}
+pre{background:var(--code-bg);color:var(--code-fg);padding:20px 24px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;overflow-x:auto;margin:20px 0;}
+code{font-family:'JetBrains Mono',monospace;font-size:14px;background:var(--paper3);padding:1px 6px;border-radius:3px;}
+pre code{background:none;padding:0;font-size:inherit;}
+.kw{color:#cba6f7;}.fn{color:#89b4fa;}.str{color:#a6e3a1;}.num{color:#fab387;}.cm{color:#6c7086;font-style:italic;}
+.math-block{background:var(--paper2);border:1px solid var(--paper3);border-radius:6px;padding:16px 24px;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink);overflow-x:auto;text-align:center;}
+.math-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);font-family:'Source Serif 4',serif;display:block;margin-bottom:8px;text-align:left;}
+.diagram-wrap{margin:32px 0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+.diagram-caption{background:var(--paper2);border-top:1px solid var(--rule);padding:10px 16px;font-size:13px;color:var(--ink3);font-style:italic;text-align:center;}
+svg.diagram{display:block;width:100%;}
+.algo-box{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:28px 0;}
+.algo-header{background:var(--ink2);color:var(--paper);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.algo-body{background:var(--paper);padding:20px 24px;}
+.step{display:flex;gap:16px;margin-bottom:12px;align-items:flex-start;}
+.step-num{flex-shrink:0;width:26px;height:26px;background:var(--accent2);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;margin-top:2px;}
+.step-text{flex:1;}
+.step-text p{margin-bottom:0;}
+.quiz-box{background:var(--ink);color:var(--paper);border-radius:8px;padding:28px 32px;margin:32px 0;}
+.quiz-q{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:20px;color:rgba(255,255,255,0.9);}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:11px 18px;border-radius:6px;cursor:pointer;text-align:left;font-family:'Source Serif 4',serif;font-size:15px;transition:all 0.2s;}
+.quiz-opt:hover{background:rgba(255,255,255,0.13);border-color:rgba(255,255,255,0.25);}
+.quiz-opt.correct{background:rgba(39,174,96,0.25);border-color:#27ae60;color:#a3d9b1;}
+.quiz-opt.wrong{background:rgba(192,57,43,0.25);border-color:#c0392b;color:#f5a9a9;}
+.quiz-feedback{margin-top:16px;font-size:14px;color:rgba(255,255,255,0.6);display:none;}
+.quiz-feedback.show{display:block;}
+.measures-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
+.measure-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:16px 18px;}
+.measure-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px;}
+.measure-formula{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--paper3);padding:6px 10px;border-radius:4px;margin-bottom:8px;}
+.measure-desc{font-size:13px;color:var(--ink3);line-height:1.55;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:28px 0;}
+.summary-card{background:var(--paper2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:16px 18px;}
+.summary-card.blue{border-left-color:var(--accent3);}
+.summary-card.green{border-left-color:var(--accent4);}
+.summary-card.gold{border-left-color:var(--gold);}
+.summary-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.summary-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);}
+.summary-sub{font-size:13px;color:var(--ink3);margin-top:4px;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 8px;border-radius:3px;margin:0 3px 4px;font-weight:500;}
+.tag-blue{background:var(--highlight3);color:#1a5f87;}
+.tag-green{background:var(--highlight2);color:#1a6b38;}
+.tag-orange{background:var(--highlight);color:#7d5a00;}
+.tag-red{background:var(--highlight4);color:#7d1e1e;}
+.compare-table th{background:var(--ink2);}
+.compare-table td:first-child{font-weight:600;background:var(--paper2)!important;}
+footer{background:var(--ink);color:rgba(255,255,255,0.4);padding:40px 60px;font-size:13px;margin-top:60px;}
+ol.styled{padding-left:22px;line-height:2.2;margin:12px 0;}
+ul.styled{padding-left:22px;line-height:2;margin:12px 0;}
+ul.styled li::marker{color:var(--accent2);}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <span class="cover-label">Artificial Intelligence — B.Tech 3rd Year · Unit III</span>
+  <h1>Knowledge &amp; <span>Reasoning</span></h1>
+  <p class="subtitle">A complete tutorial on knowledge representation issues, mapping, all major approaches, and fundamental representation problems — with worked examples and diagrams</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="meta-label">Textbook</span><span class="meta-val">Russell &amp; Norvig — Chapters 7, 8, 9, 10</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Topics</span><span class="meta-val">KR Issues · Representation &amp; Mapping · Approaches to KR · Issues in KR</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Hours</span><span class="meta-val">3 lectures</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc-bar">
+  <a href="#s1">1 · What is Knowledge?</a>
+  <a href="#s2">2 · Representation &amp; Mapping</a>
+  <a href="#s3">3 · Logic-Based Approaches</a>
+  <a href="#s4">4 · Structured Approaches</a>
+  <a href="#s5">5 · Issues in KR</a>
+  <a href="#s6">6 · Exam Summary</a>
+</nav>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════
+     SECTION 1: What is Knowledge?
+══════════════════════════════════════════ -->
+<section id="s1">
+  <div class="section-header">
+    <span class="section-num">Section 01</span>
+    <h2 class="section-title">What is Knowledge &amp; Why Represent It?</h2>
+  </div>
+
+  <p>A calculator can multiply 7,463 × 9,821 faster than any human — yet it knows nothing about why you need that product. A chess program can evaluate millions of positions per second — yet it has no idea that chess is a game. <strong>Knowledge</strong> is what distinguishes intelligent behaviour from mere computation. To build systems that reason, plan, and explain, we must first answer a deceptively difficult question: how do we represent what a system "knows" in a form a computer can use?</p>
+  <p>This question drives the field of <strong>Knowledge Representation and Reasoning (KR&amp;R)</strong> — one of the oldest and most fundamental sub-fields of AI. Without good knowledge representation, expert systems cannot diagnose diseases, natural language systems cannot understand sentences, and planning systems cannot schedule factories.</p>
+
+  <!-- DIKW Pyramid Diagram -->
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#999" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">The DIKW Pyramid — From Raw Data to Actionable Wisdom</text>
+      <!-- Pyramid layers (triangles stacked) -->
+      <!-- Wisdom (top) -->
+      <polygon points="430,50 330,130 530,130" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="430" y="95" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">Wisdom</text>
+      <text x="430" y="113" font-family="'Source Serif 4',serif" font-size="11" fill="#1a6b38" text-anchor="middle">Know WHY</text>
+      <!-- Knowledge -->
+      <polygon points="330,132 530,132 570,195 290,195" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="430" y="158" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#1a5f87" text-anchor="middle">Knowledge</text>
+      <text x="430" y="178" font-family="'Source Serif 4',serif" font-size="11" fill="#1a5f87" text-anchor="middle">Know HOW &amp; patterns</text>
+      <!-- Information -->
+      <polygon points="290,197 570,197 620,262 240,262" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="430" y="224" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#7d5a00" text-anchor="middle">Information</text>
+      <text x="430" y="244" font-family="'Source Serif 4',serif" font-size="11" fill="#7d5a00" text-anchor="middle">Processed, contextualised data</text>
+      <!-- Data (base) -->
+      <polygon points="240,264 620,264 680,310 180,310" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="430" y="285" font-family="'Playfair Display',serif" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle">Data</text>
+      <text x="430" y="303" font-family="'Source Serif 4',serif" font-size="11" fill="#c0392b" text-anchor="middle">Raw facts, numbers, symbols — no meaning yet</text>
+      <!-- Right side examples -->
+      <text x="700" y="100" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1a6b38">"This drug will harm patient X"</text>
+      <text x="700" y="167" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1a5f87">"Penicillin treats bacterial infections"</text>
+      <text x="700" y="234" font-family="'JetBrains Mono',monospace" font-size="11" fill="#7d5a00">"Patient X has strep throat"</text>
+      <text x="700" y="295" font-family="'JetBrains Mono',monospace" font-size="11" fill="#c0392b">"Temp: 38.5°C, WBC: 14,000"</text>
+      <!-- Arrows pointing right -->
+      <line x1="545" y1="95" x2="692" y2="95" stroke="#27ae60" stroke-width="1" marker-end="url(#a1)" stroke-dasharray="4,3"/>
+      <line x1="578" y1="163" x2="692" y2="163" stroke="#2980b9" stroke-width="1" marker-end="url(#a1)" stroke-dasharray="4,3"/>
+      <line x1="628" y1="230" x2="692" y2="230" stroke="#d4a017" stroke-width="1" marker-end="url(#a1)" stroke-dasharray="4,3"/>
+      <line x1="686" y1="290" x2="692" y2="290" stroke="#c0392b" stroke-width="1" marker-end="url(#a1)" stroke-dasharray="4,3"/>
+      <!-- Left side: arrows upward -->
+      <line x1="170" y1="290" x2="170" y2="50" stroke="#c5b8a8" stroke-width="1" marker-end="url(#a1)"/>
+      <text x="142" y="200" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle" transform="rotate(-90,142,200)">Adding Context &amp; Understanding</text>
+    </svg>
+    <div class="diagram-caption">Figure 1.1 — The DIKW Pyramid. AI systems must operate at the Knowledge and Wisdom levels — they need to understand facts, relationships, and consequences, not merely store raw data.</div>
+  </div>
+
+  <h3>Types of Knowledge in AI</h3>
+  <p>Not all knowledge is the same. AI systems must handle several distinct categories, each requiring different representational tools. <em>This classification is a commonly tested definition.</em></p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Type</th><th>Description</th><th>Example (Medical Domain)</th><th>Representation</th></tr>
+      <tr><td><strong>Declarative</strong></td><td>Facts about the world — "what is"</td><td>"Fever is a symptom of infection"</td><td>Logic, frames, semantic networks</td></tr>
+      <tr><td><strong>Procedural</strong></td><td>How to do something — step-by-step</td><td>"To diagnose: first take temperature, then..."</td><td>Production rules, scripts</td></tr>
+      <tr><td><strong>Heuristic</strong></td><td>Rules of thumb — expert shortcuts</td><td>"If patient is elderly, suspect pneumonia first"</td><td>IF-THEN rules, weighted rules</td></tr>
+      <tr><td><strong>Meta-knowledge</strong></td><td>Knowledge about knowledge itself</td><td>"Blood culture results are more reliable than symptoms alone"</td><td>Confidence weights, certainty factors</td></tr>
+      <tr><td><strong>Structural</strong></td><td>How concepts relate to each other</td><td>"Pneumonia is a subtype of lung disease"</td><td>Ontologies, class hierarchies</td></tr>
+      <tr class="highlight-row"><td><strong>Common-sense</strong></td><td>Implicit world knowledge humans take for granted</td><td>"A dead patient cannot be treated"</td><td>Difficult — requires large ontologies (CYC)</td></tr>
+    </table>
+  </div>
+
+  <div class="definition">
+    <div class="definition-term">The Knowledge Representation Hypothesis</div>
+    <p>Proposed by Brian Cantwell Smith (1985): <em>"Any mechanically embodied intelligent process will be comprised of structural ingredients that: (a) we as external observers naturally take to represent a propositional account of the domain the overall process is engaged in, and (b) that independent of such external semantic attribution, play a formal but causal and essential role in engendering the behaviour that constitutes the intelligence."</em></p>
+    <p>In plain terms: for a machine to behave intelligently, there must be internal structures we can interpret as representing knowledge about the world, and these structures must causally drive the intelligent behaviour. Intelligence requires explicit knowledge — not just programmed responses.</p>
+  </div>
+
+  <!-- Running Example Introduction -->
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Running Example</span>
+      <span class="example-title">Medical Diagnosis — Used Throughout This Tutorial</span>
+    </div>
+    <div class="example-body">
+      <p>We use a simplified medical diagnosis domain throughout. A doctor must diagnose a patient's illness from symptoms and tests. This domain is rich enough to illustrate all KR approaches yet compact enough for worked examples.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Entity</th><th>Known Facts</th></tr>
+          <tr><td><strong>Patient: John</strong></td><td>Age 45, male, smoker. Symptoms: fever (38.5°C), cough (productive), chest pain, shortness of breath. Duration: 3 days.</td></tr>
+          <tr><td><strong>Test Results</strong></td><td>WBC count: 14,000 (high). Chest X-ray: consolidation in right lower lobe. Sputum culture: Streptococcus pneumoniae.</td></tr>
+          <tr><td><strong>Target Diagnosis</strong></td><td>Bacterial pneumonia (community-acquired). Treatment: amoxicillin 500mg × 7 days.</td></tr>
+          <tr class="highlight-row"><td><strong>Challenge</strong></td><td>How do we encode the doctor's expertise so a computer can replicate this reasoning — and explain it?</td></tr>
+        </table>
+      </div>
+      <p>Each KR approach in Sections 3–4 will represent the same knowledge about this patient in a different formalism. Compare how each handles the same facts differently.</p>
+    </div>
+  </div>
+
+  <h3>The Knowledge Representation &amp; Reasoning Cycle</h3>
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#e67e22" stroke-width="1.8"/></marker>
+        <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#2980b9" stroke-width="1.8"/></marker>
+      </defs>
+      <!-- Boxes -->
+      <rect x="30" y="90" width="160" height="70" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="110" y="120" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">Real World</text>
+      <text x="110" y="140" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Domain facts, events</text>
+      <text x="110" y="156" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">and relationships</text>
+
+      <rect x="250" y="30" width="160" height="70" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="330" y="58" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">Knowledge</text>
+      <text x="330" y="76" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">Acquisition</text>
+      <text x="330" y="92" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Elicit from experts</text>
+
+      <rect x="470" y="90" width="160" height="70" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="550" y="118" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">Knowledge</text>
+      <text x="550" y="136" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">Base</text>
+      <text x="550" y="154" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Formal representation</text>
+
+      <rect x="250" y="155" width="160" height="70" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="330" y="183" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Inference</text>
+      <text x="330" y="201" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Engine</text>
+      <text x="330" y="217" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Reasoning + answers</text>
+
+      <!-- Arrows -->
+      <line x1="190" y1="110" x2="248" y2="75" stroke="#e67e22" stroke-width="1.8" marker-end="url(#a2)"/>
+      <text x="205" y="80" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22" text-anchor="middle">encode</text>
+
+      <line x1="410" y1="65" x2="468" y2="100" stroke="#e67e22" stroke-width="1.8" marker-end="url(#a2)"/>
+      <text x="455" y="72" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22" text-anchor="middle">store</text>
+
+      <line x1="470" y1="150" x2="412" y2="172" stroke="#2980b9" stroke-width="1.8" marker-end="url(#a3)"/>
+      <text x="435" y="152" font-family="'JetBrains Mono',monospace" font-size="10" fill="#2980b9" text-anchor="middle">query</text>
+
+      <line x1="250" y1="190" x2="192" y2="155" stroke="#2980b9" stroke-width="1.8" marker-end="url(#a3)"/>
+      <text x="200" y="184" font-family="'JetBrains Mono',monospace" font-size="10" fill="#2980b9" text-anchor="middle">answer</text>
+
+      <!-- KB to Inference -->
+      <line x1="550" y1="160" x2="410" y2="190" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <!-- User box -->
+      <rect x="680" y="90" width="150" height="70" rx="8" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="755" y="118" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">User /</text>
+      <text x="755" y="136" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">Application</text>
+      <text x="755" y="154" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Queries + results</text>
+      <line x1="680" y1="125" x2="632" y2="125" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a1)"/>
+      <line x1="632" y1="155" x2="680" y2="145" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a1)"/>
+    </svg>
+    <div class="diagram-caption">Figure 1.2 — The KR&amp;R Cycle. Domain knowledge is acquired from experts, encoded into a knowledge base using a formal representation, and then queried by an inference engine to answer questions from users or applications.</div>
+  </div>
+
+  <h3>Knowledge Representation Issues — Overview</h3>
+  <p>Building a usable knowledge representation system requires tackling five fundamental issues. These issues motivate every design decision in every KR formalism we study.</p>
+
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">Expressiveness</div>
+      <div class="measure-formula">What can be represented?</div>
+      <div class="measure-desc">Can the language express all the knowledge needed? Propositional logic cannot express "all patients with fever have some infection" — first-order logic is needed. More expressive ≠ always better.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Inferential Adequacy</div>
+      <div class="measure-formula">What can be derived?</div>
+      <div class="measure-desc">Can the reasoner derive all conclusions that follow from the represented knowledge? A complete inference procedure derives every true consequence. Incompleteness means missing valid conclusions.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Inferential Efficiency</div>
+      <div class="measure-formula">How fast can we reason?</div>
+      <div class="measure-desc">Can queries be answered in reasonable time? First-order logic is semi-decidable. Description logics trade expressiveness for polynomial inference. This tension drives most KR design.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Acquisitional Efficiency</div>
+      <div class="measure-formula">How easy to build the KB?</div>
+      <div class="measure-desc">How easily can new knowledge be added without disrupting existing facts? The "knowledge acquisition bottleneck" — getting expert knowledge into the system — is the single hardest problem in expert system building.</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">Key Insight — The Central Trade-off</span>
+    <p>Every KR system must navigate a fundamental trade-off: <strong>expressiveness vs. computational tractability</strong>. More expressive languages (full first-order logic) can represent anything — but reasoning may be undecidable or impractically slow. Weaker languages (propositional logic) support fast, complete reasoning — but cannot express many real-world facts. This trade-off shapes every KR decision in this unit.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: Which type of knowledge is hardest for AI systems to represent and is illustrated by the phrase "A dead patient cannot be treated"?</div>
+    <div class="quiz-opts" id="q1">
+      <button class="quiz-opt" onclick="checkQ('q1',0,'q1fb','wrong')">A. Declarative knowledge — facts about the world</button>
+      <button class="quiz-opt" onclick="checkQ('q1',1,'q1fb','wrong')">B. Procedural knowledge — how to perform tasks</button>
+      <button class="quiz-opt" onclick="checkQ('q1',2,'q1fb','correct')">C. Common-sense knowledge — implicit background knowledge humans take for granted</button>
+      <button class="quiz-opt" onclick="checkQ('q1',3,'q1fb','wrong')">D. Meta-knowledge — knowledge about the reliability of other knowledge</button>
+    </div>
+    <div class="quiz-feedback" id="q1fb">✅ Correct! Common-sense knowledge is the hardest category. Humans never explicitly state "dead patients cannot receive treatment" because it is so obvious — yet AI systems must be told this explicitly. The CYC project has spent decades encoding millions of such facts. Common-sense knowledge is implicit, vast, and context-dependent — making it extremely difficult to represent formally.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2: REPRESENTATION & MAPPING
+══════════════════════════════════════════ -->
+<section id="s2">
+  <div class="section-header">
+    <span class="section-num">Section 02</span>
+    <h2 class="section-title">Representation &amp; Mapping</h2>
+  </div>
+
+  <p>Building on the types of knowledge from Section 1, we now ask: <em>how</em> do we translate knowledge about the world into a form a computer can manipulate? This is the problem of <strong>representational mapping</strong> — choosing a formal structure that faithfully mirrors the relevant aspects of the world while remaining computationally tractable.</p>
+  <p>A knowledge representation is not just a storage format. It is a <strong>surrogate</strong> for the real world: a substitute for things and relationships that lets the system reason about them without direct access to reality. Every design choice for this surrogate has profound consequences for what the system can and cannot know.</p>
+
+  <div class="definition">
+    <div class="definition-term">Representational Mapping</div>
+    <p>A <strong>representational mapping</strong> is a correspondence between:</p>
+    <ol style="padding-left:20px;line-height:2.2;margin-top:8px;">
+      <li><strong>The represented world:</strong> Objects, facts, relationships, and events in the domain of interest.</li>
+      <li><strong>The representing world:</strong> Symbols, structures, and procedures in the computational formalism.</li>
+    </ol>
+    <p style="margin-top:8px;">The mapping must preserve the relevant structure: if "A is related to B" in the real world, the representing structure must capture this relationship so that any conclusion the system draws about the representing world corresponds to a true conclusion about the real world.</p>
+  </div>
+
+  <!-- Mapping diagram -->
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="am1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#e67e22" stroke-width="1.8"/></marker>
+      <marker id="am2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#27ae60" stroke-width="1.8"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">Representational Mapping — Real World to Formal Symbols</text>
+      <!-- Left: Real World -->
+      <rect x="30" y="42" width="340" height="240" rx="10" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="200" y="68" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#c0392b" text-anchor="middle">Represented World (Domain)</text>
+      <!-- Objects in real world -->
+      <circle cx="100" cy="130" r="30" fill="#faf7f2" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="100" y="126" font-family="'Source Serif 4',serif" font-size="11" fill="#333" text-anchor="middle">Patient</text>
+      <text x="100" y="142" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">John</text>
+      <circle cx="240" cy="130" r="30" fill="#faf7f2" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="240" y="126" font-family="'Source Serif 4',serif" font-size="11" fill="#333" text-anchor="middle">Disease</text>
+      <text x="240" y="142" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Pneumonia</text>
+      <circle cx="170" cy="230" r="30" fill="#faf7f2" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="170" y="226" font-family="'Source Serif 4',serif" font-size="11" fill="#333" text-anchor="middle">Symptom</text>
+      <text x="170" y="242" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Fever</text>
+      <!-- Relationship arrows in real world -->
+      <line x1="130" y1="130" x2="210" y2="130" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+      <text x="170" y="120" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="middle">has_disease</text>
+      <line x1="110" y1="158" x2="148" y2="202" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+      <text x="113" y="188" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="end">has_symptom</text>
+      <line x1="230" y1="158" x2="192" y2="202" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+      <text x="230" y="188" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="start">indicates</text>
+
+      <!-- Right: Representing World -->
+      <rect x="490" y="42" width="340" height="240" rx="10" fill="#d0e8f5" stroke="#2980b9" stroke-width="1.5"/>
+      <text x="660" y="68" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a5f87" text-anchor="middle">Representing World (Formal)</text>
+      <!-- Symbols -->
+      <rect x="520" y="100" width="120" height="50" rx="6" fill="#faf7f2" stroke="#2980b9" stroke-width="1.5"/>
+      <text x="580" y="122" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1a5f87" text-anchor="middle">Patient(John)</text>
+      <text x="580" y="140" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">constant / atom</text>
+      <rect x="660" y="100" width="140" height="50" rx="6" fill="#faf7f2" stroke="#2980b9" stroke-width="1.5"/>
+      <text x="730" y="122" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1a5f87" text-anchor="middle">Disease(Pneum)</text>
+      <text x="730" y="140" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">predicate / atom</text>
+      <rect x="580" y="200" width="160" height="50" rx="6" fill="#faf7f2" stroke="#2980b9" stroke-width="1.5"/>
+      <text x="660" y="222" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1a5f87" text-anchor="middle">Symptom(fever)</text>
+      <text x="660" y="240" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">ground atom</text>
+      <!-- Relations in formal world -->
+      <line x1="640" y1="125" x2="658" y2="125" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+      <text x="648" y="115" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="middle">hasDx(J,P)</text>
+      <line x1="580" y1="150" x2="615" y2="198" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+      <line x1="710" y1="150" x2="690" y2="198" stroke="#888" stroke-width="1.2" marker-end="url(#a1)"/>
+
+      <!-- Mapping arrows in centre -->
+      <line x1="372" y1="130" x2="488" y2="130" stroke="#e67e22" stroke-width="2.5" marker-end="url(#am1)"/>
+      <text x="430" y="120" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e67e22" text-anchor="middle">ENCODE</text>
+      <line x1="488" y1="230" x2="372" y2="230" stroke="#27ae60" stroke-width="2.5" marker-end="url(#am2)"/>
+      <text x="430" y="248" font-family="'JetBrains Mono',monospace" font-size="12" fill="#27ae60" text-anchor="middle">INTERPRET</text>
+    </svg>
+    <div class="diagram-caption">Figure 2.1 — Representational mapping. Real-world objects (Patient John, Pneumonia, Fever) are encoded into formal symbols (predicates, constants, atoms). Conclusions drawn in the formal world must map back to valid conclusions about the real world.</div>
+  </div>
+
+  <h3>Properties of a Good Knowledge Representation Language</h3>
+  <p>Not every formal language makes a good KR language. A good KR language needs four properties, defined by Brachman &amp; Levesque (1985). These appear frequently in exam questions.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Property</th><th>Definition</th><th>Implication if Missing</th></tr>
+      <tr><td><strong>Representational Adequacy</strong></td><td>Can represent all the knowledge needed for the task</td><td>Some facts cannot be stored — system gives wrong or no answers</td></tr>
+      <tr><td><strong>Inferential Adequacy</strong></td><td>Reasoning can derive all entailed conclusions</td><td>Valid conclusions are missed (incomplete reasoner)</td></tr>
+      <tr><td><strong>Inferential Efficiency</strong></td><td>Reasoning is computationally tractable in practice</td><td>System is too slow to use — answers arrive hours/days later</td></tr>
+      <tr class="highlight-row"><td><strong>Acquisitional Efficiency</strong></td><td>New knowledge can be added easily without side effects</td><td>Knowledge base becomes unmaintainable — expert time consumed</td></tr>
+    </table>
+  </div>
+
+  <h3>The Ontological Commitment</h3>
+  <p>Every KR scheme makes implicit <strong>ontological commitments</strong> — assumptions about the kinds of things that exist in the world. Choosing a representation is choosing what kinds of entities you believe the world contains.</p>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Language</th><th>Ontological Commitment — What Exists</th><th>Example Entities</th></tr>
+      <tr><td>Propositional Logic</td><td>Facts — true or false propositions</td><td>JohnHasFever, IsPneumonia</td></tr>
+      <tr><td>First-Order Logic</td><td>Objects, their properties, and relations between them</td><td>John, Pneumonia, hasFever(John)</td></tr>
+      <tr><td>Higher-Order Logic</td><td>Objects + relations + relations over relations</td><td>Believes(Doctor, Diagnosis(John, Pneumonia))</td></tr>
+      <tr><td>Probabilistic Logic</td><td>Objects + degrees of belief (probabilities)</td><td>P(Pneumonia | Fever, Cough) = 0.72</td></tr>
+      <tr class="highlight-row"><td>Temporal Logic</td><td>Objects + facts + time — things can change</td><td>HasFever(John, t) ∧ t > Day3 → WorseSituation</td></tr>
+    </table>
+  </div>
+
+  <h3>Representation as a Set of Surrogate Commitments</h3>
+  <p>Davis, Shrobe &amp; Szolovits (1993) identified <strong>five roles</strong> that any KR scheme plays simultaneously. Understanding these roles explains why KR is hard — a design choice that helps one role often hurts another.</p>
+
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">1. Surrogate</div>
+      <div class="measure-formula">Substitute for reality</div>
+      <div class="measure-desc">KR structures stand in for real-world entities. We reason about the symbols, not the world directly. Good surrogates faithfully model the relevant aspects of reality.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">2. Ontological Commitment</div>
+      <div class="measure-formula">What categories exist?</div>
+      <div class="measure-desc">Every language makes assumptions about the kinds of things that exist. These commitments shape what can and cannot be expressed. Wrong ontology → expressiveness failure.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">3. Fragmentary Theory of Intelligence</div>
+      <div class="measure-formula">Theory of reasoning</div>
+      <div class="measure-desc">Every KR scheme embeds assumptions about how intelligent agents reason. Logic assumes monotonic inference. Production rules assume forward/backward chaining. These are theories of cognition.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">4. Medium of Efficient Computation</div>
+      <div class="measure-formula">Must be computable</div>
+      <div class="measure-desc">The representation must enable efficient inference. Purely expressive but computationally intractable languages are useless in practice. This forces design tradeoffs.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">5. Medium of Human Expression</div>
+      <div class="measure-formula">Must be understandable</div>
+      <div class="measure-desc">Humans must be able to read, write, and verify the knowledge base. A representation too alien to human thought patterns will be error-prone to encode and impossible to debug.</div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Note — The Mapping Must Be Faithful</span>
+    <p>A representational mapping is only useful if it is <strong>semantically faithful</strong> — conclusions drawn in the formal system must correspond to true conclusions in the real world. A system that concludes "John has malaria" because the formal encoding was wrong is worse than useless. This faithfulness requirement is why knowledge engineering (building knowledge bases) is more art than science.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A hospital's AI system can only represent facts as true/false propositions (propositional logic). A doctor asks: "Do all patients over 65 with fever have a higher risk of sepsis?" The system cannot answer this correctly. Which property of a good KR language is being violated?</div>
+    <div class="quiz-opts" id="q2">
+      <button class="quiz-opt" onclick="checkQ('q2',0,'q2fb','correct')">A. Representational Adequacy — propositional logic cannot express universally quantified statements about objects ("all patients over 65…")</button>
+      <button class="quiz-opt" onclick="checkQ('q2',1,'q2fb','wrong')">B. Inferential Efficiency — the system is too slow to answer</button>
+      <button class="quiz-opt" onclick="checkQ('q2',2,'q2fb','wrong')">C. Acquisitional Efficiency — the knowledge is too hard to add</button>
+      <button class="quiz-opt" onclick="checkQ('q2',3,'q2fb','wrong')">D. Inferential Adequacy — the reasoner is incomplete</button>
+    </div>
+    <div class="quiz-feedback" id="q2fb">✅ Correct! <strong>Representational Adequacy</strong> is violated. Propositional logic has no variables or quantifiers — it cannot express "∀x Patient(x) ∧ Age(x)&gt;65 ∧ HasFever(x) → HighSepsisRisk(x)." This requires First-Order Logic (FOL). The system's failure isn't about speed (efficiency) or reasoning ability — the knowledge simply cannot be encoded in propositional logic at all. This is why FOL is the dominant language for most KR tasks.</div>
+  </div>
+</section>
+
+<!-- S3: LOGIC-BASED APPROACHES -->
+<section id="s3">
+  <div class="section-header">
+    <span class="section-num">Section 03</span>
+    <h2 class="section-title">Logic-Based Approaches to Knowledge Representation</h2>
+  </div>
+  <p>Logic was the first formal language proposed for AI knowledge representation, and it remains the gold standard for precision and rigour. A logical knowledge base is a set of sentences in a formal language; a logical inference procedure derives new sentences guaranteed to be true whenever the premises are. Logic gives us both <em>expressiveness</em> (what can be said) and <em>soundness</em> (what can safely be derived).</p>
+  <p>Two levels of logic dominate AI: <strong>Propositional Logic</strong> (simple but limited) and <strong>First-Order Predicate Logic</strong> (powerful and expressive). We also touch on <strong>Horn Clauses</strong> — the efficient subset used in Prolog and expert systems.</p>
+
+  <h3>Propositional Logic</h3>
+  <div class="definition">
+    <div class="definition-term">Propositional Logic</div>
+    <p>Propositional logic deals with <strong>propositions</strong> — statements that are either true or false. Complex statements are built from atomic propositions using connectives: ¬ (not), ∧ (and), ∨ (or), → (implies), ↔ (iff).</p>
+    <p>A <strong>model</strong> is a truth-value assignment to all propositions. A sentence is <strong>valid</strong> if true in all models, <strong>satisfiable</strong> if true in some model, and <strong>unsatisfiable</strong> if true in no model.</p>
+    <div class="math-block">
+      <span class="math-label">Propositional Logic — Syntax and Semantics</span>
+      Atomic propositions:  P, Q, R, HasFever, IsPneumonia
+      Complex sentences:    HasFever ∧ HasCough → SuspectPneumonia
+                            ¬HasAntibiotics → ¬CuredBacterial
+      Inference rule (Modus Ponens):  α → β,  α  ⊢  β
+      Completeness: YES   Decidability: YES (propositional SAT)
+      Limitation: NO variables, NO quantifiers, NO objects or relations
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Medical Diagnosis in Propositional Logic</span>
+    </div>
+    <div class="example-body">
+      <h4>Knowledge Base (KB)</h4>
+      <pre><code><span class="cm">-- Facts about John (given) --</span>
+<span class="kw">HasFever</span>         <span class="cm">-- John has fever</span>
+<span class="kw">HasCough</span>         <span class="cm">-- John has cough</span>
+<span class="kw">HasChestPain</span>     <span class="cm">-- John has chest pain</span>
+<span class="kw">XRayPositive</span>     <span class="cm">-- consolidation on X-ray</span>
+
+<span class="cm">-- Rules (domain knowledge) --</span>
+<span class="kw">HasFever</span> ∧ <span class="kw">HasCough</span> ∧ <span class="kw">XRayPositive</span> → <span class="str">SuspectPneumonia</span>
+<span class="str">SuspectPneumonia</span> ∧ <span class="kw">HasChestPain</span> → <span class="str">DiagnosePneumonia</span>
+<span class="str">DiagnosePneumonia</span> → <span class="str">TreatWithAntibiotics</span></code></pre>
+      <h4>Inference Chain (Modus Ponens)</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Step</th><th>From</th><th>Rule Applied</th><th>Derived</th></tr>
+          <tr><td>1</td><td>HasFever ∧ HasCough ∧ XRayPositive</td><td>Rule 1</td><td>SuspectPneumonia ✓</td></tr>
+          <tr><td>2</td><td>SuspectPneumonia ∧ HasChestPain</td><td>Rule 2</td><td>DiagnosePneumonia ✓</td></tr>
+          <tr class="highlight-row"><td>3</td><td>DiagnosePneumonia</td><td>Rule 3</td><td>TreatWithAntibiotics ✓</td></tr>
+        </table>
+      </div>
+      <div class="callout red">
+        <span class="callout-label">Limitation of Propositional Logic</span>
+        <p>This knowledge base only works for <em>John specifically</em>. To represent the same rules for patient Mary, we need entirely new propositions: <code>MaryHasFever</code>, <code>MaryHasCough</code>, etc. With 1,000 patients, the KB grows 1,000×. <strong>There is no way to express "for all patients..."</strong> — we need First-Order Logic.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>First-Order Predicate Logic (FOL)</h3>
+  <div class="definition">
+    <div class="definition-term">First-Order Predicate Logic (First-Order Logic, FOL)</div>
+    <p>FOL extends propositional logic with <strong>objects</strong> (constants, variables), <strong>predicates</strong> (relations over objects), <strong>functions</strong>, and <strong>quantifiers</strong> (∀ universal, ∃ existential). These additions make FOL dramatically more expressive — capable of representing most human knowledge.</p>
+    <div class="math-block">
+      <span class="math-label">FOL Syntax Elements</span>
+      Constants:   john, pneumonia, fever      (specific objects)
+      Variables:   x, y, p                     (placeholders for any object)
+      Predicates:  HasFever(x), Patient(x)     (properties and relations)
+      Functions:   motherOf(john), doseOf(drug) (object-valued)
+      Quantifiers: ∀x (universal — "for all x")
+                   ∃x (existential — "there exists an x")
+      Connectives: ¬ ∧ ∨ → ↔ (same as propositional)
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Medical Diagnosis in First-Order Logic — Full FOL KB</span>
+    </div>
+    <div class="example-body">
+      <h4>Ontology (object categories)</h4>
+      <pre><code><span class="cm">-- Object sorts (types) --</span>
+<span class="fn">Patient</span>(john)      <span class="cm">-- john is a patient</span>
+<span class="fn">Disease</span>(pneumonia) <span class="cm">-- pneumonia is a disease</span>
+<span class="fn">Symptom</span>(fever)     <span class="cm">-- fever is a symptom</span>
+<span class="fn">Drug</span>(amoxicillin)  <span class="cm">-- amoxicillin is a drug</span></code></pre>
+      <h4>Facts (ground atoms)</h4>
+      <pre><code><span class="fn">HasSymptom</span>(john, fever)
+<span class="fn">HasSymptom</span>(john, cough)
+<span class="fn">HasSymptom</span>(john, chest_pain)
+<span class="fn">TestResult</span>(john, xray, positive)
+<span class="fn">Age</span>(john, <span class="num">45</span>)
+<span class="fn">Smoker</span>(john)</code></pre>
+      <h4>General Rules (with variables — work for ANY patient)</h4>
+      <pre><code><span class="cm">-- Rule 1: Pneumonia diagnostic criteria --</span>
+∀x [<span class="fn">Patient</span>(x) ∧ <span class="fn">HasSymptom</span>(x, fever) ∧ <span class="fn">HasSymptom</span>(x, cough)
+     ∧ <span class="fn">TestResult</span>(x, xray, positive)
+     → <span class="fn">SuspectDisease</span>(x, pneumonia)]
+
+<span class="cm">-- Rule 2: Confirm diagnosis with chest pain --</span>
+∀x [<span class="fn">SuspectDisease</span>(x, pneumonia) ∧ <span class="fn">HasSymptom</span>(x, chest_pain)
+     → <span class="fn">Diagnosis</span>(x, pneumonia)]
+
+<span class="cm">-- Rule 3: Treatment protocol --</span>
+∀x ∀d [<span class="fn">Diagnosis</span>(x, d) ∧ <span class="fn">BacterialDisease</span>(d)
+        → <span class="fn">Prescribe</span>(x, amoxicillin)]
+
+<span class="cm">-- Fact: pneumonia is bacterial --</span>
+<span class="fn">BacterialDisease</span>(pneumonia)
+
+<span class="cm">-- Rule 4: Elderly patients need extra care (quantified!) --</span>
+∀x [<span class="fn">Patient</span>(x) ∧ <span class="fn">Age</span>(x, ?a) ∧ ?a > <span class="num">65</span> ∧ <span class="fn">Diagnosis</span>(x, pneumonia)
+     → <span class="fn">HighRisk</span>(x)]</code></pre>
+      <h4>Inference (Unification + Modus Ponens)</h4>
+      <p>Applying Rule 1 with x = john: the system <strong>unifies</strong> the variable x with the constant john, checks all conditions against the KB, and derives <code>SuspectDisease(john, pneumonia)</code>. This works for ANY patient — Mary, Bob, Alice — using the same rules.</p>
+      <div class="callout green">
+        <span class="callout-label">Advantage over Propositional Logic</span>
+        <p>One FOL rule handles all patients. Add 1,000 patients — the rules stay exactly the same. The KB grows only with new patient facts, not new rules. Quantification is the key power of FOL.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOL vs Propositional comparison table -->
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Feature</th><th>Propositional Logic</th><th>First-Order Logic (FOL)</th></tr>
+      <tr><td>Variables</td><td>❌ None — only named propositions</td><td>✅ Variables ranging over objects</td></tr>
+      <tr><td>Quantifiers</td><td>❌ None</td><td>✅ ∀ and ∃</td></tr>
+      <tr><td>Objects &amp; relations</td><td>❌ No objects — only truth values</td><td>✅ Objects, predicates, functions</td></tr>
+      <tr><td>Expressiveness</td><td>Limited — grows linearly with domain</td><td>High — one rule covers all objects</td></tr>
+      <tr><td>Decidability</td><td>✅ Decidable (exponential)</td><td>❌ Semi-decidable (can loop forever)</td></tr>
+      <tr><td>Inference speed</td><td>Fast (SAT solvers, resolution)</td><td>Slower (unification, theorem proving)</td></tr>
+      <tr class="highlight-row"><td>Practical use</td><td>Hardware verification, simple rule engines</td><td>Expert systems, ontologies, Prolog, OWL</td></tr>
+    </table>
+  </div>
+
+  <h3>Horn Clauses — The Efficient Subset</h3>
+  <div class="definition">
+    <div class="definition-term">Horn Clause</div>
+    <p>A <strong>Horn clause</strong> is a disjunction of literals with at most one positive literal. Equivalently: <code>B₁ ∧ B₂ ∧ … ∧ Bₙ → H</code> — a conjunction of conditions implies a single head. Horn clauses are a proper subset of FOL that supports efficient reasoning via <strong>SLD resolution</strong> (used in Prolog).</p>
+    <p>Advantages: linear-time inference (vs. exponential for full FOL); complete for Horn theories; forms the basis of <strong>Prolog</strong> and <strong>Datalog</strong>. Limitation: cannot express disjunctions in the head (you cannot say "diagnosis is either X or Y").</p>
+  </div>
+
+  <pre><code><span class="cm">-- Horn clause knowledge base for medical diagnosis --</span>
+<span class="cm">% Facts (unit clauses — head only)</span>
+<span class="fn">patient</span>(john).
+<span class="fn">has_symptom</span>(john, fever).
+<span class="fn">has_symptom</span>(john, cough).
+<span class="fn">test_positive</span>(john, xray).
+<span class="fn">bacterial_disease</span>(pneumonia).
+
+<span class="cm">% Rules (definite clauses — body → head)</span>
+<span class="fn">suspect_pneumonia</span>(X) :-
+    <span class="fn">patient</span>(X),
+    <span class="fn">has_symptom</span>(X, fever),
+    <span class="fn">has_symptom</span>(X, cough),
+    <span class="fn">test_positive</span>(X, xray).
+
+<span class="fn">diagnose</span>(X, pneumonia) :-
+    <span class="fn">suspect_pneumonia</span>(X).
+
+<span class="fn">prescribe</span>(X, amoxicillin) :-
+    <span class="fn">diagnose</span>(X, D),
+    <span class="fn">bacterial_disease</span>(D).
+
+<span class="cm">% Query: ?- prescribe(john, What).</span>
+<span class="cm">% Answer: What = amoxicillin  ✓</span></code></pre>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A doctor wants to encode the rule: "A patient has pneumonia OR tuberculosis if they have a chronic cough lasting more than 3 weeks." Why can this NOT be directly represented as a Horn clause?</div>
+    <div class="quiz-opts" id="q3">
+      <button class="quiz-opt" onclick="checkQ('q3',0,'q3fb','wrong')">A. Horn clauses cannot use variables — they only work with specific named individuals</button>
+      <button class="quiz-opt" onclick="checkQ('q3',1,'q3fb','correct')">B. Horn clauses allow at most ONE positive literal in the head — "pneumonia OR tuberculosis" requires two positive literals in the head (a disjunctive conclusion)</button>
+      <button class="quiz-opt" onclick="checkQ('q3',2,'q3fb','wrong')">C. Horn clauses cannot represent time-based conditions like "3 weeks"</button>
+      <button class="quiz-opt" onclick="checkQ('q3',3,'q3fb','wrong')">D. Horn clauses are not expressive enough to handle medical knowledge at all</button>
+    </div>
+    <div class="quiz-feedback" id="q3fb">✅ Correct! Horn clauses have the form Body → Head, where Head is a single positive literal. The rule "cough&gt;3weeks → Pneumonia ∨ Tuberculosis" would require a disjunctive head (Pneumonia OR Tuberculosis), which violates the Horn clause restriction. Full FOL can express this: <code>ChronicCough(x) → HasDisease(x, pneumonia) ∨ HasDisease(x, tb)</code>. This is a common exam question — remember "at most one positive literal in the head."</div>
+  </div>
+</section>
+
+<!-- S4: STRUCTURED APPROACHES -->
+<section id="s4">
+  <div class="section-header">
+    <span class="section-num">Section 04</span>
+    <h2 class="section-title">Structured Approaches to Knowledge Representation</h2>
+  </div>
+  <p>Logic is precise but verbose — representing a doctor's knowledge about pneumonia in FOL requires dozens of atomic sentences for what a physician grasps intuitively as a unified concept. <strong>Structured representations</strong> package related knowledge into coherent units that mirror how humans organise knowledge: as networks of related concepts, as stereotyped descriptions, or as templated event sequences.</p>
+  <p>The four major structured approaches are: <strong>Semantic Networks</strong>, <strong>Frames</strong>, <strong>Production Rules (IF-THEN)</strong>, and <strong>Scripts</strong>. Each offers a different trade-off between expressiveness, naturalness, and computational efficiency.</p>
+
+  <h3>Semantic Networks</h3>
+  <div class="definition">
+    <div class="definition-term">Semantic Network</div>
+    <p>A <strong>semantic network</strong> is a directed graph where:</p>
+    <ul class="styled">
+      <li><strong>Nodes</strong> represent concepts, objects, or events.</li>
+      <li><strong>Labelled arcs</strong> represent relationships between nodes.</li>
+    </ul>
+    <p>Key relationship types: <strong>is-a</strong> (class membership — John is-a Patient), <strong>kind-of / a-kind-of (AKO)</strong> (class hierarchy — Pneumonia kind-of Lung-Disease), <strong>has-property</strong>, <strong>part-of</strong>. Inheritance propagates properties along is-a and AKO links.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="sn1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#3d3530" stroke-width="1.5"/></marker>
+      <marker id="sn2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#27ae60" stroke-width="1.8"/></marker>
+      <marker id="sn3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#2980b9" stroke-width="1.8"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">Semantic Network — Medical Diagnosis Domain</text>
+
+      <!-- Top level: Disease (abstract) -->
+      <ellipse cx="430" cy="65" rx="65" ry="28" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="430" y="61" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Disease</text>
+      <text x="430" y="78" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">(abstract class)</text>
+
+      <!-- Lung Disease -->
+      <ellipse cx="240" cy="165" rx="70" ry="28" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="240" y="161" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Lung Disease</text>
+      <text x="240" y="178" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">organ: lung</text>
+
+      <!-- Infectious Disease -->
+      <ellipse cx="620" cy="165" rx="80" ry="28" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="620" y="161" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Infectious Disease</text>
+      <text x="620" y="178" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">cause: pathogen</text>
+
+      <!-- Pneumonia -->
+      <ellipse cx="430" cy="265" rx="70" ry="28" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="430" y="261" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">Pneumonia</text>
+      <text x="430" y="278" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">treatment: antibiotics</text>
+
+      <!-- John (instance) -->
+      <rect x="90" y="305" width="120" height="60" rx="8" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="150" y="328" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">John</text>
+      <text x="150" y="346" font-family="'JetBrains Mono',monospace" font-size="10" fill="#7d5a00" text-anchor="middle">age: 45</text>
+      <text x="150" y="360" font-family="'JetBrains Mono',monospace" font-size="10" fill="#7d5a00" text-anchor="middle">smoker: true</text>
+
+      <!-- Symptom nodes -->
+      <ellipse cx="620" cy="310" rx="50" ry="25" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="620" y="306" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">Fever</text>
+      <text x="620" y="322" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b" text-anchor="middle">temp: &gt;38°C</text>
+
+      <ellipse cx="740" cy="310" rx="50" ry="25" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="740" y="306" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">Cough</text>
+      <text x="740" y="322" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b" text-anchor="middle">type: productive</text>
+
+      <!-- AKO arcs (green — kind-of) -->
+      <line x1="290" y1="152" x2="378" y2="86" stroke="#27ae60" stroke-width="2" marker-end="url(#sn2)"/>
+      <text x="310" y="110" font-family="'JetBrains Mono',monospace" font-size="10" fill="#27ae60" text-anchor="middle">AKO</text>
+      <line x1="570" y1="152" x2="482" y2="86" stroke="#27ae60" stroke-width="2" marker-end="url(#sn2)"/>
+      <text x="550" y="110" font-family="'JetBrains Mono',monospace" font-size="10" fill="#27ae60" text-anchor="middle">AKO</text>
+      <line x1="385" y1="252" x2="273" y2="186" stroke="#27ae60" stroke-width="2" marker-end="url(#sn2)"/>
+      <text x="300" y="225" font-family="'JetBrains Mono',monospace" font-size="10" fill="#27ae60" text-anchor="middle">AKO</text>
+      <line x1="475" y1="252" x2="568" y2="186" stroke="#27ae60" stroke-width="2" marker-end="url(#sn2)"/>
+      <text x="548" y="225" font-family="'JetBrains Mono',monospace" font-size="10" fill="#27ae60" text-anchor="middle">AKO</text>
+
+      <!-- is-a arc (John → Pneumonia instance link) -->
+      <line x1="210" y1="325" x2="365" y2="280" stroke="#2980b9" stroke-width="2" marker-end="url(#sn3)"/>
+      <text x="265" y="298" font-family="'JetBrains Mono',monospace" font-size="10" fill="#2980b9" text-anchor="middle">has_diagnosis</text>
+
+      <!-- has_symptom arcs -->
+      <line x1="210" y1="335" x2="572" y2="316" stroke="#c0392b" stroke-width="1.5" marker-end="url(#sn1)"/>
+      <text x="388" y="316" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b" text-anchor="middle">has_symptom</text>
+      <line x1="210" y1="345" x2="692" y2="322" stroke="#c0392b" stroke-width="1.5" marker-end="url(#sn1)"/>
+
+      <!-- Legend -->
+      <line x1="40" y1="368" x2="70" y2="368" stroke="#27ae60" stroke-width="2" marker-end="url(#sn2)"/>
+      <text x="78" y="373" font-family="'Source Serif 4',serif" font-size="12" fill="#555">AKO / is-a (inheritance)</text>
+      <line x1="220" y1="368" x2="250" y2="368" stroke="#2980b9" stroke-width="2" marker-end="url(#sn3)"/>
+      <text x="258" y="373" font-family="'Source Serif 4',serif" font-size="12" fill="#555">instance relation</text>
+      <line x1="380" y1="368" x2="410" y2="368" stroke="#3d3530" stroke-width="1.5" marker-end="url(#sn1)"/>
+      <text x="418" y="373" font-family="'Source Serif 4',serif" font-size="12" fill="#555">property/symptom link</text>
+    </svg>
+    <div class="diagram-caption">Figure 4.1 — Semantic network for medical diagnosis. Green AKO arcs form the class hierarchy (Pneumonia is both a Lung Disease and an Infectious Disease). John inherits properties from classes via AKO links — e.g., treatment=antibiotics propagates down from Pneumonia.</div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">Key Feature — Inheritance</span>
+    <p><strong>Inheritance</strong> is the key power of semantic networks. John's diagnosis of Pneumonia automatically grants him all properties of Pneumonia (treatment: antibiotics), Lung Disease (organ: lung), and Infectious Disease (cause: pathogen) — without stating each property individually. This dramatically reduces redundancy. But inheritance can be problematic when exceptions exist: "Tweety is a Bird; Birds fly; Tweety is a Penguin; Penguins don't fly." Which rule wins? This is the famous <strong>multiple inheritance</strong> problem.</p>
+  </div>
+
+  <h3>Frames</h3>
+  <div class="definition">
+    <div class="definition-term">Frame (Minsky, 1975)</div>
+    <p>A <strong>frame</strong> is a data structure (like a record or class) that collects all knowledge about a concept or object into a single unit. Each frame has <strong>slots</strong> (attributes) and <strong>fillers</strong> (values). Slot values can be: specific values, pointers to other frames, default values (assumed unless overridden), or procedural attachments (code to run when the slot is accessed).</p>
+    <p>Frames introduced the ideas of <em>inheritance</em>, <em>default values</em>, and <em>procedural attachment</em> that later became core object-oriented programming (OOP) concepts.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Frame Representation — Medical Diagnosis Domain</span>
+    </div>
+    <div class="example-body">
+      <h4>Disease Frame (superclass)</h4>
+      <pre><code><span class="kw">FRAME:</span> <span class="fn">Disease</span>
+  <span class="num">name:</span>           [STRING]
+  <span class="num">category:</span>       [STRING]
+  <span class="num">treatment:</span>      [Frame: Drug]
+  <span class="num">severity:</span>       default: <span class="str">"moderate"</span>
+  <span class="num">is-a:</span>           Medical-Condition</code></pre>
+
+      <h4>Pneumonia Frame (inherits from Disease)</h4>
+      <pre><code><span class="kw">FRAME:</span> <span class="fn">Pneumonia</span>
+  <span class="num">is-a:</span>           <span class="fn">Disease</span>, <span class="fn">LungDisease</span>, <span class="fn">InfectiousDisease</span>
+  <span class="num">name:</span>           <span class="str">"Pneumonia"</span>
+  <span class="num">symptoms:</span>       [fever, productive-cough, chest-pain, dyspnea]
+  <span class="num">diagnostic-criteria:</span>
+      - <span class="fn">HasSymptom</span>(fever) ∧ <span class="fn">HasSymptom</span>(cough)
+      - <span class="fn">XRayResult</span>(consolidation)
+  <span class="num">treatment:</span>      amoxicillin-500mg   <span class="cm">-- overrides Disease default</span>
+  <span class="num">duration:</span>       default: <span class="str">"7 days"</span>
+  <span class="num">severity:</span>       <span class="str">"moderate-to-severe"</span> <span class="cm">-- overrides Disease default</span>
+  <span class="num">when-filled(diagnosis):</span>
+      <span class="cm">-- procedural attachment: run when diagnosis slot is filled</span>
+      → <span class="fn">GeneratePrescription</span>(treatment, duration)</code></pre>
+
+      <h4>Patient-Instance Frame: John</h4>
+      <pre><code><span class="kw">FRAME:</span> <span class="fn">John-Patient</span>
+  <span class="num">is-a:</span>           <span class="fn">Patient</span>
+  <span class="num">name:</span>           <span class="str">"John Smith"</span>
+  <span class="num">age:</span>            <span class="num">45</span>
+  <span class="num">smoker:</span>         <span class="kw">true</span>
+  <span class="num">symptoms:</span>       [fever(38.5°C), productive-cough, chest-pain]
+  <span class="num">test-results:</span>   [xray: consolidation, WBC: 14000]
+  <span class="num">diagnosis:</span>      <span class="fn">Pneumonia</span>    <span class="cm">-- filled by inference; triggers procedural attachment</span>
+  <span class="num">prescription:</span>   amoxicillin-500mg × 7 days   <span class="cm">-- generated automatically</span></code></pre>
+
+      <div class="callout green">
+        <span class="callout-label">Frame Mechanism — Inheritance + Default + Procedure</span>
+        <p>When <code>diagnosis = Pneumonia</code> is filled in John's frame: (1) John <em>inherits</em> all Pneumonia slot values. (2) <em>Default values</em> ("7 days", "moderate") are used unless explicitly overridden. (3) The <em>procedural attachment</em> <code>when-filled(diagnosis)</code> automatically triggers <code>GeneratePrescription</code> — producing the prescription without additional rules.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Production Rules (IF-THEN Systems)</h3>
+  <div class="definition">
+    <div class="definition-term">Production Rule System</div>
+    <p>A <strong>production rule</strong> is an IF-THEN pair: <code>IF &lt;condition&gt; THEN &lt;action&gt;</code>. A production system has three components: a set of production rules (knowledge base), a <strong>working memory</strong> (current state), and an <strong>inference engine</strong> (selects and fires rules).</p>
+    <p>Production rules directly model human expert decision-making and are the basis of most clinical decision support systems, credit scoring systems, and early expert systems like MYCIN.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Classic Example</span>
+      <span class="example-title">MYCIN-Style Production Rules for Medical Diagnosis</span>
+    </div>
+    <div class="example-body">
+      <p>MYCIN (1976) was the first successful medical expert system, diagnosing bacterial infections. It used production rules with <strong>certainty factors</strong> (CF) to handle uncertainty. CF ranges from −1 (definitely false) to +1 (definitely true).</p>
+      <pre><code><span class="cm">-- Rule 1: Suspect bacterial pneumonia --</span>
+<span class="kw">IF</span>   the patient has fever (temp &gt; 38°C)
+<span class="kw">AND</span>  the patient has productive cough
+<span class="kw">AND</span>  chest X-ray shows consolidation
+<span class="kw">THEN</span> suspect bacterial pneumonia  [CF = 0.8]
+
+<span class="cm">-- Rule 2: Raise confidence with positive culture --</span>
+<span class="kw">IF</span>   suspect bacterial pneumonia
+<span class="kw">AND</span>  sputum culture positive for Streptococcus pneumoniae
+<span class="kw">THEN</span> diagnose community-acquired pneumonia  [CF = 0.95]
+
+<span class="cm">-- Rule 3: Select antibiotic --</span>
+<span class="kw">IF</span>   diagnose community-acquired pneumonia
+<span class="kw">AND</span>  patient is NOT penicillin-allergic
+<span class="kw">THEN</span> prescribe amoxicillin 500mg three times daily  [CF = 0.9]
+
+<span class="cm">-- Rule 4: Age-based risk flag --</span>
+<span class="kw">IF</span>   patient age &gt; 65
+<span class="kw">AND</span>  diagnose community-acquired pneumonia
+<span class="kw">THEN</span> flag as HIGH RISK — consider hospitalisation  [CF = 0.85]</code></pre>
+
+      <h4>Forward Chaining Trace (Data → Conclusion)</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Step</th><th>Working Memory Contains</th><th>Rule Fired</th><th>New Fact Added</th></tr>
+          <tr><td>Init</td><td>Fever(38.5°C), ProductiveCough, XRay(+), Culture(S.pneumoniae), Age(45)</td><td>—</td><td>—</td></tr>
+          <tr><td>1</td><td>Above facts match Rule 1 conditions</td><td>Rule 1</td><td>SuspectBacterialPneumonia [CF=0.8]</td></tr>
+          <tr><td>2</td><td>SuspectPneumonia + Culture match Rule 2</td><td>Rule 2</td><td>DiagnoseCAP [CF=0.95]</td></tr>
+          <tr class="highlight-row"><td>3</td><td>DiagnoseCAP + no allergy match Rule 3</td><td>Rule 3</td><td>PrescribeAmoxicillin [CF=0.9] ✓</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3>Scripts</h3>
+  <div class="definition">
+    <div class="definition-term">Script (Schank &amp; Abelson, 1977)</div>
+    <p>A <strong>script</strong> is a structured representation of a <em>stereotyped sequence of events</em> — a template for typical situations. Scripts capture procedural knowledge about how common events typically unfold. They have four components:</p>
+    <ul class="styled">
+      <li><strong>Entry conditions:</strong> What must be true before the script begins.</li>
+      <li><strong>Roles:</strong> The participants (doctor, patient, nurse).</li>
+      <li><strong>Props:</strong> The objects involved (stethoscope, prescription pad).</li>
+      <li><strong>Scenes:</strong> The sequence of actions, each with expected causal structure.</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Medical Consultation Script</span>
+    </div>
+    <div class="example-body">
+      <div class="table-wrap">
+        <table>
+          <tr><th>Component</th><th>Content</th></tr>
+          <tr><td><strong>Script Name</strong></td><td>MEDICAL-CONSULTATION</td></tr>
+          <tr><td><strong>Entry Conditions</strong></td><td>Patient is unwell. Patient has appointment. Doctor is available.</td></tr>
+          <tr><td><strong>Roles</strong></td><td>Patient (p), Doctor (d), Nurse (n), Receptionist (r)</td></tr>
+          <tr><td><strong>Props</strong></td><td>Waiting room, examination table, stethoscope, blood pressure cuff, prescription pad, medical records</td></tr>
+          <tr><td><strong>Scene 1: Arrival</strong></td><td>p arrives at clinic → r checks in p → n takes vitals (temp, BP, pulse) → p waits in waiting room</td></tr>
+          <tr><td><strong>Scene 2: Consultation</strong></td><td>n calls p → p enters examination room → d greets p → d asks about symptoms → p describes symptoms → d examines p (auscultation, palpation)</td></tr>
+          <tr><td><strong>Scene 3: Diagnosis</strong></td><td>d orders tests (X-ray, blood work) → d reviews results → d formulates diagnosis → d explains diagnosis to p</td></tr>
+          <tr class="highlight-row"><td><strong>Scene 4: Treatment</strong></td><td>d writes prescription → d gives follow-up instructions → p leaves clinic → p fills prescription at pharmacy</td></tr>
+          <tr><td><strong>Exit Conditions</strong></td><td>Patient has prescription. Patient understands treatment plan.</td></tr>
+          <tr><td><strong>Expected Outcomes</strong></td><td>Patient recovers. Condition is monitored. Follow-up scheduled if needed.</td></tr>
+        </table>
+      </div>
+      <div class="callout blue">
+        <span class="callout-label">Why Scripts Matter</span>
+        <p>Scripts allow an AI system to <em>fill in missing information</em>. If a story says "John went to the doctor and got amoxicillin," a script-based system knows John probably had to check in, wait, be examined, and receive a diagnosis — even though none of this is stated. Scripts power natural language understanding of stories and are the basis of modern frame-based NLU systems.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Comparing All KR Approaches</h3>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Approach</th><th>Structure</th><th>Strengths</th><th>Weaknesses</th><th>Best For</th></tr>
+      <tr><td>Propositional Logic</td><td>Truth-valued propositions</td><td>Decidable; fast; sound &amp; complete</td><td>No variables; no quantifiers; exponential growth</td><td>Simple boolean reasoning, hardware verification</td></tr>
+      <tr><td>First-Order Logic (FOL)</td><td>Objects + predicates + quantifiers</td><td>Highly expressive; sound; general</td><td>Semi-decidable; slow; verbose</td><td>Expert systems, ontologies, theorem proving</td></tr>
+      <tr><td>Horn Clauses / Prolog</td><td>Definite clauses — body → head</td><td>Efficient SLD resolution; Prolog</td><td>No disjunctive heads; limited negation</td><td>Logic programming, Datalog databases</td></tr>
+      <tr><td>Semantic Networks</td><td>Nodes + labelled arcs + inheritance</td><td>Natural; visual; inheritance</td><td>Ambiguous semantics; multiple inheritance issues</td><td>Taxonomies, NLU, knowledge graphs</td></tr>
+      <tr><td>Frames</td><td>Slots + fillers + inheritance + procedures</td><td>Default values; procedural attachment; OOP-like</td><td>Complex interaction of defaults; not formal</td><td>Expert systems, object modelling, planning</td></tr>
+      <tr><td>Production Rules</td><td>IF condition THEN action</td><td>Natural expert knowledge; modular; explainable</td><td>Conflict resolution needed; no structure between rules</td><td>Expert systems (MYCIN), decision support</td></tr>
+      <tr class="highlight-row"><td>Scripts</td><td>Stereotyped event sequences</td><td>Captures procedural knowledge; enables inference</td><td>Rigid; hard to handle deviations; difficult to build</td><td>NLU story understanding, dialogue systems</td></tr>
+    </table>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A hospital wants to build a system that automatically generates a default treatment plan the moment a diagnosis is entered — without writing a separate rule for every disease. Which KR mechanism is BEST suited for this?</div>
+    <div class="quiz-opts" id="q4">
+      <button class="quiz-opt" onclick="checkQ('q4',0,'q4fb','wrong')">A. Propositional Logic — write one proposition for each disease-treatment pair</button>
+      <button class="quiz-opt" onclick="checkQ('q4',1,'q4fb','wrong')">B. Production Rules — write an IF diagnosis=X THEN treatment=Y rule for every disease</button>
+      <button class="quiz-opt" onclick="checkQ('q4',2,'q4fb','correct')">C. Frames with procedural attachments — when the diagnosis slot is filled, a when-filled demon automatically triggers GenerateTreatmentPlan</button>
+      <button class="quiz-opt" onclick="checkQ('q4',3,'q4fb','wrong')">D. Scripts — encode a treatment script for every disease</button>
+    </div>
+    <div class="quiz-feedback" id="q4fb">✅ Correct! <strong>Frames with procedural attachments</strong> (specifically "when-filled demons") are designed exactly for this: when a slot value is assigned, attached code fires automatically. No separate rules are needed per disease — the procedure is part of the frame definition itself. This is superior to production rules (which require one rule per disease-treatment pair) and propositional logic (which cannot express this pattern compactly). This is why frames became the basis of object-oriented programming — methods fire when attributes are set.</div>
+  </div>
+</section>
+
+<!-- S5: ISSUES IN KR -->
+<section id="s5">
+  <div class="section-header">
+    <span class="section-num">Section 05</span>
+    <h2 class="section-title">Issues in Knowledge Representation</h2>
+  </div>
+
+  <p>Building a working knowledge representation system is hard — much harder than picking a formalism and writing down facts. Fundamental problems arise that no current KR approach fully solves. These issues are not bugs in specific systems; they are deep conceptual challenges inherent to representing a complex, changing, and incompletely known world in a finite, static formal language.</p>
+  <p>This section covers the six most important issues: the <strong>expressiveness–tractability trade-off</strong>, <strong>completeness and consistency</strong>, <strong>uncertainty and vagueness</strong>, the <strong>Frame Problem</strong>, the <strong>Qualification and Ramification Problems</strong>, and the <strong>knowledge acquisition bottleneck</strong>.</p>
+
+  <h3>Issue 1: Expressiveness vs. Computational Tractability</h3>
+  <p>The most fundamental issue in KR is a tension between two desirable but conflicting goals. This trade-off is the most frequently examined issue in KR courses.</p>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="et1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">The Expressiveness–Tractability Trade-off in KR Languages</text>
+      <!-- Horizontal axis: Expressiveness -->
+      <line x1="60" y1="170" x2="800" y2="170" stroke="#888" stroke-width="2" marker-end="url(#et1)"/>
+      <text x="430" y="210" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#3d3530" text-anchor="middle">← Less Expressive ·················· More Expressive →</text>
+      <!-- Tractability curve (inverse of expressiveness) -->
+      <path d="M80 80 Q200 82 320 90 Q420 100 520 125 Q620 155 700 185 Q750 200 790 220" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3"/>
+      <text x="150" y="68" font-family="'JetBrains Mono',monospace" font-size="11" fill="#c0392b" text-anchor="middle">Tractability / Speed</text>
+      <!-- Language markers on axis -->
+      <circle cx="110" cy="170" r="6" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="110" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Prop. Logic</text>
+      <text x="110" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">Decidable</text>
+      <circle cx="240" cy="170" r="6" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="240" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Horn Clauses</text>
+      <text x="240" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">PTIME</text>
+      <circle cx="380" cy="170" r="6" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="380" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">Description Logic</text>
+      <text x="380" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">Decidable</text>
+      <circle cx="520" cy="170" r="6" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="520" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">FOL (∀, ∃)</text>
+      <text x="520" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">Semi-decidable</text>
+      <circle cx="660" cy="170" r="6" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="660" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#7d5a00" text-anchor="middle">Higher-Order Logic</text>
+      <text x="660" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">Undecidable</text>
+      <circle cx="780" cy="170" r="6" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="780" y="192" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b" text-anchor="middle">Full NL</text>
+      <text x="780" y="206" font-family="'Source Serif 4',serif" font-size="10" fill="#888" text-anchor="middle">Intractable</text>
+      <!-- Vertical bracket showing sweet spot -->
+      <rect x="330" y="40" width="240" height="115" rx="6" fill="rgba(39,174,96,0.08)" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="450" y="62" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#1a6b38" text-anchor="middle">★ Sweet Spot</text>
+      <text x="450" y="82" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Description Logics (OWL)</text>
+      <text x="450" y="100" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Decidable + highly expressive</text>
+      <text x="450" y="118" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Powers modern ontologies</text>
+      <text x="450" y="136" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">(used in SNOMED CT, Gene Ontology)</text>
+    </svg>
+    <div class="diagram-caption">Figure 5.1 — The expressiveness–tractability trade-off. Moving right increases what can be expressed but reduces reasoning speed. Description Logics occupy the current "sweet spot" — expressive enough for most ontological knowledge, decidable, and implemented in OWL for the Semantic Web.</div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">Key Insight — No Free Lunch</span>
+    <p>There is no KR language that is simultaneously fully expressive (can represent all human knowledge), computationally efficient (answers queries in polynomial time), and complete (derives all valid conclusions). Every practical KR system makes a deliberate trade-off. Description Logics (the basis of OWL — Web Ontology Language) are the current best balance for ontology engineering.</p>
+  </div>
+
+  <h3>Issue 2: Completeness and Consistency</h3>
+  <div class="definition">
+    <div class="definition-term">Completeness and Consistency in Knowledge Bases</div>
+    <p><strong>Completeness:</strong> A KB is complete if it contains all relevant facts about the domain — no true fact is missing. Real-world KBs are almost never complete (we don't know everything).</p>
+    <p><strong>Consistency:</strong> A KB is consistent if no contradiction can be derived — no statement and its negation are both entailed. Inconsistent KBs are dangerous: from a contradiction, everything is provable (ex falso quodlibet).</p>
+    <p><strong>Closed World Assumption (CWA):</strong> Anything not in the KB is assumed false. Databases use CWA. Simple but dangerous — absence of evidence treated as evidence of absence.</p>
+    <p><strong>Open World Assumption (OWA):</strong> Anything not in the KB is simply unknown. Web ontologies (OWL) use OWA. More faithful to reality but requires explicit negation to say something is false.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">CWA vs. OWA — Medical Records</span>
+    </div>
+    <div class="example-body">
+      <p>The KB contains: <code>Allergy(John, penicillin)</code> but does NOT contain <code>Allergy(John, amoxicillin)</code>.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Assumption</th><th>Query: Is John allergic to amoxicillin?</th><th>Consequence</th></tr>
+          <tr><td><strong>CWA (Database)</strong></td><td>"NO — not in the KB, therefore false"</td><td>System confidently prescribes amoxicillin — possibly dangerous!</td></tr>
+          <tr class="highlight-row"><td><strong>OWA (Ontology)</strong></td><td>"UNKNOWN — not stated either way"</td><td>System asks doctor to verify before prescribing — safer!</td></tr>
+        </table>
+      </div>
+      <p>Medical KBs should use OWA: a missing allergy record does not mean no allergy — it may mean the allergy was never tested or recorded.</p>
+    </div>
+  </div>
+
+  <h3>Issue 3: Uncertainty and Vagueness</h3>
+  <p>Real-world knowledge is rarely certain. A doctor doesn't know that a patient has pneumonia — they have a degree of belief based on incomplete evidence. Classic logic is bivalent (true or false). Two main approaches handle uncertainty in KR:</p>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Approach</th><th>Representation</th><th>Example</th><th>Used In</th></tr>
+      <tr><td>Certainty Factors (CF)</td><td>Weight from −1 to +1 attached to rules</td><td>IF fever AND cough THEN pneumonia [CF=0.8]</td><td>MYCIN, early expert systems</td></tr>
+      <tr><td>Bayesian Networks</td><td>Conditional probability distributions</td><td>P(Pneumonia | Fever=T, Cough=T) = 0.72</td><td>Medical diagnosis, spam filters, NLP</td></tr>
+      <tr><td>Fuzzy Logic</td><td>Truth values in [0,1]; linguistic variables</td><td>Temperature is "HIGH" with degree 0.85</td><td>Control systems, washing machines</td></tr>
+      <tr class="highlight-row"><td>Dempster-Shafer Theory</td><td>Belief functions over sets of hypotheses</td><td>Belief({pneumonia, bronchitis}) = 0.6</td><td>Decision support under ignorance</td></tr>
+    </table>
+  </div>
+
+  <div class="math-block">
+    <span class="math-label">Certainty Factor Combination (MYCIN)</span>
+    CF(H, E₁ ∧ E₂) = CF(H|E₁) + CF(H|E₂) × (1 − CF(H|E₁))   if both positive
+
+    Example: Fever gives CF=0.6; Positive X-ray gives CF=0.7
+    Combined CF = 0.6 + 0.7 × (1 − 0.6) = 0.6 + 0.28 = 0.88
+    → Strong belief in pneumonia
+  </div>
+
+  <h3>Issue 4: The Frame Problem</h3>
+  <div class="definition">
+    <div class="definition-term">The Frame Problem (McCarthy &amp; Hayes, 1969)</div>
+    <p>The <strong>Frame Problem</strong> asks: when an agent takes an action, which facts about the world remain true (the "frame") and which change? In formal terms: how do we efficiently represent <em>non-change</em> without explicitly listing all unchanged facts after every action?</p>
+    <p>Naïve solution: add an <em>axiom of persistence</em> for every fact and every action. With F facts and A actions, this requires F×A <em>frame axioms</em> — exponentially expensive and impossible to maintain.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Classic Example</span>
+      <span class="example-title">The Frame Problem — Medical Treatment</span>
+    </div>
+    <div class="example-body">
+      <p>State before action: John has Fever, Cough, Chest-Pain, Diagnosis=Pneumonia.</p>
+      <p>Action: <code>Prescribe(John, amoxicillin)</code></p>
+      <p><strong>Question:</strong> What is true after the action?</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Fact</th><th>After Prescribing?</th><th>How do we know?</th></tr>
+          <tr><td>HasFever(John)</td><td>Still true (immediately)</td><td>Frame axiom: Prescribe doesn't change fever</td></tr>
+          <tr><td>HasCough(John)</td><td>Still true (immediately)</td><td>Frame axiom: Prescribe doesn't change cough</td></tr>
+          <tr><td>Diagnosis(John, Pneumonia)</td><td>Still true</td><td>Frame axiom: Prescribe doesn't change diagnosis</td></tr>
+          <tr class="highlight-row"><td>Prescription(John, amoxicillin)</td><td>Now true (NEW)</td><td>Effect axiom: Prescribe creates this fact</td></tr>
+          <tr><td>Age(John, 45)</td><td>Still true</td><td>Frame axiom: Prescribe doesn't change age</td></tr>
+          <tr><td>Smoker(John)</td><td>Still true</td><td>Frame axiom: Prescribe doesn't change smoking</td></tr>
+        </table>
+      </div>
+      <p>For one action and six facts, we need five explicit frame axioms. With 1,000 facts and 100 actions, we need 100,000 frame axioms. This is the Frame Problem.</p>
+      <div class="callout blue">
+        <span class="callout-label">Solutions to the Frame Problem</span>
+        <p><strong>Successor-State Axioms (Reiter, 1991):</strong> Instead of frame axioms, write one axiom per fluent: "Fact F is true after action A if: A causes F, OR F was already true and A doesn't change F." This collapses exponentially many axioms into one per fact.<br>
+        <strong>Default Persistence:</strong> Assume all facts persist unless explicitly changed — "what was true remains true unless otherwise stated" (the STRIPS assumption used in planning).</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Issue 5: The Qualification and Ramification Problems</h3>
+  <div class="definition">
+    <div class="definition-term">The Qualification Problem</div>
+    <p>The <strong>Qualification Problem</strong> asks: how many conditions must be listed before an action is guaranteed to achieve its effect? Practically — how complete must the precondition list of an action be?</p>
+    <p>Example: "Prescribing amoxicillin cures bacterial pneumonia." Qualifications needed: the patient is not allergic, the bacteria are not resistant, the patient actually takes the medication, the dosage is correct, the patient doesn't have an interfering condition… The list is potentially infinite. We can never fully qualify an action.</p>
+  </div>
+  <div class="definition">
+    <div class="definition-term">The Ramification Problem</div>
+    <p>The <strong>Ramification Problem</strong> asks: how do we represent all the <em>indirect consequences</em> of an action? When an action changes something, it may trigger cascading changes that are hard to enumerate.</p>
+    <p>Example: Prescribing amoxicillin → patient buys medicine → patient spends money → patient's bank balance changes → patient has less money for food → … The chain of indirect consequences can be infinite and unpredictable.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Problem</th><th>Core Question</th><th>Challenge</th><th>Partial Solution</th></tr>
+      <tr><td><strong>Frame Problem</strong></td><td>What stays the same after an action?</td><td>Exponential frame axioms</td><td>Successor-state axioms; STRIPS default</td></tr>
+      <tr><td><strong>Qualification Problem</strong></td><td>What must be true for an action to work?</td><td>Infinite preconditions</td><td>Default logic; closed world for preconditions</td></tr>
+      <tr class="highlight-row"><td><strong>Ramification Problem</strong></td><td>What changes indirectly?</td><td>Infinite ripple effects</td><td>Causal theories; ontological modularisation</td></tr>
+    </table>
+  </div>
+
+  <h3>Issue 6: The Knowledge Acquisition Bottleneck</h3>
+  <p>Even if we choose the perfect KR formalism, we still need to fill the knowledge base with knowledge. This turns out to be the single hardest practical challenge in AI: the <strong>knowledge acquisition bottleneck</strong>.</p>
+
+  <div class="definition">
+    <div class="definition-term">The Knowledge Acquisition Bottleneck</div>
+    <p>The process of extracting knowledge from human experts and encoding it into a formal KB is: <em>slow</em> (experts communicate poorly in formal terms), <em>expensive</em> (expert time costs money), <em>incomplete</em> (experts cannot articulate all their knowledge), and <em>inconsistent</em> (different experts contradict each other).</p>
+    <p>Studies show that building a medical expert system requires years of collaboration between knowledge engineers and domain experts. Experts know things they cannot articulate — this <em>tacit knowledge</em> is the hardest to capture.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">THE KNOWLEDGE ACQUISITION PROCESS — Stages and Challenges</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Knowledge Elicitation:</strong> Interview domain experts. Use protocol analysis (think-aloud), structured interviews, cases and repertory grids. Challenge: experts cannot fully articulate tacit knowledge.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Knowledge Analysis:</strong> Organise raw information into concepts, relations, and rules. Identify inconsistencies. Challenge: different experts disagree; elicited knowledge is ambiguous.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Knowledge Encoding:</strong> Translate analysed knowledge into the chosen KR formalism. Challenge: knowledge does not fit cleanly into any single formalism; lossy translation.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Knowledge Validation:</strong> Test the KB against known cases. Identify missing rules and incorrect encodings. Challenge: errors may not surface until rare edge cases; validation requires more expert time.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p><strong>Knowledge Maintenance:</strong> Update the KB as the domain changes (new drugs, new diseases, changed protocols). Challenge: changes may invalidate many existing rules; no version control for knowledge.</p></div></div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Modern Approach — Machine Learning as a Solution</span>
+    <p>The knowledge acquisition bottleneck drove the AI community toward <strong>machine learning</strong>: rather than manually encoding knowledge, learn it automatically from data. Large language models (GPT-4, Claude) learn vast amounts of implicit world knowledge from text corpora — effectively automating much of the knowledge acquisition process. However, learned knowledge is less transparent, harder to verify, and may contain errors — trading the encoding problem for a verification problem.</p>
+  </div>
+
+  <h3>Summary — All Issues at a Glance</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Issue</th><th>Definition</th><th>Impact</th><th>Key Solution Strategies</th></tr>
+      <tr><td><strong>Expressiveness vs. Tractability</strong></td><td>More expressive → slower reasoning</td><td>Cannot represent all knowledge efficiently</td><td>Description Logics, Horn clauses for efficiency</td></tr>
+      <tr><td><strong>Completeness</strong></td><td>KB may be missing facts</td><td>System gives wrong answers on unknown facts</td><td>CWA vs. OWA; explicit negation</td></tr>
+      <tr><td><strong>Consistency</strong></td><td>KB may contain contradictions</td><td>Any conclusion derivable — system useless</td><td>Truth maintenance systems; paraconsistent logic</td></tr>
+      <tr><td><strong>Uncertainty</strong></td><td>Knowledge is often probabilistic</td><td>Binary T/F fails on real evidence</td><td>Certainty factors, Bayesian networks, fuzzy logic</td></tr>
+      <tr><td><strong>Frame Problem</strong></td><td>What stays same after action?</td><td>Exponential axiom count</td><td>Successor-state axioms; STRIPS</td></tr>
+      <tr><td><strong>Qualification Problem</strong></td><td>Preconditions may be infinite</td><td>Actions may fail unexpectedly</td><td>Default logic; assume normal conditions</td></tr>
+      <tr><td><strong>Ramification Problem</strong></td><td>Indirect effects may be infinite</td><td>Cannot predict all consequences</td><td>Causal models; modular ontologies</td></tr>
+      <tr class="highlight-row"><td><strong>Knowledge Acquisition</strong></td><td>Encoding expert knowledge is hard</td><td>KBs are incomplete, inconsistent, expensive</td><td>Machine learning; crowdsourcing; ontology reuse</td></tr>
+    </table>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A robotic surgery system plans to cut a tendon. After the cut, the system must determine what has changed. It needs to verify that the patient's blood pressure, heart rate, oxygen saturation, age, and medical history are all still the same. This is an instance of which KR problem?</div>
+    <div class="quiz-opts" id="q5">
+      <button class="quiz-opt" onclick="checkQ('q5',0,'q5fb','wrong')">A. The Qualification Problem — the preconditions for cutting were not fully specified</button>
+      <button class="quiz-opt" onclick="checkQ('q5',1,'q5fb','wrong')">B. The Knowledge Acquisition Bottleneck — the surgeon's knowledge was hard to encode</button>
+      <button class="quiz-opt" onclick="checkQ('q5',2,'q5fb','correct')">C. The Frame Problem — the system must explicitly track which facts remain unchanged after the action</button>
+      <button class="quiz-opt" onclick="checkQ('q5',3,'q5fb','wrong')">D. The Ramification Problem — the cut has indirect consequences that are hard to enumerate</button>
+    </div>
+    <div class="quiz-feedback" id="q5fb">✅ Correct! The <strong>Frame Problem</strong>: the system must determine what persists (blood pressure, heart rate, age, etc.) and what changes (tendon is cut, bleeding may start) after the action. Without frame axioms or a default persistence assumption, the system cannot assume anything is unchanged — it must check every fact explicitly, which is computationally infeasible. The Ramification Problem would arise if we asked about all the indirect effects of cutting (pain → increased heart rate → changed blood pressure). Those are different aspects of the same challenge.</div>
+  </div>
+</section>
+
+<!-- S6: EXAM SUMMARY -->
+<section id="s6">
+  <div class="section-header">
+    <span class="section-num">Section 06</span>
+    <h2 class="section-title">Exam Preparation Summary</h2>
+  </div>
+
+  <p>This section consolidates every definition, comparison, and issue from Unit III into a single revision reference. Work through all tables carefully — the most commonly tested items are marked with a ★.</p>
+
+  <h3>★ All Key Definitions at a Glance</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Term</th><th>Definition</th><th>Exam Tip</th></tr>
+      <tr><td><strong>Knowledge Representation</strong></td><td>A formal language + inference procedure for encoding and reasoning about domain knowledge</td><td>Always mention: syntax, semantics, reasoning procedure</td></tr>
+      <tr><td><strong>KR Hypothesis</strong></td><td>Intelligent behaviour requires internal structures that represent propositional knowledge and causally drive behaviour (B.C. Smith, 1985)</td><td>Quote the key phrase: "structural ingredients that represent…"</td></tr>
+      <tr><td><strong>Ontological Commitment</strong></td><td>The assumptions a KR language makes about what kinds of things exist in the world</td><td>Every language makes different commitments — give examples</td></tr>
+      <tr><td><strong>Representational Mapping</strong></td><td>A structure-preserving correspondence from the real world to formal symbols</td><td>Must be faithful: conclusions in formal world = true in real world</td></tr>
+      <tr><td><strong>CWA vs. OWA</strong></td><td>CWA: what's not stated is false. OWA: what's not stated is unknown</td><td>Databases use CWA; OWL ontologies use OWA</td></tr>
+      <tr><td><strong>Frame Problem</strong></td><td>How to represent what does NOT change after an action without listing all unchanged facts</td><td>McCarthy &amp; Hayes 1969; solution = successor-state axioms</td></tr>
+      <tr><td><strong>Qualification Problem</strong></td><td>How many preconditions must be listed for an action to guarantee its effect?</td><td>List is potentially infinite; use default logic as solution</td></tr>
+      <tr class="highlight-row"><td><strong>Ramification Problem</strong></td><td>How to represent all indirect consequences of an action</td><td>Different from Frame Problem — it's about what DOES change indirectly</td></tr>
+      <tr><td><strong>KA Bottleneck</strong></td><td>The practical difficulty of extracting, encoding, and maintaining expert knowledge in a KB</td><td>Tacit knowledge = hardest to capture; ML is the modern partial solution</td></tr>
+    </table>
+  </div>
+
+  <h3>★ Types of Knowledge — Summary</h3>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Declarative</div>
+      <div class="summary-val">What IS</div>
+      <div class="summary-sub">"Fever is a symptom of infection." Facts about the world. Represented by logic, frames, semantic networks.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Procedural</div>
+      <div class="summary-val">How TO</div>
+      <div class="summary-sub">"To diagnose, first take temperature…" Step-by-step knowledge. Represented by scripts, production rules, algorithms.</div>
+    </div>
+    <div class="summary-card green">
+      <div class="summary-title">Heuristic</div>
+      <div class="summary-val">Rules of Thumb</div>
+      <div class="summary-sub">"In elderly patients, suspect pneumonia first." Expert shortcuts. Represented by IF-THEN rules with certainty factors.</div>
+    </div>
+    <div class="summary-card gold">
+      <div class="summary-title">Meta-knowledge</div>
+      <div class="summary-val">About Knowledge</div>
+      <div class="summary-sub">"Culture results are more reliable than symptoms." Knowledge about the reliability of other knowledge.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Structural</div>
+      <div class="summary-val">Relationships</div>
+      <div class="summary-sub">"Pneumonia is a subtype of lung disease." Class hierarchies. Represented by ontologies, semantic networks.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Common-Sense</div>
+      <div class="summary-val">Implicit</div>
+      <div class="summary-sub">"Dead patients cannot be treated." Hardest to represent — humans never state it because it's too obvious.</div>
+    </div>
+  </div>
+
+  <h3>★ Master KR Approaches Comparison</h3>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Approach</th><th>Year / Author</th><th>Core Structure</th><th>Key Strength</th><th>Key Weakness</th><th>Example System</th></tr>
+      <tr><td>Propositional Logic</td><td>Boole 1847</td><td>Truth-valued propositions + connectives</td><td>Decidable; fast; sound &amp; complete</td><td>No variables, quantifiers, or objects</td><td>SAT solvers, hardware verification</td></tr>
+      <tr><td>First-Order Logic (FOL)</td><td>Frege 1879</td><td>Objects + predicates + ∀/∃ + functions</td><td>Highly expressive; general-purpose</td><td>Semi-decidable; slow on large KBs</td><td>Cyc, theorem provers, Prolog</td></tr>
+      <tr><td>Horn Clauses</td><td>Horn 1951 / Kowalski 1974</td><td>Definite clauses Body → Head</td><td>Polynomial inference (SLD)</td><td>No disjunctive head; limited negation</td><td>Prolog, Datalog</td></tr>
+      <tr><td>Semantic Networks</td><td>Quillian 1966</td><td>Nodes (concepts) + labelled arcs</td><td>Natural; visual; inheritance</td><td>Ambiguous semantics; multiple inheritance</td><td>WordNet, ConceptNet, Knowledge Graphs</td></tr>
+      <tr><td>Frames</td><td>Minsky 1975</td><td>Slots + fillers + default + procedures</td><td>Default values; procedural attachment</td><td>Informal; complex default interactions</td><td>FRL, KRL; basis of OOP</td></tr>
+      <tr><td>Production Rules</td><td>Newell &amp; Simon 1972</td><td>IF condition THEN action</td><td>Natural expert encoding; modular</td><td>Rule interaction; conflict resolution</td><td>MYCIN, CLIPS, Drools</td></tr>
+      <tr class="highlight-row"><td>Scripts</td><td>Schank &amp; Abelson 1977</td><td>Stereotyped event sequences with roles</td><td>Procedural + causal structure; NLU</td><td>Rigid; hard to handle novel situations</td><td>SAM, PAM (story understanding)</td></tr>
+    </table>
+  </div>
+
+  <h3>★ Issues in KR — Quick Reference</h3>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Issue</th><th>One-Line Definition</th><th>Classic Example</th><th>Solution Approach</th></tr>
+      <tr><td>Expressiveness–Tractability</td><td>More expressive = slower reasoning</td><td>FOL: expressive but semi-decidable</td><td>Description Logics (OWL)</td></tr>
+      <tr><td>Completeness</td><td>Missing facts cause wrong answers</td><td>Absent allergy record ≠ no allergy</td><td>Open World Assumption</td></tr>
+      <tr><td>Consistency</td><td>Contradictions make KB useless</td><td>Drug A cures and harms pneumonia</td><td>Truth Maintenance Systems</td></tr>
+      <tr><td>Uncertainty</td><td>Knowledge is probabilistic, not binary</td><td>"Possibly pneumonia" (CF=0.8)</td><td>Certainty factors, Bayesian nets</td></tr>
+      <tr><td>Frame Problem</td><td>What persists after an action?</td><td>After prescribing, age still same</td><td>Successor-state axioms; STRIPS</td></tr>
+      <tr><td>Qualification Problem</td><td>How many preconditions does an action need?</td><td>Drug works IF not allergic AND not resistant AND…</td><td>Default normal conditions</td></tr>
+      <tr><td>Ramification Problem</td><td>What are all indirect effects?</td><td>Prescription → purchase → bank balance changes</td><td>Causal theories, modular ontology</td></tr>
+      <tr class="highlight-row"><td>KA Bottleneck</td><td>Getting expert knowledge in is very hard</td><td>Expert cannot articulate tacit knowledge</td><td>Machine learning; ontology reuse</td></tr>
+    </table>
+  </div>
+
+  <h3>Common Exam Mistakes</h3>
+  <div class="callout red">
+    <span class="callout-label">Watch Out!</span>
+    <p><strong>Mistake 1:</strong> Confusing the Frame Problem (what stays the same?) with the Ramification Problem (what changes indirectly?). They are different aspects of the action-effects problem.</p>
+    <p><strong>Mistake 2:</strong> Saying propositional logic is "complete" without qualification — it is complete for propositional reasoning, but cannot express FOL statements at all (no variables, no quantifiers).</p>
+    <p><strong>Mistake 3:</strong> Saying Horn clauses are the same as FOL — they are a proper SUBSET of FOL. The key restriction: at most ONE positive literal in the head. Disjunctive conclusions cannot be expressed.</p>
+    <p><strong>Mistake 4:</strong> Confusing semantic networks and frames — semantic networks show relationships between concepts; frames package all slot-value knowledge about a single concept. Frames evolved from semantic networks.</p>
+    <p><strong>Mistake 5:</strong> Saying the knowledge acquisition bottleneck is about encoding speed — it is fundamentally about <em>tacit knowledge</em> that experts cannot articulate, making it impossible to elicit, not merely slow to encode.</p>
+    <p><strong>Mistake 6:</strong> Forgetting CWA vs. OWA — databases (SQL) use CWA; ontologies (OWL, SPARQL) use OWA. This difference is commonly tested and has real-world safety consequences.</p>
+  </div>
+
+  <h3>Typical Exam Question Types</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Question Pattern</th><th>Required Approach</th><th>Key Terms to Use</th></tr>
+      <tr><td>"What is knowledge representation?"</td><td>Define KR + give the 5 roles (surrogate, ontological commitment, etc.) + KR hypothesis</td><td>Formal language, inference, surrogate, Brian Smith</td></tr>
+      <tr><td>"Compare approaches to KR"</td><td>Use the master comparison table; highlight expressiveness, strengths, weaknesses, example systems</td><td>Logic, frames, semantic networks, production rules, scripts</td></tr>
+      <tr><td>"Explain the Frame Problem with an example"</td><td>Define the problem → give action example → show exponential frame axioms → explain successor-state solution</td><td>Non-change, frame axioms, persistence, STRIPS</td></tr>
+      <tr><td>"Represent X in [formalism]"</td><td>Give concrete syntax for the chosen formalism applied to the given domain</td><td>Use correct notation; show both facts and rules</td></tr>
+      <tr><td>"What are issues in KR?"</td><td>List and explain all 8 issues; give one example for each</td><td>Expressiveness, tractability, completeness, uncertainty, Frame, Qualification, Ramification, KA bottleneck</td></tr>
+      <tr class="highlight-row"><td>"CWA vs OWA — when to use each?"</td><td>Define both; give database vs ontology example; explain safety implications</td><td>Closed world, open world, absence of evidence</td></tr>
+    </table>
+  </div>
+
+  <h3>Challenge Quiz — Exam-Level Question</h3>
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Challenge: A medical AI system uses First-Order Logic with the Closed World Assumption. A patient record does not contain the fact "AllergicToPenicillin(Mary)." The system concludes "NOT AllergicToPenicillin(Mary)" and prescribes penicillin. The patient has a severe allergic reaction. Identify (a) which KR issue caused the problem, (b) what representational assumption was wrong, and (c) what change would prevent this?</div>
+    <div class="quiz-opts" id="q6">
+      <button class="quiz-opt" onclick="checkQ('q6',0,'q6fb','wrong')">A. Frame Problem — the system failed to track what changed after previous treatments</button>
+      <button class="quiz-opt" onclick="checkQ('q6',1,'q6fb','wrong')">B. Qualification Problem — the prescribing rule didn't list enough preconditions</button>
+      <button class="quiz-opt" onclick="checkQ('q6',2,'q6fb','correct')">C. Completeness + Closed World Assumption — the KB was incomplete (missing allergy fact), and CWA wrongly treated absence of evidence as evidence of absence; fix by switching to Open World Assumption</button>
+      <button class="quiz-opt" onclick="checkQ('q6',3,'q6fb','wrong')">D. Ramification Problem — prescribing penicillin caused an indirect allergic reaction the system didn't anticipate</button>
+    </div>
+    <div class="quiz-feedback" id="q6fb">✅ Correct! This is a classic <strong>completeness + CWA</strong> failure. (a) The KR issue: the KB is incomplete — the allergy was never recorded, not because it doesn't exist but because it wasn't tested or entered. (b) The wrong assumption: the Closed World Assumption treats any fact absent from the KB as FALSE. "AllergicToPenicillin(Mary) is not in the KB → Mary is NOT allergic" is a dangerous inference. (c) The fix: switch to the Open World Assumption (OWA) — if "AllergicToPenicillin(Mary)" is absent, the system should conclude UNKNOWN, not FALSE. Under OWA, the prescribing rule requires an explicit "NOT allergic" fact before proceeding. This is exactly why medical ontologies use OWL (OWA) rather than SQL databases (CWA).</div>
+  </div>
+</section>
+
+</div><!-- end .page -->
+
+<footer>
+  <p>Tutorial compiled from: Russell, S. J., &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach, 4th Edition</em>. Pearson. Chapters 7 (Logical Agents), 8 (First-Order Logic), 9 (Inference in First-Order Logic), 10 (Knowledge Representation). Additional references: Brachman &amp; Levesque (2004), <em>Knowledge Representation and Reasoning</em>; Davis, Shrobe &amp; Szolovits (1993), "What is a Knowledge Representation?"</p>
+  <p style="margin-top:12px;">Unit III · B.Tech 3rd Year · Artificial Intelligence · 3 Lectures</p>
+</footer>
+
+<script>
+function checkQ(cid,ci,fid,res){
+  var c=document.getElementById(cid);
+  var bs=c.querySelectorAll('.quiz-opt');
+  bs.forEach(function(b){b.disabled=true;b.style.cursor='default';});
+  bs[ci].classList.add(res);
+  var f=document.getElementById(fid);
+  f.classList.add('show');
+}
+</script>
+</body>
+</html>
