@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit V: NLP, Learning &amp; Expert Systems — Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1410;--ink2:#3d3530;--ink3:#6b5f58;--paper:#faf7f2;--paper2:#f2ede4;--paper3:#e8e0d4;--accent:#c0392b;--accent2:#e67e22;--accent3:#2980b9;--accent4:#27ae60;--gold:#d4a017;--rule:#c5b8a8;--highlight:#fff3cd;--highlight2:#d5edda;--highlight3:#d0e8f5;--highlight4:#fce8e8;--code-bg:#1e1e2e;--code-fg:#cdd6f4;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:17px;}
+.cover{background:var(--ink);color:var(--paper);padding:80px 60px 60px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border:2px solid rgba(255,255,255,0.06);border-radius:50%;}
+.cover::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border:1px solid rgba(255,255,255,0.04);border-radius:50%;}
+.cover-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:24px;display:block;}
+.cover h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;line-height:1.1;margin-bottom:12px;max-width:700px;}
+.cover h1 span{color:#e67e22;}
+.cover .subtitle{font-size:20px;color:rgba(255,255,255,0.6);font-weight:300;font-style:italic;margin-bottom:40px;}
+.cover-meta{display:flex;gap:32px;flex-wrap:wrap;}
+.cover-meta-item{display:flex;flex-direction:column;gap:2px;}
+.cover-meta-item .meta-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.cover-meta-item .meta-val{font-size:14px;color:rgba(255,255,255,0.85);}
+.toc-bar{background:var(--ink2);padding:0;display:flex;overflow-x:auto;position:sticky;top:0;z-index:100;}
+.toc-bar a{color:rgba(255,255,255,0.65);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;padding:14px 20px;white-space:nowrap;transition:all 0.2s;border-bottom:2px solid transparent;}
+.toc-bar a:hover{color:#fff;background:rgba(255,255,255,0.05);border-bottom-color:var(--accent2);}
+.page{max-width:900px;margin:0 auto;padding:0 40px 80px;}
+section{padding-top:72px;}
+section+section{border-top:1px solid var(--rule);}
+.section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;}
+.section-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:var(--accent);text-transform:uppercase;letter-spacing:2px;flex-shrink:0;}
+.section-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1.15;color:var(--ink);}
+h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin:40px 0 16px;color:var(--ink);}
+h4{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;margin:28px 0 10px;color:var(--ink2);}
+p{margin-bottom:16px;}
+.callout{border-left:3px solid var(--accent2);background:var(--highlight);padding:16px 20px;border-radius:0 6px 6px 0;margin:24px 0;}
+.callout.blue{border-left-color:var(--accent3);background:var(--highlight3);}
+.callout.green{border-left-color:var(--accent4);background:var(--highlight2);}
+.callout.red{border-left-color:var(--accent);background:var(--highlight4);}
+.callout-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block;}
+.callout p:last-child{margin-bottom:0;}
+.definition{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:20px 24px;margin:24px 0;}
+.definition-term{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--accent);margin-bottom:8px;}
+.definition p:last-child{margin-bottom:0;}
+.example-box{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:28px 0;}
+.example-header{background:var(--ink);color:var(--paper);padding:10px 20px;display:flex;align-items:center;gap:10px;}
+.example-badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--accent2);color:var(--ink);padding:2px 8px;border-radius:3px;}
+.example-title{font-size:14px;font-weight:400;}
+.example-body{padding:20px 24px;background:var(--paper);}
+.example-body p:last-child{margin-bottom:0;}
+.table-wrap{overflow-x:auto;margin:24px 0;}
+table{width:100%;border-collapse:collapse;font-size:15px;}
+th{background:var(--ink);color:var(--paper);padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;font-weight:500;}
+td{padding:9px 14px;border-bottom:1px solid var(--paper3);vertical-align:middle;}
+tr:nth-child(even) td{background:var(--paper2);}
+tr:hover td{background:var(--highlight3);}
+.highlight-row td{background:var(--highlight)!important;font-weight:600;}
+pre{background:var(--code-bg);color:var(--code-fg);padding:20px 24px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;overflow-x:auto;margin:20px 0;}
+code{font-family:'JetBrains Mono',monospace;font-size:14px;background:var(--paper3);padding:1px 6px;border-radius:3px;}
+pre code{background:none;padding:0;}
+.kw{color:#cba6f7;}.fn{color:#89b4fa;}.str{color:#a6e3a1;}.num{color:#fab387;}.cm{color:#6c7086;font-style:italic;}
+.math-block{background:var(--paper2);border:1px solid var(--paper3);border-radius:6px;padding:16px 24px;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink);overflow-x:auto;text-align:center;}
+.math-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);font-family:'Source Serif 4',serif;display:block;margin-bottom:8px;text-align:left;}
+.diagram-wrap{margin:32px 0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+.diagram-caption{background:var(--paper2);border-top:1px solid var(--rule);padding:10px 16px;font-size:13px;color:var(--ink3);font-style:italic;text-align:center;}
+svg.diagram{display:block;width:100%;}
+.algo-box{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:28px 0;}
+.algo-header{background:var(--ink2);color:var(--paper);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.algo-body{background:var(--paper);padding:20px 24px;}
+.step{display:flex;gap:16px;margin-bottom:12px;align-items:flex-start;}
+.step-num{flex-shrink:0;width:26px;height:26px;background:var(--accent2);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;margin-top:2px;}
+.step-text{flex:1;}
+.step-text p{margin-bottom:0;}
+.quiz-box{background:var(--ink);color:var(--paper);border-radius:8px;padding:28px 32px;margin:32px 0;}
+.quiz-q{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:20px;color:rgba(255,255,255,0.9);}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:11px 18px;border-radius:6px;cursor:pointer;text-align:left;font-family:'Source Serif 4',serif;font-size:15px;transition:all 0.2s;}
+.quiz-opt:hover{background:rgba(255,255,255,0.13);border-color:rgba(255,255,255,0.25);}
+.quiz-opt.correct{background:rgba(39,174,96,0.25);border-color:#27ae60;color:#a3d9b1;}
+.quiz-opt.wrong{background:rgba(192,57,43,0.25);border-color:#c0392b;color:#f5a9a9;}
+.quiz-feedback{margin-top:16px;font-size:14px;color:rgba(255,255,255,0.6);display:none;}
+.quiz-feedback.show{display:block;}
+.measures-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
+.measure-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:16px 18px;}
+.measure-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px;}
+.measure-formula{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--paper3);padding:6px 10px;border-radius:4px;margin-bottom:8px;}
+.measure-desc{font-size:13px;color:var(--ink3);line-height:1.55;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:28px 0;}
+.summary-card{background:var(--paper2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:16px 18px;}
+.summary-card.blue{border-left-color:var(--accent3);}
+.summary-card.green{border-left-color:var(--accent4);}
+.summary-card.gold{border-left-color:var(--gold);}
+.summary-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.summary-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);}
+.summary-sub{font-size:13px;color:var(--ink3);margin-top:4px;}
+.compare-table th{background:var(--ink2);}
+.compare-table td:first-child{font-weight:600;background:var(--paper2)!important;}
+footer{background:var(--ink);color:rgba(255,255,255,0.4);padding:40px 60px;font-size:13px;margin-top:60px;}
+</style>
+</head>
+<body>
+<div class="cover">
+  <span class="cover-label">Artificial Intelligence — B.Tech 3rd Year · Unit V</span>
+  <h1>NLP, <span>Learning</span> &amp; Expert Systems</h1>
+  <p class="subtitle">Natural language processing pipelines, machine learning paradigms, decision trees, neural networks, genetic algorithms, and expert system design — with worked examples throughout</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="meta-label">Textbook</span><span class="meta-val">Russell &amp; Norvig — Chapters 18, 19, 22, 25, 26</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Topics</span><span class="meta-val">NLP · Syntactic/Semantic Processing · Learning · Decision Trees · Neural Nets · Expert Systems</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Hours</span><span class="meta-val">6 lectures</span></div>
+  </div>
+</div>
+<nav class="toc-bar">
+  <a href="#s1">1 · NLP Introduction</a>
+  <a href="#s2">2 · Semantic &amp; Discourse</a>
+  <a href="#s3">3 · Forms of Learning</a>
+  <a href="#s4">4 · Decision Trees</a>
+  <a href="#s5">5 · Neural &amp; Genetic Learning</a>
+  <a href="#s6">6 · Expert Systems</a>
+  <a href="#s7">7 · Exam Summary</a>
+</nav>
+<div class="page">
+
+<!-- ═══ S1: NLP INTRODUCTION & SYNTACTIC PROCESSING ═══ -->
+<section id="s1">
+  <div class="section-header">
+    <span class="section-num">Section 01</span>
+    <h2 class="section-title">Natural Language Processing — Introduction &amp; Syntactic Processing</h2>
+  </div>
+  <p>Every time you type a query into a search engine, ask a voice assistant a question, or receive an auto-translated email, you are using <strong>Natural Language Processing (NLP)</strong>. NLP is the sub-field of AI that enables computers to understand, interpret, and generate human language — the most natural and complex form of human communication.</p>
+  <p>Human language is extraordinarily difficult to process automatically. The sentence "I saw the man with the telescope" is genuinely ambiguous — did <em>I</em> use the telescope, or did the man have it? Resolving such ambiguities requires not just grammar but world knowledge, context, and pragmatic reasoning. NLP tackles this challenge through a pipeline of processing stages, each building on the last.</p>
+
+  <div class="definition">
+    <div class="definition-term">The NLP Processing Pipeline</div>
+    <p>NLP systems process language through a layered pipeline of analysis. Each layer handles a different aspect of meaning:</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="np1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#e67e22" stroke-width="2"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">The NLP Processing Pipeline — Layers of Language Analysis</text>
+      <!-- Boxes -->
+      <rect x="30" y="50" width="120" height="55" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="90" y="74" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">Morphological</text>
+      <text x="90" y="92" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Words + stems</text>
+      <rect x="185" y="50" width="120" height="55" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="245" y="74" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#c0392b" text-anchor="middle">Lexical</text>
+      <text x="245" y="92" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">POS tagging</text>
+      <rect x="340" y="50" width="120" height="55" rx="8" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="400" y="74" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#7d5a00" text-anchor="middle">Syntactic</text>
+      <text x="400" y="92" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Parse tree</text>
+      <rect x="495" y="50" width="120" height="55" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="555" y="74" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#1a5f87" text-anchor="middle">Semantic</text>
+      <text x="555" y="92" font-family="'Source Serif 4',serif" font-size="11" fill="#555" text-anchor="middle">Meaning</text>
+      <rect x="650" y="50" width="120" height="55" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="710" y="74" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#1a6b38" text-anchor="middle">Discourse /</text>
+      <text x="710" y="90" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#1a6b38" text-anchor="middle">Pragmatic</text>
+      <!-- Arrows -->
+      <line x1="150" y1="77" x2="183" y2="77" stroke="#e67e22" stroke-width="2" marker-end="url(#np1)"/>
+      <line x1="305" y1="77" x2="338" y2="77" stroke="#e67e22" stroke-width="2" marker-end="url(#np1)"/>
+      <line x1="460" y1="77" x2="493" y2="77" stroke="#e67e22" stroke-width="2" marker-end="url(#np1)"/>
+      <line x1="615" y1="77" x2="648" y2="77" stroke="#e67e22" stroke-width="2" marker-end="url(#np1)"/>
+      <!-- Input -->
+      <text x="90" y="138" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">run→run+s</text>
+      <text x="245" y="138" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">saw→verb</text>
+      <text x="400" y="138" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">NP VP NP</text>
+      <text x="555" y="138" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">saw(I,man)</text>
+      <text x="710" y="138" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">intent+context</text>
+      <!-- Raw input + final output -->
+      <rect x="30" y="170" width="800" height="38" rx="6" fill="#f2ede4" stroke="#c5b8a8" stroke-width="1"/>
+      <text x="430" y="185" font-family="'JetBrains Mono',monospace" font-size="11" fill="#333" text-anchor="middle">Input: "I saw the man on the hill with the telescope"</text>
+      <text x="430" y="201" font-family="'JetBrains Mono',monospace" font-size="11" fill="#555" text-anchor="middle">Output: Structured representation of meaning + speaker's intent</text>
+    </svg>
+    <div class="diagram-caption">Figure 1.1 — The NLP processing pipeline. Each layer adds a deeper level of analysis, from word forms up to the speaker's communicative intent. Each stage's output feeds the next.</div>
+  </div>
+
+  <h3>Morphological and Lexical Analysis</h3>
+  <p><strong>Morphological analysis</strong> decomposes words into their component morphemes (stems, prefixes, suffixes). The word "unpredictably" → un + predict + able + ly. This helps map surface word forms to their base meanings. <strong>Lexical analysis</strong> (tokenisation + part-of-speech tagging) assigns each token a grammatical category.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Word</th><th>Morphological Analysis</th><th>POS Tag</th><th>Lemma</th></tr>
+      <tr><td>The</td><td>definite article (no morphemes)</td><td>DT (determiner)</td><td>the</td></tr>
+      <tr><td>doctor</td><td>doctor (root)</td><td>NN (noun, singular)</td><td>doctor</td></tr>
+      <tr><td>treated</td><td>treat + ed (past tense)</td><td>VBD (verb, past)</td><td>treat</td></tr>
+      <tr><td>patients</td><td>patient + s (plural)</td><td>NNS (noun, plural)</td><td>patient</td></tr>
+      <tr class="highlight-row"><td>carefully</td><td>care + ful + ly</td><td>RB (adverb)</td><td>carefully</td></tr>
+    </table>
+  </div>
+
+  <h3>Syntactic Processing — Parsing</h3>
+  <p><strong>Syntactic processing</strong> (parsing) determines the grammatical structure of a sentence — how words group into phrases and how phrases relate to each other. The result is a <strong>parse tree</strong> (or phrase structure tree) that makes the hierarchical structure explicit.</p>
+
+  <div class="definition">
+    <div class="definition-term">Context-Free Grammar (CFG)</div>
+    <p>A <strong>CFG</strong> defines the syntax of a language through production rules of the form <code>X → Y₁ Y₂ … Yₙ</code>, where X is a non-terminal symbol and Y₁…Yₙ are terminals or non-terminals. Standard sentence-level rules:</p>
+    <pre><code><span class="cm">-- Phrase structure rules --</span>
+<span class="fn">S</span>   → <span class="str">NP VP</span>                   <span class="cm">-- Sentence = Noun Phrase + Verb Phrase</span>
+<span class="fn">NP</span>  → <span class="str">Det N</span> | <span class="str">Det N PP</span>      <span class="cm">-- NP = Det + Noun (optional PP)</span>
+<span class="fn">VP</span>  → <span class="str">V NP</span> | <span class="str">V NP PP</span>       <span class="cm">-- VP = Verb + NP (optional PP)</span>
+<span class="fn">PP</span>  → <span class="str">P NP</span>                   <span class="cm">-- PP = Preposition + NP</span>
+<span class="fn">Det</span> → <span class="str">the</span> | <span class="str">a</span> | <span class="str">an</span>
+<span class="fn">N</span>   → <span class="str">doctor</span> | <span class="str">patient</span> | <span class="str">hospital</span>
+<span class="fn">V</span>   → <span class="str">saw</span> | <span class="str">treated</span> | <span class="str">found</span>
+<span class="fn">P</span>   → <span class="str">with</span> | <span class="str">in</span> | <span class="str">on</span></code></pre>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Parse Tree for "The doctor treated the patient"</span>
+    </div>
+    <div class="example-body">
+      <div class="diagram-wrap">
+        <svg class="diagram" viewBox="0 0 860 310" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="pt1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker></defs>
+          <text x="430" y="22" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#3d3530" text-anchor="middle">Parse Tree — "The doctor treated the patient carefully"</text>
+          <!-- Root S -->
+          <ellipse cx="430" cy="55" rx="28" ry="22" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+          <text x="430" y="60" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">S</text>
+          <!-- NP (subject) -->
+          <ellipse cx="220" cy="120" rx="28" ry="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+          <text x="220" y="125" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">NP</text>
+          <!-- VP -->
+          <ellipse cx="590" cy="120" rx="28" ry="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+          <text x="590" y="125" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">VP</text>
+          <!-- NP children: Det + N -->
+          <ellipse cx="135" cy="195" rx="24" ry="20" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/>
+          <text x="135" y="200" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">Det</text>
+          <ellipse cx="220" cy="195" rx="24" ry="20" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/>
+          <text x="220" y="200" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">N</text>
+          <!-- VP children: V + NP + AdvP -->
+          <ellipse cx="470" cy="195" rx="24" ry="20" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/>
+          <text x="470" y="200" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">V</text>
+          <ellipse cx="590" cy="195" rx="24" ry="20" fill="#d0e8f5" stroke="#2980b9" stroke-width="1.5"/>
+          <text x="590" y="200" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">NP</text>
+          <ellipse cx="710" cy="195" rx="30" ry="20" fill="#fff3cd" stroke="#d4a017" stroke-width="1.5"/>
+          <text x="710" y="200" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">AdvP</text>
+          <!-- NP (object) children -->
+          <ellipse cx="545" cy="265" rx="24" ry="20" fill="#e8d5f5" stroke="#8e44ad" stroke-width="1.5"/>
+          <text x="545" y="270" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#4a1b8c" text-anchor="middle">Det</text>
+          <ellipse cx="635" cy="265" rx="24" ry="20" fill="#e8d5f5" stroke="#8e44ad" stroke-width="1.5"/>
+          <text x="635" y="270" font-family="'Playfair Display',serif" font-size="12" font-weight="700" fill="#4a1b8c" text-anchor="middle">N</text>
+          <!-- Leaf terminals -->
+          <text x="135" y="290" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1a5f87" text-anchor="middle">The</text>
+          <text x="220" y="290" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1a5f87" text-anchor="middle">doctor</text>
+          <text x="470" y="290" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1a5f87" text-anchor="middle">treated</text>
+          <text x="545" y="295" font-family="'JetBrains Mono',monospace" font-size="12" fill="#4a1b8c" text-anchor="middle">the</text>
+          <text x="635" y="295" font-family="'JetBrains Mono',monospace" font-size="12" fill="#4a1b8c" text-anchor="middle">patient</text>
+          <text x="710" y="290" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1a5f87" text-anchor="middle">carefully</text>
+          <!-- Edges -->
+          <line x1="410" y1="68" x2="244" y2="108" stroke="#888" stroke-width="1.2" marker-end="url(#pt1)"/>
+          <line x1="450" y1="68" x2="566" y2="108" stroke="#888" stroke-width="1.2" marker-end="url(#pt1)"/>
+          <line x1="204" y1="133" x2="147" y2="183" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="220" y1="142" x2="220" y2="183" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="565" y1="133" x2="483" y2="183" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="590" y1="142" x2="590" y2="183" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="615" y1="133" x2="697" y2="183" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="578" y1="208" x2="553" y2="253" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="602" y1="208" x2="627" y2="253" stroke="#888" stroke-width="1" marker-end="url(#pt1)"/>
+          <line x1="135" y1="215" x2="135" y2="275" stroke="#aaa" stroke-width="0.8"/>
+          <line x1="220" y1="215" x2="220" y2="275" stroke="#aaa" stroke-width="0.8"/>
+          <line x1="470" y1="215" x2="470" y2="275" stroke="#aaa" stroke-width="0.8"/>
+          <line x1="545" y1="285" x2="545" y2="290" stroke="#aaa" stroke-width="0.8"/>
+          <line x1="635" y1="285" x2="635" y2="290" stroke="#aaa" stroke-width="0.8"/>
+          <line x1="710" y1="215" x2="710" y2="275" stroke="#aaa" stroke-width="0.8"/>
+        </svg>
+        <div class="diagram-caption">Figure 1.2 — Parse tree for "The doctor treated the patient carefully." S splits into NP (subject) and VP (predicate). The VP further divides into V, object NP, and AdvP. This hierarchical structure makes grammatical relationships explicit.</div>
+      </div>
+
+      <h4>Structural Ambiguity — "I saw the man with the telescope"</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Parse</th><th>Structure</th><th>Meaning</th></tr>
+          <tr><td><strong>Parse 1</strong></td><td>VP = [V [NP the man [PP with the telescope]]]</td><td>The man had the telescope (PP modifies NP)</td></tr>
+          <tr class="highlight-row"><td><strong>Parse 2</strong></td><td>VP = [V [NP the man] [PP with the telescope]]</td><td>I used the telescope to see him (PP modifies VP)</td></tr>
+        </table>
+      </div>
+      <p>Both parses are grammatically valid — a parser returns both. Choosing the correct one requires semantic and world knowledge. This is a core challenge in NLP.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">Key Insight — Parsing Algorithms</span>
+    <p>Two main parsing strategies: <strong>Top-Down (Recursive Descent)</strong> — start from S, expand rules until terminals match the input. Fast but may explore many dead ends. <strong>Bottom-Up (Shift-Reduce / CYK)</strong> — start from terminals, combine into larger phrases. The CYK algorithm runs in O(n³|G|) and handles all CFGs. Modern NLP uses neural parsers (transformers) that run in linear time with much higher accuracy than grammar-based parsers.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: The sentence "Flying planes can be dangerous" has two interpretations. Which syntactic property explains this ambiguity?</div>
+    <div class="quiz-opts" id="q1">
+      <button class="quiz-opt" onclick="checkQ('q1',0,'q1fb','wrong')">A. Lexical ambiguity — "flying" has two dictionary meanings</button>
+      <button class="quiz-opt" onclick="checkQ('q1',1,'q1fb','correct')">B. Structural (syntactic) ambiguity — "flying" can be parsed as a verb (gerund: the act of flying) or an adjective (modifying planes that are in flight), giving two different parse trees</button>
+      <button class="quiz-opt" onclick="checkQ('q1',2,'q1fb','wrong')">C. Semantic ambiguity — "dangerous" means different things in context</button>
+      <button class="quiz-opt" onclick="checkQ('q1',3,'q1fb','wrong')">D. Pragmatic ambiguity — the speaker's intention is unclear</button>
+    </div>
+    <div class="quiz-feedback" id="q1fb">✅ Correct! "Flying planes can be dangerous" has two parse trees: (1) [NP Flying planes] [VP can be dangerous] — planes that are flying are dangerous; (2) [NP-gerund Flying planes] [VP can be dangerous] — the activity of flying planes is dangerous. "Flying" is a present participle that can function as both an adjective (modifying "planes") and a gerund (head of an NP). This is structural (syntactic) ambiguity — the same word sequence has two valid phrase structure trees.</div>
+  </div>
+</section>
+
+<!-- ═══ S2: SEMANTIC, DISCOURSE & PRAGMATIC ═══ -->
+<section id="s2">
+  <div class="section-header">
+    <span class="section-num">Section 02</span>
+    <h2 class="section-title">Semantic Analysis, Discourse &amp; Pragmatic Processing</h2>
+  </div>
+  <p>A parse tree tells us <em>structure</em> — but not <em>meaning</em>. "Colourless green ideas sleep furiously" is perfectly grammatical but semantically nonsensical. <strong>Semantic analysis</strong> maps parsed structures onto representations of meaning, resolving word-sense ambiguity and establishing relationships between entities. <strong>Discourse processing</strong> then links sentences together, while <strong>pragmatics</strong> addresses the speaker's intent beyond literal meaning.</p>
+
+  <h3>Semantic Analysis</h3>
+  <div class="definition">
+    <div class="definition-term">Compositional Semantics</div>
+    <p><strong>Compositional semantics</strong> (the Principle of Compositionality, Frege) holds that the meaning of a complex expression is determined by the meanings of its parts and the rules combining them. Semantic analysis maps syntactic parse trees to logical forms using this principle.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">From Parse Tree to Logical Form</span>
+    </div>
+    <div class="example-body">
+      <p><strong>Sentence:</strong> "The doctor treated every patient"</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Phrase</th><th>Semantic Rule</th><th>Logical Form</th></tr>
+          <tr><td>"the doctor"</td><td>Definite NP → specific individual</td><td><code>ιx Doctor(x)</code> (the unique doctor)</td></tr>
+          <tr><td>"every patient"</td><td>Universal NP → quantified variable</td><td><code>∀y Patient(y)</code></td></tr>
+          <tr><td>"treated"</td><td>Transitive verb → binary predicate</td><td><code>Treated(subj, obj)</code></td></tr>
+          <tr class="highlight-row"><td>Full sentence</td><td>S → compose all parts</td><td><code>∀y Patient(y) → Treated(doctor₁, y)</code></td></tr>
+        </table>
+      </div>
+
+      <h4>Word Sense Disambiguation</h4>
+      <p>Many words have multiple senses. "bank" can mean a financial institution or a river bank. WSD assigns the correct sense based on context words:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Sentence</th><th>Ambiguous Word</th><th>Context Clues</th><th>Correct Sense</th></tr>
+          <tr><td>"The patient's condition improved"</td><td>patient (adj/noun)</td><td>Possessive 's + condition</td><td>Noun: sick person</td></tr>
+          <tr><td>"Be patient while waiting"</td><td>patient (adj/noun)</td><td>Imperative + "while waiting"</td><td>Adjective: tolerant</td></tr>
+          <tr><td>"He deposited money at the bank"</td><td>bank</td><td>deposited, money</td><td>Financial institution</td></tr>
+          <tr class="highlight-row"><td>"The fish swam near the bank"</td><td>bank</td><td>fish, swam</td><td>River bank</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3>Discourse Processing</h3>
+  <p>Real language is not isolated sentences — it is connected text. <strong>Discourse processing</strong> deals with how sentences in a text relate to each other to create coherent meaning.</p>
+
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">Co-reference Resolution</div>
+      <div class="measure-formula">pronoun → antecedent</div>
+      <div class="measure-desc">"The doctor examined John. She found he had pneumonia." — "She" refers to the doctor, "he" refers to John. Must link pronouns and definite NPs to the entities they refer to.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Discourse Relations</div>
+      <div class="measure-formula">causal, temporal, contrast</div>
+      <div class="measure-desc">"The patient felt better. The fever had broken." — Second sentence is a causal explanation of the first. Discourse relations (RST theory) classify these: Cause, Elaboration, Contrast, Sequence.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Topic Segmentation</div>
+      <div class="measure-formula">coherent topic chains</div>
+      <div class="measure-desc">Long documents split into topic segments. A medical report has sections: Chief Complaint → History → Examination → Diagnosis → Treatment. Segmentation identifies these boundaries automatically.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Information Structure</div>
+      <div class="measure-formula">given vs. new information</div>
+      <div class="measure-desc">"The doctor arrived. She immediately examined the patient." — "The doctor" is given (introduced); "She immediately examined" is new information. Tracks what is in common ground vs. newly asserted.</div>
+    </div>
+  </div>
+
+  <h3>Pragmatic Processing</h3>
+  <div class="definition">
+    <div class="definition-term">Pragmatics — Language in Context</div>
+    <p><strong>Pragmatics</strong> studies how context and social conventions influence the interpretation of utterances beyond their literal linguistic meaning. The same sentence can mean very different things in different situations.</p>
+    <p>Key concepts: <strong>Speech Acts</strong> (Austin, Searle) — utterances as actions (assertions, requests, promises, warnings). <strong>Implicature</strong> (Grice) — what is suggested but not literally said. <strong>Presupposition</strong> — background assumptions an utterance takes for granted.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">Pragmatic Interpretation — Beyond Literal Meaning</span>
+    </div>
+    <div class="example-body">
+      <div class="table-wrap">
+        <table>
+          <tr><th>Utterance</th><th>Literal Meaning</th><th>Pragmatic (Intended) Meaning</th><th>Mechanism</th></tr>
+          <tr><td>"Can you pass the salt?"</td><td>Query about physical ability</td><td>Request: please pass the salt</td><td>Indirect Speech Act</td></tr>
+          <tr><td>"It's cold in here."</td><td>Statement about temperature</td><td>Request: please close the window</td><td>Implicature</td></tr>
+          <tr><td>"John stopped smoking."</td><td>Statement about behaviour change</td><td>Presupposes John used to smoke</td><td>Presupposition</td></tr>
+          <tr class="highlight-row"><td>"Some students passed."</td><td>At least one student passed</td><td>Implicature: NOT all students passed</td><td>Gricean Maxim of Quantity</td></tr>
+        </table>
+      </div>
+      <h4>Grice's Cooperative Principle — Four Maxims</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Maxim</th><th>Principle</th><th>Violation Example</th></tr>
+          <tr><td><strong>Quantity</strong></td><td>Be as informative as required, not more or less</td><td>"Some patients have the disease" when all do — implies not all</td></tr>
+          <tr><td><strong>Quality</strong></td><td>Say only what you believe to be true</td><td>Sarcasm violates this deliberately</td></tr>
+          <tr><td><strong>Relation</strong></td><td>Be relevant to the conversation</td><td>Changing subject abruptly signals avoidance</td></tr>
+          <tr class="highlight-row"><td><strong>Manner</strong></td><td>Be clear, brief, and orderly</td><td>Deliberately obscure phrasing signals special meaning</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: In co-reference resolution, what challenge does the sentence "The trophy didn't fit in the suitcase because it was too big" present for NLP systems?</div>
+    <div class="quiz-opts" id="q2">
+      <button class="quiz-opt" onclick="checkQ('q2',0,'q2fb','wrong')">A. Syntactic ambiguity — "it" can be subject or object of the clause</button>
+      <button class="quiz-opt" onclick="checkQ('q2',1,'q2fb','correct')">B. Co-reference ambiguity — "it" could refer to either the trophy OR the suitcase, requiring world knowledge (size relationships) to resolve: the trophy is too big to fit, so "it"=trophy</button>
+      <button class="quiz-opt" onclick="checkQ('q2',2,'q2fb','wrong')">C. Lexical ambiguity — "fit" has multiple word senses</button>
+      <button class="quiz-opt" onclick="checkQ('q2',3,'q2fb','wrong')">D. Pragmatic ambiguity — the speaker's intention is unclear</button>
+    </div>
+    <div class="quiz-feedback" id="q2fb">✅ Correct! This is the famous "Winograd Schema Challenge" — a co-reference problem requiring real-world knowledge. Grammatically, "it" could refer to either the trophy or the suitcase. To resolve it correctly (it = trophy), the system must know: if X can't fit into Y because it's too big → "it" is X (the thing that's too big for the container). This requires common-sense knowledge about containment and size relationships. Solving Winograd schemas is considered a key benchmark for NLU and has been used to test large language models.</div>
+  </div>
+</section>
+
+<!-- S3: FORMS OF LEARNING -->
+<section id="s3">
+  <div class="section-header">
+    <span class="section-num">Section 03</span>
+    <h2 class="section-title">Forms of Learning &amp; Inductive Learning</h2>
+  </div>
+
+  <p>A system that can only do what it was explicitly programmed to do will always be limited by the programmer's knowledge. <strong>Machine learning</strong> breaks this barrier: systems that learn from experience improve their performance on tasks without being explicitly reprogrammed. This section surveys the major paradigms of learning and examines inductive learning — the process of generalising from specific examples to general rules.</p>
+
+  <div class="definition">
+    <div class="definition-term">Learning Agent (Mitchell, 1997)</div>
+    <p>A computer program is said to <strong>learn</strong> from experience E with respect to task T and performance measure P if its performance on T, as measured by P, improves with experience E.</p>
+    <p>Example: A spam filter (T = classify email) learns (E = labelled examples) and improves accuracy (P = % correct) over time.</p>
+  </div>
+
+  <h3>Forms of Learning — A Taxonomy</h3>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="lm1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">Taxonomy of Machine Learning Paradigms</text>
+      <!-- Root -->
+      <rect x="335" y="40" width="190" height="45" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="430" y="60" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a6b38" text-anchor="middle">Machine Learning</text>
+      <text x="430" y="77" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Improve from experience</text>
+      <!-- Level 2 -->
+      <rect x="60" y="130" width="160" height="50" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="140" y="151" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">Supervised</text>
+      <text x="140" y="168" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Labelled examples</text>
+      <rect x="260" y="130" width="160" height="50" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="340" y="151" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">Unsupervised</text>
+      <text x="340" y="168" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">No labels, find patterns</text>
+      <rect x="460" y="130" width="160" height="50" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="540" y="151" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">Reinforcement</text>
+      <text x="540" y="168" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Reward/penalty signals</text>
+      <rect x="660" y="130" width="160" height="50" rx="8" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="740" y="151" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a5f87" text-anchor="middle">Semi-supervised</text>
+      <text x="740" y="168" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Few labels + many unlabelled</text>
+      <!-- Level 3 examples -->
+      <rect x="40" y="220" width="200" height="60" rx="6" fill="#faf7f2" stroke="#c5b8a8" stroke-width="1"/>
+      <text x="140" y="240" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Decision Trees, SVMs,</text>
+      <text x="140" y="256" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Neural Networks, Regression,</text>
+      <text x="140" y="272" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Naive Bayes</text>
+      <rect x="260" y="220" width="200" height="60" rx="6" fill="#faf7f2" stroke="#c5b8a8" stroke-width="1"/>
+      <text x="360" y="240" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">K-Means, DBSCAN,</text>
+      <text x="360" y="256" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Hierarchical Clustering,</text>
+      <text x="360" y="272" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Autoencoders</text>
+      <rect x="480" y="220" width="200" height="60" rx="6" fill="#faf7f2" stroke="#c5b8a8" stroke-width="1"/>
+      <text x="580" y="240" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Q-Learning, Policy Gradient,</text>
+      <text x="580" y="256" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Actor-Critic, AlphaGo,</text>
+      <text x="580" y="272" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Game playing agents</text>
+      <!-- Edges -->
+      <line x1="380" y1="85" x2="175" y2="128" stroke="#888" stroke-width="1.2" marker-end="url(#lm1)"/>
+      <line x1="410" y1="85" x2="340" y2="128" stroke="#888" stroke-width="1.2" marker-end="url(#lm1)"/>
+      <line x1="455" y1="85" x2="540" y2="128" stroke="#888" stroke-width="1.2" marker-end="url(#lm1)"/>
+      <line x1="480" y1="85" x2="720" y2="128" stroke="#888" stroke-width="1.2" marker-end="url(#lm1)"/>
+      <line x1="140" y1="180" x2="140" y2="218" stroke="#888" stroke-width="1" marker-end="url(#lm1)"/>
+      <line x1="340" y1="180" x2="360" y2="218" stroke="#888" stroke-width="1" marker-end="url(#lm1)"/>
+      <line x1="540" y1="180" x2="580" y2="218" stroke="#888" stroke-width="1" marker-end="url(#lm1)"/>
+    </svg>
+    <div class="diagram-caption">Figure 3.1 — Taxonomy of machine learning paradigms. Supervised learning (most tested in exams) uses labelled examples. Unsupervised discovers hidden structure. Reinforcement learns from reward signals. Semi-supervised combines both.</div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Paradigm</th><th>Input</th><th>Feedback</th><th>Goal</th><th>Example Task</th></tr>
+      <tr><td>Supervised</td><td>Labelled (x, y) pairs</td><td>True labels given</td><td>Learn f: x → y</td><td>Spam detection, diagnosis</td></tr>
+      <tr><td>Unsupervised</td><td>Unlabelled x only</td><td>None</td><td>Find structure in x</td><td>Customer segmentation, topic modelling</td></tr>
+      <tr><td>Reinforcement</td><td>State observations</td><td>Reward / penalty</td><td>Maximise cumulative reward</td><td>Game playing, robot navigation</td></tr>
+      <tr><td>Semi-supervised</td><td>Few labelled + many unlabelled</td><td>Sparse labels</td><td>Propagate labels</td><td>Image classification with few labels</td></tr>
+      <tr class="highlight-row"><td>Self-supervised</td><td>Unlabelled x</td><td>Pseudo-labels from data</td><td>Learn rich representations</td><td>GPT, BERT pre-training</td></tr>
+    </table>
+  </div>
+
+  <h3>Inductive Learning</h3>
+  <div class="definition">
+    <div class="definition-term">Inductive Learning</div>
+    <p><strong>Inductive learning</strong> is the process of generalising from specific training examples to a general hypothesis (concept or rule) that correctly classifies unseen examples. It is the most fundamental form of supervised learning.</p>
+    <p>Given: a set of training examples (positive and negative instances of a concept).<br>
+    Goal: find a hypothesis H consistent with all examples and general enough to classify new ones correctly.<br>
+    Key challenge: <strong>inductive bias</strong> — with infinitely many consistent hypotheses, we need additional assumptions to prefer simpler or more general ones (Occam's Razor).</p>
+    <div class="math-block">
+      <span class="math-label">Inductive Learning Problem</span>
+      Given: Training set D = {(x₁,y₁), (x₂,y₂), …, (xₙ,yₙ)}
+             where xᵢ = input features, yᵢ = target label
+      Find:  Hypothesis H such that H(xᵢ) ≈ yᵢ for all training examples
+             AND H generalises well to new unseen examples (low test error)
+
+      Version space: Set of all hypotheses consistent with training data
+      Occam's Razor: Prefer the simplest consistent hypothesis
+    </div>
+  </div>
+
+  <h3>Explanation-Based Learning (EBL)</h3>
+  <div class="definition">
+    <div class="definition-term">Explanation-Based Learning</div>
+    <p><strong>EBL</strong> (Mitchell et al., 1986) generalises from a <em>single</em> training example by constructing a logical explanation of <em>why</em> the example belongs to the target concept, then generalising that explanation. Unlike statistical inductive learning (which needs many examples), EBL uses existing domain knowledge to explain one example and extract a reusable rule.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Explanation-Based Learning (EBL)</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Goal:</strong> Observe one example of a concept. e.g., "a cup is safe-to-drink-from."</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Explain:</strong> Using background domain knowledge, construct a proof of why this example satisfies the concept. e.g., the cup is light, has a handle, is stable → therefore safe to drink from.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Generalise:</strong> Replace specific constants in the proof with variables. Extract the most general conditions that make the proof valid.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Output:</strong> A general rule: ∀x Light(x) ∧ HasHandle(x) ∧ Stable(x) → SafeToDrinkFrom(x).</p></div></div>
+    </div>
+  </div>
+
+  <h3>Learning Using Relevance Information</h3>
+  <p>Not all features are equally useful for learning. <strong>Relevance-based learning</strong> uses prior knowledge about which attributes are relevant to the target concept, focusing the learner and improving generalisation from fewer examples.</p>
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">Feature Selection</div>
+      <div class="measure-formula">max I(feature; label)</div>
+      <div class="measure-desc">Select features with high mutual information with the target label. Removes irrelevant and redundant features. e.g., for spam detection: word frequency relevant; email font size irrelevant.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Relevance Feedback</div>
+      <div class="measure-formula">User marks relevance</div>
+      <div class="measure-desc">User labels retrieved documents as relevant/irrelevant; the learner adjusts its model. Rocchio algorithm for IR: move query toward relevant, away from irrelevant documents.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Prior Knowledge Injection</div>
+      <div class="measure-formula">constrained hypothesis space</div>
+      <div class="measure-desc">Tell the learner which attributes matter. EBL does this explicitly. Modern: attention mechanisms in transformers learn which input tokens are relevant for each output.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">FOIL (Quinlan, 1990)</div>
+      <div class="measure-formula">max FOIL-gain</div>
+      <div class="measure-desc">First-Order Inductive Learner — learns Horn clause rules by adding literals that maximise FOIL-gain (a variant of information gain for relational data). Combines relevance with inductive rule learning.</div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: Explanation-Based Learning (EBL) differs from standard inductive learning primarily because:</div>
+    <div class="quiz-opts" id="q3">
+      <button class="quiz-opt" onclick="checkQ('q3',0,'q3fb','wrong')">A. EBL requires thousands of examples to learn a concept reliably</button>
+      <button class="quiz-opt" onclick="checkQ('q3',1,'q3fb','correct')">B. EBL can generalise from a SINGLE example by using background domain knowledge to explain why that example belongs to the concept</button>
+      <button class="quiz-opt" onclick="checkQ('q3',2,'q3fb','wrong')">C. EBL does not require any background knowledge — it discovers knowledge from scratch</button>
+      <button class="quiz-opt" onclick="checkQ('q3',3,'q3fb','wrong')">D. EBL only works for numeric data, not symbolic AI problems</button>
+    </div>
+    <div class="quiz-feedback" id="q3fb">✅ Correct! EBL's key feature is that it can learn from a single example — something statistical inductive learning cannot do. It achieves this by leveraging rich domain knowledge to construct a logical explanation (proof) of why the example fits the concept. The explanation is then generalised by replacing constants with variables. This makes EBL powerful for domains with strong prior knowledge (like physics, chess) but weak for domains where we lack good domain theories. The trade-off: EBL is knowledge-intensive but data-efficient.</div>
+  </div>
+</section>
+
+<!-- S4: DECISION TREES -->
+<section id="s4">
+  <div class="section-header">
+    <span class="section-num">Section 04</span>
+    <h2 class="section-title">Learning Decision Trees</h2>
+  </div>
+
+  <p>Decision trees are one of the most interpretable and widely used machine learning algorithms. A decision tree classifies examples by asking a series of attribute-value questions, following branches based on answers until a leaf (classification) is reached. They are the basis of modern ensemble methods (Random Forests, Gradient Boosting) and are frequently featured in AI exams.</p>
+
+  <div class="definition">
+    <div class="definition-term">Decision Tree</div>
+    <p>A <strong>decision tree</strong> is a tree where each <strong>internal node</strong> tests an attribute, each <strong>branch</strong> corresponds to an attribute value, and each <strong>leaf node</strong> gives a classification. To classify a new example, start at the root, follow branches based on the example's attribute values, and return the label at the leaf reached.</p>
+  </div>
+
+  <!-- Play Tennis running example -->
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Running Example</span>
+      <span class="example-title">Play Tennis Dataset (Mitchell, 1997)</span>
+    </div>
+    <div class="example-body">
+      <p>Should we play tennis today? Four weather attributes and 14 training examples (9 positive, 5 negative). <em>This exact dataset appears in almost every AI exam on decision trees — know it by heart.</em></p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Day</th><th>Outlook</th><th>Temperature</th><th>Humidity</th><th>Wind</th><th>Play?</th></tr>
+          <tr><td>D1</td><td>Sunny</td><td>Hot</td><td>High</td><td>Weak</td><td class="tag-red" style="color:#c0392b;font-weight:700">No</td></tr>
+          <tr><td>D2</td><td>Sunny</td><td>Hot</td><td>High</td><td>Strong</td><td style="color:#c0392b;font-weight:700">No</td></tr>
+          <tr><td>D3</td><td>Overcast</td><td>Hot</td><td>High</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D4</td><td>Rain</td><td>Mild</td><td>High</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D5</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D6</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Strong</td><td style="color:#c0392b;font-weight:700">No</td></tr>
+          <tr><td>D7</td><td>Overcast</td><td>Cool</td><td>Normal</td><td>Strong</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D8</td><td>Sunny</td><td>Mild</td><td>High</td><td>Weak</td><td style="color:#c0392b;font-weight:700">No</td></tr>
+          <tr><td>D9</td><td>Sunny</td><td>Cool</td><td>Normal</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D10</td><td>Rain</td><td>Mild</td><td>Normal</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D11</td><td>Sunny</td><td>Mild</td><td>Normal</td><td>Strong</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D12</td><td>Overcast</td><td>Mild</td><td>High</td><td>Strong</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr><td>D13</td><td>Overcast</td><td>Hot</td><td>Normal</td><td>Weak</td><td style="color:#27ae60;font-weight:700">Yes</td></tr>
+          <tr class="highlight-row"><td>D14</td><td>Rain</td><td>Mild</td><td>High</td><td>Strong</td><td style="color:#c0392b;font-weight:700">No</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3>The ID3 Algorithm — Information Gain</h3>
+  <div class="definition">
+    <div class="definition-term">Information Gain and Entropy</div>
+    <p>ID3 (Quinlan, 1986) selects the attribute at each node that maximises <strong>Information Gain</strong> — the reduction in entropy (uncertainty) achieved by splitting on that attribute.</p>
+    <div class="math-block">
+      <span class="math-label">Entropy and Information Gain</span>
+      Entropy(S) = −Σ pᵢ log₂(pᵢ)   where pᵢ = fraction of examples in class i
+                                       = 0 if all same class (pure)
+                                       = 1 if 50/50 split (maximum uncertainty)
+
+      InfoGain(S, A) = Entropy(S) − Σ_{v∈values(A)} |Sᵥ|/|S| × Entropy(Sᵥ)
+                     = entropy BEFORE split − weighted entropy AFTER split
+
+      For PlayTennis (9 Yes, 5 No):
+        Entropy(S) = −(9/14)log₂(9/14) − (5/14)log₂(5/14)
+                   = −0.643×(−0.637) − 0.357×(−1.485)
+                   = 0.410 + 0.530 = 0.940 bits
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">ID3 — Computing Information Gain for All Attributes</span>
+    </div>
+    <div class="example-body">
+      <h4>Step 1 — Entropy of Outlook subsets</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Outlook Value</th><th>Examples</th><th>Yes/No</th><th>Entropy</th></tr>
+          <tr><td>Sunny</td><td>D1,D2,D8,D9,D11</td><td>2 Yes, 3 No</td><td>−(2/5)log(2/5)−(3/5)log(3/5) = 0.971</td></tr>
+          <tr><td>Overcast</td><td>D3,D7,D12,D13</td><td>4 Yes, 0 No</td><td>−1·log(1)−0 = <strong>0.0</strong> (pure!)</td></tr>
+          <tr class="highlight-row"><td>Rain</td><td>D4,D5,D6,D10,D14</td><td>3 Yes, 2 No</td><td>−(3/5)log(3/5)−(2/5)log(2/5) = 0.971</td></tr>
+        </table>
+      </div>
+      <div class="math-block">
+        <span class="math-label">Gain(S, Outlook)</span>
+        = 0.940 − (5/14)×0.971 − (4/14)×0.000 − (5/14)×0.971
+        = 0.940 − 0.347 − 0.000 − 0.347
+        = <strong>0.246 bits</strong>
+      </div>
+      <h4>Information Gain for All Attributes</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Attribute</th><th>Information Gain</th><th>Selected?</th></tr>
+          <tr class="highlight-row"><td><strong>Outlook</strong></td><td><strong>0.246 bits</strong></td><td><strong>✅ YES — highest gain → root node</strong></td></tr>
+          <tr><td>Temperature</td><td>0.029 bits</td><td>❌ Low gain</td></tr>
+          <tr><td>Humidity</td><td>0.151 bits</td><td>❌ Second highest</td></tr>
+          <tr><td>Wind</td><td>0.048 bits</td><td>❌ Low gain</td></tr>
+        </table>
+      </div>
+      <p><strong>Outlook is chosen as the root</strong> (highest information gain = 0.246). The Overcast branch immediately gives a pure leaf (always Play=Yes). Recursion continues on Sunny and Rain branches with remaining examples.</p>
+    </div>
+  </div>
+
+  <!-- Final Decision Tree Diagram -->
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 360" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="dt1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#3d3530" text-anchor="middle">Learned Decision Tree — Play Tennis Dataset (ID3)</text>
+      <!-- Root: Outlook -->
+      <rect x="340" y="40" width="180" height="50" rx="10" fill="#d5edda" stroke="#27ae60" stroke-width="2.5"/>
+      <text x="430" y="62" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">Outlook</text>
+      <text x="430" y="80" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Gain = 0.246 (root)</text>
+      <!-- Edges from root -->
+      <line x1="390" y1="90" x2="180" y2="168" stroke="#888" stroke-width="1.5" marker-end="url(#dt1)"/>
+      <line x1="430" y1="90" x2="430" y2="168" stroke="#888" stroke-width="1.5" marker-end="url(#dt1)"/>
+      <line x1="470" y1="90" x2="680" y2="168" stroke="#888" stroke-width="1.5" marker-end="url(#dt1)"/>
+      <!-- Edge labels -->
+      <text x="270" y="132" font-family="'JetBrains Mono',monospace" font-size="11" fill="#e67e22" text-anchor="middle">Sunny</text>
+      <text x="440" y="138" font-family="'JetBrains Mono',monospace" font-size="11" fill="#e67e22" text-anchor="middle">Overcast</text>
+      <text x="600" y="132" font-family="'JetBrains Mono',monospace" font-size="11" fill="#e67e22" text-anchor="middle">Rain</text>
+      <!-- Overcast → Yes (pure leaf) -->
+      <rect x="370" y="170" width="120" height="45" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="430" y="190" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a6b38" text-anchor="middle">YES ✓</text>
+      <text x="430" y="207" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">4 examples (pure)</text>
+      <!-- Sunny branch → Humidity node -->
+      <rect x="95" y="170" width="160" height="50" rx="10" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="175" y="192" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#7d5a00" text-anchor="middle">Humidity</text>
+      <text x="175" y="210" font-family="'JetBrains Mono',monospace" font-size="10" fill="#7d5a00" text-anchor="middle">Gain=0.971 (sunny)</text>
+      <!-- Humidity edges -->
+      <line x1="140" y1="220" x2="90" y2="278" stroke="#888" stroke-width="1.2" marker-end="url(#dt1)"/>
+      <line x1="210" y1="220" x2="260" y2="278" stroke="#888" stroke-width="1.2" marker-end="url(#dt1)"/>
+      <text x="100" y="260" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22">High</text>
+      <text x="234" y="260" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22">Normal</text>
+      <!-- Humidity leaves -->
+      <rect x="45" y="280" width="90" height="45" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="90" y="300" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">NO ✗</text>
+      <text x="90" y="316" font-family="'JetBrains Mono',monospace" font-size="9" fill="#c0392b" text-anchor="middle">D1,D2,D8</text>
+      <rect x="218" y="280" width="90" height="45" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="263" y="300" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">YES ✓</text>
+      <text x="263" y="316" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a6b38" text-anchor="middle">D9,D11</text>
+      <!-- Rain branch → Wind node -->
+      <rect x="600" y="170" width="160" height="50" rx="10" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="680" y="192" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#1a5f87" text-anchor="middle">Wind</text>
+      <text x="680" y="210" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">Gain=0.971 (rain)</text>
+      <!-- Wind edges -->
+      <line x1="645" y1="220" x2="595" y2="278" stroke="#888" stroke-width="1.2" marker-end="url(#dt1)"/>
+      <line x1="715" y1="220" x2="765" y2="278" stroke="#888" stroke-width="1.2" marker-end="url(#dt1)"/>
+      <text x="604" y="260" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22">Weak</text>
+      <text x="754" y="260" font-family="'JetBrains Mono',monospace" font-size="10" fill="#e67e22">Strong</text>
+      <!-- Wind leaves -->
+      <rect x="548" y="280" width="90" height="45" rx="8" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="593" y="300" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">YES ✓</text>
+      <text x="593" y="316" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a6b38" text-anchor="middle">D4,D5,D10</text>
+      <rect x="718" y="280" width="90" height="45" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="763" y="300" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">NO ✗</text>
+      <text x="763" y="316" font-family="'JetBrains Mono',monospace" font-size="9" fill="#c0392b" text-anchor="middle">D6,D14</text>
+    </svg>
+    <div class="diagram-caption">Figure 4.1 — Learned decision tree for the Play Tennis dataset. Outlook is the root (highest gain=0.246). Overcast always gives Yes (pure leaf). Under Sunny, Humidity decides; under Rain, Wind decides. The tree correctly classifies all 14 training examples.</div>
+  </div>
+
+  <h3>Overfitting and Pruning</h3>
+  <div class="callout red">
+    <span class="callout-label">Watch Out — Overfitting</span>
+    <p><strong>Overfitting</strong> occurs when the tree grows too deep, fitting noise in the training data rather than the true pattern. An overfit tree has 100% training accuracy but poor generalisation. Prevention: <strong>Pre-pruning</strong> (stop growing when gain falls below a threshold) or <strong>Post-pruning</strong> (grow full tree, then prune branches that don't improve validation accuracy). Random Forests tackle overfitting by averaging many trees trained on random subsets.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: The Outlook=Overcast branch in the Play Tennis decision tree has entropy 0.0. What does this mean, and why does ID3 create a leaf node here immediately?</div>
+    <div class="quiz-opts" id="q4">
+      <button class="quiz-opt" onclick="checkQ('q4',0,'q4fb','wrong')">A. There are no training examples with Outlook=Overcast, so no split is possible</button>
+      <button class="quiz-opt" onclick="checkQ('q4',1,'q4fb','wrong')">B. Entropy=0 means the attribute is uninformative and should be ignored</button>
+      <button class="quiz-opt" onclick="checkQ('q4',2,'q4fb','correct')">C. Entropy=0 means all 4 Overcast examples have the same label (Yes) — a pure subset — so no further splitting is needed; the leaf label is Yes</button>
+      <button class="quiz-opt" onclick="checkQ('q4',3,'q4fb','wrong')">D. Entropy=0 means maximum information gain, so we should split further on this branch</button>
+    </div>
+    <div class="quiz-feedback" id="q4fb">✅ Correct! Entropy = −Σ pᵢ log₂(pᵢ). When all 4 Overcast examples are Yes (p_Yes=1, p_No=0): Entropy = −1·log₂(1) − 0·log₂(0) = 0. Zero entropy = zero uncertainty = perfect purity. ID3 immediately makes this a leaf node with label Yes because splitting further cannot reduce entropy below 0. Any split on an already-pure node would be pointless. This is a key insight: the goal of ID3 is to reach pure leaves (entropy=0), and when we already have one, we stop.</div>
+  </div>
+</section>
+
+<!-- S5: NEURAL & GENETIC LEARNING -->
+<section id="s5">
+  <div class="section-header">
+    <span class="section-num">Section 05</span>
+    <h2 class="section-title">Neural Network Learning &amp; Genetic Algorithms</h2>
+  </div>
+
+  <p>Decision trees work beautifully on tabular data with clear attribute splits — but they struggle with images, audio, and continuous-valued inputs. <strong>Neural networks</strong> learn hierarchical representations directly from raw data, making them the backbone of modern deep learning. <strong>Genetic algorithms</strong> borrow from biological evolution to search vast hypothesis spaces that gradient-based methods cannot navigate.</p>
+
+  <h3>Neural Network Learning — The Perceptron</h3>
+  <div class="definition">
+    <div class="definition-term">Artificial Neuron (Perceptron)</div>
+    <p>A perceptron computes a weighted sum of its inputs, adds a bias, and passes the result through an activation function. For input vector <strong>x</strong>, weights <strong>w</strong>, bias b, and activation σ:</p>
+    <div class="math-block">
+      <span class="math-label">Single Neuron Computation</span>
+      z = w₁x₁ + w₂x₂ + … + wₙxₙ + b = <b>w</b>·<b>x</b> + b   (weighted sum)
+      ŷ = σ(z)                                                   (activation)
+
+      Common activations:
+        Step:    σ(z) = 1 if z≥0, else 0          (Perceptron — binary)
+        Sigmoid: σ(z) = 1/(1+e^{−z})               (smooth, 0 to 1)
+        ReLU:    σ(z) = max(0, z)                   (deep learning standard)
+        Tanh:    σ(z) = (e^z−e^{−z})/(e^z+e^{−z}) (−1 to +1)
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="nn1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="14" font-weight="700" fill="#3d3530" text-anchor="middle">Multi-Layer Neural Network — Feed-Forward Architecture</text>
+      <!-- Input layer -->
+      <text x="95" y="48" font-family="'JetBrains Mono',monospace" font-size="11" fill="#888" text-anchor="middle">Input Layer</text>
+      <circle cx="95" cy="90" r="22" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="95" y="86" font-family="'JetBrains Mono',monospace" font-size="11" fill="#c0392b" text-anchor="middle">x₁</text>
+      <text x="95" y="100" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="middle">feature</text>
+      <circle cx="95" cy="160" r="22" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="95" y="156" font-family="'JetBrains Mono',monospace" font-size="11" fill="#c0392b" text-anchor="middle">x₂</text>
+      <text x="95" y="170" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="middle">feature</text>
+      <circle cx="95" cy="230" r="22" fill="#fce8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="95" y="226" font-family="'JetBrains Mono',monospace" font-size="11" fill="#c0392b" text-anchor="middle">x₃</text>
+      <text x="95" y="240" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888" text-anchor="middle">feature</text>
+      <!-- Hidden layer 1 -->
+      <text x="280" y="48" font-family="'JetBrains Mono',monospace" font-size="11" fill="#888" text-anchor="middle">Hidden Layer 1</text>
+      <circle cx="280" cy="80" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="280" y="85" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <circle cx="280" cy="140" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="280" y="145" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <circle cx="280" cy="200" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="280" y="205" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <circle cx="280" cy="260" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="280" y="265" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <!-- Hidden layer 2 -->
+      <text x="465" y="48" font-family="'JetBrains Mono',monospace" font-size="11" fill="#888" text-anchor="middle">Hidden Layer 2</text>
+      <circle cx="465" cy="100" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="465" y="105" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <circle cx="465" cy="170" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="465" y="175" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <circle cx="465" cy="240" r="22" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="465" y="245" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a5f87" text-anchor="middle">ReLU</text>
+      <!-- Output layer -->
+      <text x="670" y="48" font-family="'JetBrains Mono',monospace" font-size="11" fill="#888" text-anchor="middle">Output Layer</text>
+      <circle cx="670" cy="130" r="26" fill="#d5edda" stroke="#27ae60" stroke-width="2.5"/>
+      <text x="670" y="126" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Softmax</text>
+      <text x="670" y="140" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a6b38" text-anchor="middle">class 1</text>
+      <circle cx="670" cy="205" r="26" fill="#d5edda" stroke="#27ae60" stroke-width="2.5"/>
+      <text x="670" y="201" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1a6b38" text-anchor="middle">Softmax</text>
+      <text x="670" y="215" font-family="'JetBrains Mono',monospace" font-size="9" fill="#1a6b38" text-anchor="middle">class 2</text>
+      <!-- Edges input→h1 -->
+      <line x1="117" y1="90" x2="258" y2="83" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="93" x2="258" y2="138" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="95" x2="258" y2="198" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="97" x2="258" y2="258" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="160" x2="258" y2="83" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="162" x2="258" y2="142" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="165" x2="258" y2="200" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="167" x2="258" y2="258" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="230" x2="258" y2="85" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="232" x2="258" y2="143" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="235" x2="258" y2="200" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="117" y1="237" x2="258" y2="260" stroke="#ccc" stroke-width="0.8"/>
+      <!-- Edges h1→h2 -->
+      <line x1="302" y1="82" x2="443" y2="102" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="85" x2="443" y2="170" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="88" x2="443" y2="240" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="142" x2="443" y2="103" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="145" x2="443" y2="170" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="148" x2="443" y2="240" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="200" x2="443" y2="103" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="203" x2="443" y2="172" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="206" x2="443" y2="240" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="260" x2="443" y2="106" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="262" x2="443" y2="172" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="302" y1="264" x2="443" y2="242" stroke="#ccc" stroke-width="0.8"/>
+      <!-- Edges h2→output -->
+      <line x1="487" y1="103" x2="644" y2="133" stroke="#888" stroke-width="1"/>
+      <line x1="487" y1="172" x2="644" y2="135" stroke="#888" stroke-width="1"/>
+      <line x1="487" y1="241" x2="644" y2="137" stroke="#888" stroke-width="1"/>
+      <line x1="487" y1="103" x2="644" y2="207" stroke="#888" stroke-width="1"/>
+      <line x1="487" y1="172" x2="644" y2="207" stroke="#888" stroke-width="1"/>
+      <line x1="487" y1="241" x2="644" y2="209" stroke="#888" stroke-width="1"/>
+      <!-- weight label -->
+      <text x="185" y="110" font-family="'JetBrains Mono',monospace" font-size="9" fill="#e67e22">w_{ij}</text>
+      <!-- Backprop arrow -->
+      <path d="M720 170 Q780 170 780 130 Q780 90 720 90" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#nn1)"/>
+      <text x="800" y="135" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b">Back-</text>
+      <text x="800" y="149" font-family="'JetBrains Mono',monospace" font-size="10" fill="#c0392b">prop</text>
+    </svg>
+    <div class="diagram-caption">Figure 5.1 — Multi-layer neural network (MLP). Input layer feeds hidden layers (ReLU activation); output uses Softmax for classification. Backpropagation (red dashed) adjusts weights by propagating the gradient of the loss from output back to input.</div>
+  </div>
+
+  <h3>Backpropagation — Learning the Weights</h3>
+  <div class="definition">
+    <div class="definition-term">Backpropagation Algorithm</div>
+    <p>Backpropagation (Rumelhart, Hinton &amp; Williams, 1986) computes the gradient of the loss function with respect to every weight in the network using the chain rule, then updates weights using gradient descent.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Backpropagation Training</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Forward Pass:</strong> Compute network output ŷ = f(x; W) layer by layer. Store all intermediate activations.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Compute Loss:</strong> L = Loss(ŷ, y). For classification: Cross-entropy L = −Σ yᵢ log ŷᵢ. For regression: MSE L = (1/n)Σ(ŷ−y)².</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Backward Pass:</strong> Compute δL/δW for every weight using chain rule from output to input: δL/δwᵢⱼ = δL/δaⱼ × δaⱼ/δzⱼ × δzⱼ/δwᵢⱼ.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Weight Update:</strong> wᵢⱼ ← wᵢⱼ − η × δL/δwᵢⱼ where η = learning rate (e.g. 0.001). Repeat for all weights.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p><strong>Iterate:</strong> Repeat Steps 1–4 for all mini-batches over multiple epochs until convergence (loss stops decreasing).</p></div></div>
+    </div>
+  </div>
+
+  <div class="math-block">
+    <span class="math-label">Gradient Descent Weight Update</span>
+    Output layer delta:  δₒ = (ŷ − y) × σ'(zₒ)
+    Hidden layer delta:  δₕ = (Σ wₒₕ × δₒ) × σ'(zₕ)   ← chain rule
+    Weight update:       Δwₕₒ = −η × δₒ × aₕ
+                         Δwᵢₕ = −η × δₕ × xᵢ
+
+    Example: η=0.1, output=0.8, target=1.0, σ'(z)=0.16 (sigmoid at 0.8)
+      δₒ = (0.8−1.0) × 0.16 = −0.032
+      Δw = −0.1 × (−0.032) × aₕ = +0.0032 × aₕ  ← weight increases (toward target)
+  </div>
+
+  <h3>Genetic Learning (Genetic Algorithms)</h3>
+  <div class="definition">
+    <div class="definition-term">Genetic Algorithm (GA)</div>
+    <p>A <strong>Genetic Algorithm</strong> (Holland, 1975) searches a hypothesis space by maintaining a <strong>population</strong> of candidate solutions (chromosomes) and evolving them through <strong>selection, crossover, and mutation</strong> — mimicking biological natural selection. GAs excel when the search space is large, non-differentiable, or has many local optima that trap gradient-based methods.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Genetic Algorithm for Learning</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Initialise:</strong> Create a population of k random individuals (bit strings or rule sets). Each individual = one candidate hypothesis.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Evaluate Fitness:</strong> For each individual, compute f(individual) = measure of how well it solves the problem (accuracy, reward, etc.).</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Selection:</strong> Select parents with probability proportional to fitness (roulette wheel). Better individuals reproduce more.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Crossover:</strong> With probability p_c, swap tail segments of two parents at a random crossover point to produce two offspring.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p><strong>Mutation:</strong> With probability p_m (small, e.g. 0.01), flip each bit. Maintains genetic diversity; prevents premature convergence.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text"><p><strong>Replace:</strong> New population replaces old. Repeat from Step 2 until termination criterion (max generations or fitness threshold).</p></div></div>
+    </div>
+  </div>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Worked Example</span>
+      <span class="example-title">GA for Decision Rule Learning — One Generation</span>
+    </div>
+    <div class="example-body">
+      <p>Encode the Play Tennis attributes as a bit string: Outlook(2 bits) + Temperature(2 bits) + Humidity(1 bit) + Wind(1 bit) = 6-bit chromosome. 1=relevant/True, 0=irrelevant/False.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Individual</th><th>Chromosome</th><th>Rule Decoded</th><th>Fitness (accuracy)</th><th>Selection Prob.</th></tr>
+          <tr><td>A</td><td><code>110011</code></td><td>Sunny AND High-Humidity AND Strong-Wind → No</td><td>0.72</td><td>0.72/2.65 = 27%</td></tr>
+          <tr><td>B</td><td><code>010100</code></td><td>Overcast AND Low-Temp → Yes</td><td>0.65</td><td>0.65/2.65 = 25%</td></tr>
+          <tr><td>C</td><td><code>100110</code></td><td>Outlook AND Humidity AND Wind rule</td><td>0.71</td><td>0.71/2.65 = 27%</td></tr>
+          <tr class="highlight-row"><td>D</td><td><code>111001</code></td><td>Sunny AND Hot AND Normal</td><td>0.57</td><td>0.57/2.65 = 22%</td></tr>
+        </table>
+      </div>
+      <h4>Crossover Example (Parents A and C, crossover at position 3)</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th></th><th>Chromosome</th><th>Decoded Rule</th><th>Fitness</th></tr>
+          <tr><td>Parent A</td><td><code>110|011</code></td><td>Sunny AND …</td><td>0.72</td></tr>
+          <tr><td>Parent C</td><td><code>100|110</code></td><td>Outlook AND …</td><td>0.71</td></tr>
+          <tr class="highlight-row"><td>Child A'</td><td><code>110|110</code></td><td>New rule combining best of both</td><td>0.78 ↑ Improved!</td></tr>
+          <tr><td>Child C'</td><td><code>100|011</code></td><td>New variant</td><td>0.69</td></tr>
+        </table>
+      </div>
+      <p>Child A' achieves higher fitness (0.78) than either parent by combining their best segments — this is the power of crossover.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Feature</th><th>Neural Networks</th><th>Decision Trees</th><th>Genetic Algorithms</th></tr>
+      <tr><td>Learning paradigm</td><td>Gradient-based optimisation</td><td>Greedy recursive splitting</td><td>Population-based evolution</td></tr>
+      <tr><td>Interpretability</td><td>❌ Black box</td><td>✅ Fully interpretable</td><td>❌ Hard to interpret</td></tr>
+      <tr><td>Data requirement</td><td>Large (thousands–millions)</td><td>Small–medium (hundreds)</td><td>Medium (evaluation-heavy)</td></tr>
+      <tr><td>Handles non-linearity</td><td>✅ Excellent</td><td>✅ Good (axis-aligned)</td><td>✅ Excellent</td></tr>
+      <tr><td>Escapes local optima</td><td>❌ SGD can get stuck</td><td>N/A (greedy)</td><td>✅ Via crossover + mutation</td></tr>
+      <tr class="highlight-row"><td>Best for</td><td>Images, text, audio, sequences</td><td>Tabular data, explainable AI</td><td>Combinatorial optimisation, rule evolution</td></tr>
+    </table>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: In backpropagation, why must we store the intermediate activations from the forward pass before computing the backward pass?</div>
+    <div class="quiz-opts" id="q5">
+      <button class="quiz-opt" onclick="checkQ('q5',0,'q5fb','wrong')">A. To compute the loss function at the output layer</button>
+      <button class="quiz-opt" onclick="checkQ('q5',1,'q5fb','correct')">B. The chain rule gradient for each weight requires the activation of the previous layer: δL/δwᵢⱼ = δL/δaⱼ × aᵢ — without stored activations, the weight gradients cannot be computed</button>
+      <button class="quiz-opt" onclick="checkQ('q5',2,'q5fb','wrong')">C. To detect when the network has converged and stop training</button>
+      <button class="quiz-opt" onclick="checkQ('q5',3,'q5fb','wrong')">D. Only the final output activation needs to be stored; intermediate ones are not needed</button>
+    </div>
+    <div class="quiz-feedback" id="q5fb">✅ Correct! The gradient of the loss with respect to weight wᵢⱼ (connecting neuron i to j) is: δL/δwᵢⱼ = δL/δzⱼ × aᵢ, where aᵢ is the activation of neuron i from the forward pass. Without aᵢ, this gradient cannot be computed. This is why backpropagation requires a full forward pass first — to cache all intermediate activations — before the backward pass can calculate gradients. This memory cost (storing all activations) is why training large networks requires significant GPU memory.</div>
+  </div>
+</section>
+
+<!-- S6: EXPERT SYSTEMS -->
+<section id="s6">
+  <div class="section-header">
+    <span class="section-num">Section 06</span>
+    <h2 class="section-title">Expert Systems</h2>
+  </div>
+
+  <p>In the 1970s and 80s, AI researchers asked a provocative question: could we capture the expertise of the world's best doctors, lawyers, and engineers in a computer program? The answer was <strong>expert systems</strong> — AI programs that emulate the decision-making ability of a human expert in a specific domain. Unlike general-purpose programs, expert systems encode <em>deep, specialised knowledge</em> and can explain their reasoning — a property that earned them widespread adoption in medicine, engineering, and finance.</p>
+  <p>The most famous early success was <strong>MYCIN</strong> (Stanford, 1976) — a system that diagnosed bacterial blood infections with accuracy matching senior physicians. This section covers the architecture, design, and knowledge acquisition process that make expert systems work.</p>
+
+  <h3>Architecture of an Expert System</h3>
+
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="es1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5"/></marker>
+      <marker id="es2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#e67e22" stroke-width="1.8"/></marker></defs>
+      <text x="430" y="22" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#3d3530" text-anchor="middle">Expert System Architecture — Components and Data Flow</text>
+
+      <!-- Knowledge Base -->
+      <rect x="280" y="45" width="300" height="80" rx="10" fill="#d5edda" stroke="#27ae60" stroke-width="2"/>
+      <text x="430" y="74" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a6b38" text-anchor="middle">Knowledge Base</text>
+      <text x="430" y="96" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Domain facts + IF-THEN rules + heuristics</text>
+      <text x="430" y="115" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">e.g. MYCIN: 600 rules about bacteria + antibiotics</text>
+
+      <!-- Inference Engine -->
+      <rect x="280" y="175" width="300" height="70" rx="10" fill="#d0e8f5" stroke="#2980b9" stroke-width="2"/>
+      <text x="430" y="202" font-family="'Playfair Display',serif" font-size="15" font-weight="700" fill="#1a5f87" text-anchor="middle">Inference Engine</text>
+      <text x="430" y="224" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Forward chaining / Backward chaining</text>
+      <text x="430" y="238" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Conflict resolution strategy</text>
+
+      <!-- Working Memory -->
+      <rect x="580" y="175" width="220" height="70" rx="10" fill="#fff3cd" stroke="#d4a017" stroke-width="2"/>
+      <text x="690" y="202" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#7d5a00" text-anchor="middle">Working Memory</text>
+      <text x="690" y="222" font-family="'JetBrains Mono',monospace" font-size="10" fill="#555" text-anchor="middle">Current patient facts</text>
+      <text x="690" y="238" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Derived conclusions</text>
+
+      <!-- Explanation Module -->
+      <rect x="60" y="175" width="190" height="70" rx="10" fill="#e8d5f5" stroke="#8e44ad" stroke-width="2"/>
+      <text x="155" y="202" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#4a1b8c" text-anchor="middle">Explanation</text>
+      <text x="155" y="220" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#4a1b8c" text-anchor="middle">Module</text>
+      <text x="155" y="238" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">WHY / HOW traces</text>
+
+      <!-- User Interface -->
+      <rect x="280" y="290" width="300" height="40" rx="8" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="430" y="315" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">User Interface — Doctor / End User</text>
+
+      <!-- Knowledge Engineer box -->
+      <rect x="60" y="45" width="185" height="80" rx="10" fill="#fce8e8" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="153" y="74" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">Knowledge</text>
+      <text x="153" y="92" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#c0392b" text-anchor="middle">Engineer</text>
+      <text x="153" y="114" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Elicits + encodes rules</text>
+
+      <!-- Domain Expert box -->
+      <rect x="615" y="45" width="185" height="80" rx="10" fill="#d5edda" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="708" y="74" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">Domain Expert</text>
+      <text x="708" y="92" font-family="'Playfair Display',serif" font-size="13" font-weight="700" fill="#1a6b38" text-anchor="middle">(Physician)</text>
+      <text x="708" y="114" font-family="'JetBrains Mono',monospace" font-size="10" fill="#888" text-anchor="middle">Provides expertise</text>
+
+      <!-- Arrows -->
+      <line x1="245" y1="85" x2="278" y2="85" stroke="#e67e22" stroke-width="1.8" marker-end="url(#es2)"/>
+      <text x="262" y="78" font-family="'JetBrains Mono',monospace" font-size="9" fill="#e67e22">encode</text>
+      <line x1="613" y1="85" x2="582" y2="85" stroke="#e67e22" stroke-width="1.8" marker-end="url(#es2)"/>
+      <text x="596" y="78" font-family="'JetBrains Mono',monospace" font-size="9" fill="#e67e22">consult</text>
+      <line x1="430" y1="125" x2="430" y2="173" stroke="#888" stroke-width="1.5" marker-end="url(#es1)"/>
+      <text x="445" y="155" font-family="'JetBrains Mono',monospace" font-size="9" fill="#888">rules</text>
+      <line x1="580" y1="210" x2="582" y2="210" stroke="#888" stroke-width="1.5" marker-end="url(#es1)"/>
+      <line x1="250" y1="210" x2="278" y2="210" stroke="#888" stroke-width="1.5" marker-end="url(#es1)"/>
+      <line x1="430" y1="245" x2="430" y2="288" stroke="#888" stroke-width="1.5" marker-end="url(#es1)"/>
+      <line x1="580" y1="210" x2="802" y2="210" stroke="#888" stroke-width="0.8" stroke-dasharray="4,3"/>
+    </svg>
+    <div class="diagram-caption">Figure 6.1 — Expert system architecture. A knowledge engineer (working with domain experts) populates the knowledge base with rules. The inference engine applies rules to working memory (patient facts) to derive conclusions. The explanation module traces the reasoning for the user.</div>
+  </div>
+
+  <h3>Representing and Using Domain Knowledge</h3>
+  <p>The power of an expert system comes entirely from the quality and completeness of its knowledge base. Domain knowledge is encoded in several forms, all of which we saw in Unit III and IV.</p>
+
+  <div class="example-box">
+    <div class="example-header">
+      <span class="example-badge">Classic Example</span>
+      <span class="example-title">MYCIN — Rules, Certainty Factors, and Explanation</span>
+    </div>
+    <div class="example-body">
+      <h4>MYCIN Knowledge Base (Sample Rules)</h4>
+      <pre><code><span class="cm">-- Rule 52: Identify organism as Pseudomonas --</span>
+<span class="kw">IF</span>   the gram-stain of the organism is gramneg
+<span class="kw">AND</span>  the morphology is rod
+<span class="kw">AND</span>  the aerobicity is aerobic
+<span class="kw">THEN</span> there is suggestive evidence (CF=0.6) that
+     the identity of the organism is Pseudomonas
+
+<span class="cm">-- Rule 073: Treat with Gentamicin for Pseudomonas --</span>
+<span class="kw">IF</span>   the identity of organism-1 is Pseudomonas
+<span class="kw">AND</span>  the patient is not allergic to Gentamicin
+<span class="kw">THEN</span> recommend Gentamicin  [CF=0.8]
+
+<span class="cm">-- Rule 119: Penicillin coverage for Streptococcus --</span>
+<span class="kw">IF</span>   the identity of organism-1 is Streptococcus
+<span class="kw">AND</span>  the patient has received Penicillin in past 6 months
+<span class="kw">THEN</span> consider Penicillin-resistant strain  [CF=0.4]</code></pre>
+
+      <h4>Backward Chaining Trace</h4>
+      <p><strong>Goal:</strong> What drug should be prescribed? → Triggers drug-recommendation rules → Triggers identity-of-organism rules → Triggers lab-result queries.</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Step</th><th>Goal</th><th>Rule Applied</th><th>Sub-goal / Action</th></tr>
+          <tr><td>1</td><td>PRESCRIBE(drug, patient)</td><td>Drug rules</td><td>Need: IDENTITY(organism, ?)</td></tr>
+          <tr><td>2</td><td>IDENTITY(organism, Pseudomonas)</td><td>Rule 52</td><td>Need: GramStain=neg, Morphology=rod, Aerobic</td></tr>
+          <tr><td>3</td><td>GramStain=neg</td><td>Ask user</td><td>Q: "What is the gram stain of organism-1?"</td></tr>
+          <tr><td>4</td><td>Morphology=rod</td><td>Ask user</td><td>Q: "What is the morphology of organism-1?"</td></tr>
+          <tr class="highlight-row"><td>5</td><td>Identity ≈ Pseudomonas [CF=0.6]</td><td>Rule 073</td><td>RECOMMEND(Gentamicin) [CF=0.8×0.6=0.48]</td></tr>
+        </table>
+      </div>
+
+      <h4>Explanation Facility — WHY and HOW</h4>
+      <pre><code><span class="cm">-- User asks WHY is gram stain needed? --</span>
+<span class="fn">SYSTEM:</span> <span class="str">"I am trying to determine the identity of organism-1."</span>
+<span class="str">"Rule 52 states: IF gram-stain is gramneg AND morphology is rod"</span>
+<span class="str">"AND aerobic THEN identity is Pseudomonas [CF=0.6]."</span>
+<span class="str">"I need gram-stain to apply this rule."</span>
+
+<span class="cm">-- User asks HOW did you conclude Pseudomonas? --</span>
+<span class="fn">SYSTEM:</span> <span class="str">"I concluded Pseudomonas [CF=0.6] because:"</span>
+<span class="str">"  1. Gram stain = gramneg  (you told me, CF=1.0)"</span>
+<span class="str">"  2. Morphology = rod      (you told me, CF=1.0)"</span>
+<span class="str">"  3. Aerobicity = aerobic  (lab result, CF=0.9)"</span>
+<span class="str">"  → Rule 52 applied with combined CF = 0.6×0.9 = 0.54"</span></code></pre>
+      <div class="callout green">
+        <span class="callout-label">Why Explanation Matters</span>
+        <p>MYCIN's explanation facility was arguably as important as its diagnostic accuracy. Physicians could ask WHY (what information is needed and why) and HOW (how a conclusion was reached). This transparency built trust and allowed doctors to catch errors — something a black-box neural network cannot provide.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Expert System Shells</h3>
+  <div class="definition">
+    <div class="definition-term">Expert System Shell</div>
+    <p>An <strong>expert system shell</strong> is a reusable framework containing the inference engine, working memory management, explanation facility, and user interface — everything <em>except</em> the domain-specific knowledge base. A knowledge engineer can build a new expert system by simply populating the shell with domain rules, without implementing the reasoning engine from scratch.</p>
+    <p>EMYCIN (Empty MYCIN) was the first major shell, created by stripping MYCIN's medical knowledge and keeping the reasoning architecture. Subsequent shells became commercial products used across industries.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Shell / System</th><th>Year</th><th>Origin</th><th>Key Features</th><th>Applications</th></tr>
+      <tr><td><strong>EMYCIN</strong></td><td>1979</td><td>Stanford (from MYCIN)</td><td>Backward chaining, certainty factors</td><td>Medical diagnosis</td></tr>
+      <tr><td><strong>OPS5</strong></td><td>1977</td><td>Carnegie Mellon</td><td>Forward chaining, Rete algorithm</td><td>R1 (DEC VAX config)</td></tr>
+      <tr><td><strong>CLIPS</strong></td><td>1985</td><td>NASA</td><td>Forward chaining, C-based, free</td><td>Aerospace, manufacturing</td></tr>
+      <tr><td><strong>JESS</strong></td><td>1995</td><td>Sandia National Labs</td><td>Java-based CLIPS variant, JVM integration</td><td>Enterprise, web apps</td></tr>
+      <tr class="highlight-row"><td><strong>Drools</strong></td><td>2001</td><td>Red Hat / JBoss</td><td>Java, RETE algorithm, business rules</td><td>Finance, banking, insurance</td></tr>
+    </table>
+  </div>
+
+  <h3>Knowledge Acquisition</h3>
+  <div class="definition">
+    <div class="definition-term">Knowledge Acquisition Bottleneck</div>
+    <p><strong>Knowledge acquisition</strong> — the process of extracting expert knowledge and encoding it into the knowledge base — is the single hardest and most time-consuming step in building an expert system. Experts find it difficult to articulate the heuristics and intuitions they use, a phenomenon called <strong>tacit knowledge</strong>.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">KNOWLEDGE ACQUISITION PROCESS — Stages</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p><strong>Identification:</strong> Define the problem domain, identify the expert(s), select the representation formalism. Determine scope — what questions must the system answer?</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Conceptualisation:</strong> Identify key concepts, their relationships, and the reasoning strategies experts use. Techniques: structured interviews, think-aloud protocols, case analysis.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p><strong>Formalisation:</strong> Translate conceptualised knowledge into formal rules, frames, or ontologies suitable for the chosen shell. This is where tacit knowledge is hardest to capture.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p><strong>Implementation:</strong> Enter formal rules into the knowledge base. Test on sample cases. Identify missing rules and incorrect certainty factors.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p><strong>Testing and Validation:</strong> Evaluate against known expert cases. Expert reviews the system's reasoning traces. Iterate: add rules, adjust CFs, refine conditions.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-text"><p><strong>Maintenance:</strong> Update the KB as domain knowledge changes (new drugs, new diseases, changed protocols). Track rule interactions to avoid unintended consequences.</p></div></div>
+    </div>
+  </div>
+
+  <div class="measures-grid">
+    <div class="measure-card">
+      <div class="measure-name">Forward Chaining</div>
+      <div class="measure-formula">Data → Conclusions</div>
+      <div class="measure-desc">Start with known facts in working memory. Fire all matching rules. Repeat until goal is derived or no more rules fire. "Data-driven." Best when: all data available upfront, multiple possible conclusions.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Backward Chaining</div>
+      <div class="measure-formula">Goal → Sub-goals</div>
+      <div class="measure-desc">Start with the goal. Find rules that can prove it. Recursively prove sub-goals. Ask user only for needed data. "Goal-driven." Best when: single hypothesis to verify, many possible data items (ask only what's needed).</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">Certainty Factors</div>
+      <div class="measure-formula">CF ∈ [−1, +1]</div>
+      <div class="measure-desc">MYCIN's uncertainty handling. CF = 0 = no evidence; CF = 1 = certain; CF = −1 = certainly false. Combined: CF(A∧B) = min(CF_A, CF_B). Simpler than Bayesian but less principled.</div>
+    </div>
+    <div class="measure-card">
+      <div class="measure-name">RETE Algorithm</div>
+      <div class="measure-formula">Pattern network</div>
+      <div class="measure-desc">Efficient rule matching: pre-compiles rules into a discrimination network. Avoids re-evaluating unchanged facts. Used in OPS5, CLIPS, Drools. Reduces rule matching from O(rules×facts) to near O(1) per fact change.</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">Key Insight — Why Expert Systems Succeeded and Then Declined</span>
+    <p><strong>Success (1970s–80s):</strong> R1/XCON (DEC, 1980) configured VAX computers, saving $40M/year. MYCIN matched physicians in diagnosis. PROSPECTOR discovered a molybdenum deposit worth $100M.<br>
+    <strong>Decline (late 80s–90s):</strong> Knowledge acquisition bottleneck — encoding new domains took years. Knowledge bases became unmaintainable. No learning — systems could not improve automatically. Could not handle exceptions gracefully.<br>
+    <strong>Revival (2010s–present):</strong> Hybrid systems combine ML (for pattern recognition) with expert system shells (for transparent reasoning). Medical AI now combines neural networks with rule engines for explainability.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Quick Check: A doctor using MYCIN asks "WHY do you need to know the patient's gram stain result?" Which expert system component answers this question, and what does it use?</div>
+    <div class="quiz-opts" id="q6">
+      <button class="quiz-opt" onclick="checkQ('q6',0,'q6fb','wrong')">A. The Knowledge Base — it looks up the definition of gram stain</button>
+      <button class="quiz-opt" onclick="checkQ('q6',1,'q6fb','wrong')">B. The Inference Engine — it re-runs the backward chaining to show all possible conclusions</button>
+      <button class="quiz-opt" onclick="checkQ('q6',2,'q6fb','correct')">C. The Explanation Facility — it traces the current goal chain and shows which rule needs the gram stain value and why that rule is being pursued</button>
+      <button class="quiz-opt" onclick="checkQ('q6',3,'q6fb','wrong')">D. The Working Memory — it shows all facts currently known about the patient</button>
+    </div>
+    <div class="quiz-feedback" id="q6fb">✅ Correct! The <strong>Explanation Facility</strong> handles WHY and HOW questions. WHY("gram stain"): traces the backward chaining stack — "I'm asking because Rule 52 needs gram-stain=gramneg to conclude Pseudomonas, and I'm trying to identify the organism in order to recommend a drug." It uses the goal stack maintained by the inference engine during backward chaining. HOW("Pseudomonas"): shows the chain of rules and facts that led to that conclusion. This transparency is what distinguishes expert systems from black-box ML — it is the explanation facility, not the inference engine or KB alone.</div>
+  </div>
+</section>
+
+<!-- S7: EXAM SUMMARY -->
+<section id="s7">
+  <div class="section-header">
+    <span class="section-num">Section 07</span>
+    <h2 class="section-title">Exam Preparation Summary</h2>
+  </div>
+  <p>This section consolidates every definition, formula, algorithm, and comparison from Unit V into a single revision reference.</p>
+
+  <h3>★ NLP Pipeline — All Levels</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Level</th><th>Task</th><th>Input→Output</th><th>Key Technique</th><th>Example</th></tr>
+      <tr><td><strong>Morphological</strong></td><td>Decompose word forms</td><td>Words → morphemes</td><td>Finite-state transducers</td><td>treated → treat + ed</td></tr>
+      <tr><td><strong>Lexical (POS)</strong></td><td>Tag parts of speech</td><td>Tokens → POS tags</td><td>HMM, CRF, BERT</td><td>treated/VBD doctor/NN</td></tr>
+      <tr><td><strong>Syntactic</strong></td><td>Build parse tree</td><td>Tagged words → tree</td><td>CFG, CYK algorithm</td><td>S→NP VP, NP→Det N</td></tr>
+      <tr><td><strong>Semantic</strong></td><td>Compute meaning</td><td>Parse tree → logical form</td><td>Lambda calculus, WSD</td><td>Treated(doctor, patient)</td></tr>
+      <tr><td><strong>Discourse</strong></td><td>Link sentences</td><td>Sentences → coherent text</td><td>Co-reference, RST</td><td>"She" → doctor</td></tr>
+      <tr class="highlight-row"><td><strong>Pragmatic</strong></td><td>Identify speaker intent</td><td>Utterance → speech act</td><td>Grice's maxims, speech acts</td><td>"Can you pass salt?" = Request</td></tr>
+    </table>
+  </div>
+
+  <h3>★ Machine Learning — Forms and Algorithms</h3>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <tr><th>Algorithm</th><th>Type</th><th>Key Formula / Concept</th><th>Best For</th></tr>
+      <tr><td>Decision Tree (ID3)</td><td>Supervised</td><td>Gain(S,A) = H(S) − Σ|Sᵥ|/|S|·H(Sᵥ)</td><td>Tabular data; interpretable AI</td></tr>
+      <tr><td>Neural Network</td><td>Supervised</td><td>Backprop: δw = −η·∂L/∂w</td><td>Images, text, audio</td></tr>
+      <tr><td>Genetic Algorithm</td><td>Evolutionary</td><td>Selection + Crossover + Mutation</td><td>Combinatorial optimisation</td></tr>
+      <tr><td>Inductive Learning</td><td>Supervised</td><td>Generalise from (x,y) pairs</td><td>General classification / regression</td></tr>
+      <tr><td>EBL</td><td>Knowledge-intensive</td><td>Explain ONE example → generalise</td><td>Domains with strong prior knowledge</td></tr>
+      <tr class="highlight-row"><td>Reinforcement</td><td>Reward-based</td><td>max E[Σ γᵗ rₜ]</td><td>Games, robotics, control</td></tr>
+    </table>
+  </div>
+
+  <h3>★ Information Gain — Full Calculation Template</h3>
+  <div class="math-block">
+    <span class="math-label">ID3 Entropy and Information Gain — Exam Template</span>
+    Step 1:  H(S) = −(p₊)log₂(p₊) − (p₋)log₂(p₋)
+             For 9 Yes, 5 No: H = −(9/14)log₂(9/14) − (5/14)log₂(5/14) = 0.940
+
+    Step 2:  For each attribute A with values v₁, v₂, …:
+             Gain(S,A) = H(S) − Σᵥ (|Sᵥ|/|S|) × H(Sᵥ)
+
+    Step 3:  Choose attribute with HIGHEST gain as next split node.
+
+    Step 4:  Recurse on each branch. STOP when:
+             • All examples in node have same label (entropy = 0) → leaf
+             • No attributes left → majority vote leaf
+             • No examples left → parent majority vote
+  </div>
+
+  <h3>★ Expert System Components</h3>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Knowledge Base</div>
+      <div class="summary-val">Rules + Facts</div>
+      <div class="summary-sub">IF-THEN rules with certainty factors. Domain-specific. Built by knowledge engineer from expert interviews.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Inference Engine</div>
+      <div class="summary-val">Forward / Backward</div>
+      <div class="summary-sub">Forward: data→conclusions. Backward: goal→sub-goals. Conflict resolution selects which rule fires.</div>
+    </div>
+    <div class="summary-card green">
+      <div class="summary-title">Working Memory</div>
+      <div class="summary-val">Current State</div>
+      <div class="summary-sub">Holds known facts about current case. Rules match against working memory. Updated as inference proceeds.</div>
+    </div>
+    <div class="summary-card gold">
+      <div class="summary-title">Explanation Facility</div>
+      <div class="summary-val">WHY / HOW</div>
+      <div class="summary-sub">WHY: traces goal chain. HOW: shows rule+facts chain for conclusion. Critical for user trust and verification.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">KA Bottleneck</div>
+      <div class="summary-val">Tacit Knowledge</div>
+      <div class="summary-sub">Experts cannot articulate all they know. Acquisition = interviews + think-aloud + case analysis + iteration.</div>
+    </div>
+    <div class="summary-card blue">
+      <div class="summary-title">Shell</div>
+      <div class="summary-val">KB-less Engine</div>
+      <div class="summary-sub">Reusable inference engine (CLIPS, Drools, EMYCIN). Fill with domain rules to get a new expert system.</div>
+    </div>
+  </div>
+
+  <h3>Common Exam Mistakes</h3>
+  <div class="callout red">
+    <span class="callout-label">Watch Out!</span>
+    <p><strong>Mistake 1:</strong> Confusing structural ambiguity (two parse trees) with lexical ambiguity (one word, two meanings). "I saw the man with the telescope" is structural; "bank" is lexical.</p>
+    <p><strong>Mistake 2:</strong> Forgetting that entropy = 0 means a PURE node (all same class) — this is the BEST outcome for a split, not the worst. ID3 aims for entropy 0.</p>
+    <p><strong>Mistake 3:</strong> Mixing up forward chaining (data-driven, fires all matching rules) with backward chaining (goal-driven, asks only what's needed). Medical diagnosis typically uses backward chaining.</p>
+    <p><strong>Mistake 4:</strong> In the GA crossover example, children inherit HEAD from one parent and TAIL from the other — not the reverse. Check which part of the string is being swapped.</p>
+    <p><strong>Mistake 5:</strong> Saying neural networks are "complete" like logic-based systems. NNs are statistical learners — they generalise from data but can fail on out-of-distribution examples. Expert systems with rules are more predictable but cannot learn.</p>
+    <p><strong>Mistake 6:</strong> In EBL, the generalisation step replaces constants with variables — not the other way round. The goal is to make the rule as general as possible while still being provably correct.</p>
+  </div>
+
+  <h3>Typical Exam Question Types</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Question Pattern</th><th>Required Approach</th><th>Key Terms</th></tr>
+      <tr><td>"Describe NLP processing levels"</td><td>List all 6 levels; give input/output/technique for each</td><td>Morphological, lexical, syntactic, semantic, discourse, pragmatic</td></tr>
+      <tr><td>"Draw parse tree for sentence X"</td><td>Apply CFG rules; use NP/VP/PP/Det/N/V notation</td><td>S→NP VP, NP→Det N, VP→V NP, PP→P NP</td></tr>
+      <tr><td>"Apply ID3 to dataset"</td><td>Compute entropy of S; compute gain for each attribute; pick highest; recurse</td><td>H(S) = −Σ pᵢ log₂ pᵢ; Gain = H(S) − weighted child entropy</td></tr>
+      <tr><td>"Explain backpropagation"</td><td>Forward pass → compute loss → backward pass (chain rule) → weight update</td><td>δL/δw, learning rate η, gradient descent</td></tr>
+      <tr><td>"How does a GA work?"</td><td>5 steps: Init → Evaluate → Select → Crossover → Mutate</td><td>Population, chromosome, fitness, roulette wheel, crossover point</td></tr>
+      <tr class="highlight-row"><td>"Architecture of an expert system"</td><td>Draw diagram with KB, inference engine, WM, explanation, UI</td><td>Forward/backward chaining, certainty factors, WHY/HOW</td></tr>
+    </table>
+  </div>
+
+  <h3>Challenge Quiz</h3>
+  <div class="quiz-box">
+    <div class="quiz-q">🎯 Challenge: A hospital wants to build an AI system to diagnose rare cancers. The system must: (a) explain every diagnosis to oncologists, (b) learn from new patient cases as they arrive, and (c) handle ambiguous test results (probability < 1). Which combination of techniques best addresses ALL three requirements?</div>
+    <div class="quiz-opts" id="q7">
+      <button class="quiz-opt" onclick="checkQ('q7',0,'q7fb','wrong')">A. Pure neural network — it learns from data, handles uncertainty via softmax, and is widely used in medical imaging</button>
+      <button class="quiz-opt" onclick="checkQ('q7',1,'q7fb','wrong')">B. Pure expert system with certainty factors — it explains reasoning with WHY/HOW and handles uncertain evidence</button>
+      <button class="quiz-opt" onclick="checkQ('q7',2,'q7fb','correct')">C. Hybrid: Bayesian network or neural network (for learning + uncertainty) COMBINED with an expert system explanation layer (for WHY/HOW traces to oncologists)</button>
+      <button class="quiz-opt" onclick="checkQ('q7',3,'q7fb','wrong')">D. Decision tree with ID3 — it is interpretable, handles uncertainty with confidence scores, and can be retrained on new data</button>
+    </div>
+    <div class="quiz-feedback" id="q7fb">✅ Correct! No single technique satisfies all three requirements alone. (a) <strong>Explanation:</strong> Neural networks are black boxes — they cannot generate clinically useful "WHY" traces. Expert systems excel here. (b) <strong>Learning:</strong> Classic expert systems cannot learn from new cases — rules must be manually updated. Neural networks and Bayesian networks learn automatically. (c) <strong>Uncertainty:</strong> Both Bayesian networks and NNs handle probabilistic evidence; expert system certainty factors are a simpler approximation. The solution: a <strong>hybrid neuro-symbolic system</strong> — the neural/Bayesian component handles learning and uncertainty, while the expert system layer generates explanations from the model's decisions. This architecture is now the state of the art in clinical AI (e.g., IBM Watson for Oncology, clinical decision support systems).</div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>Tutorial compiled from: Russell, S. J., &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach, 4th Edition</em>. Pearson. Chapters 18 (Learning from Examples), 19 (Knowledge in Learning), 22 (Natural Language Processing), 25 (Robotics), 26 (AI: Present and Future). Additional: Mitchell, T. (1997). <em>Machine Learning</em>. McGraw-Hill. Quinlan, J. R. (1986). "Induction of Decision Trees," <em>Machine Learning</em> 1(1).</p>
+  <p style="margin-top:12px;">Unit V · B.Tech 3rd Year · Artificial Intelligence · 6 Lectures</p>
+</footer>
+
+<script>
+function checkQ(cid,ci,fid,res){
+  var c=document.getElementById(cid);
+  var bs=c.querySelectorAll('.quiz-opt');
+  bs.forEach(function(b){b.disabled=true;b.style.cursor='default';});
+  bs[ci].classList.add(res);
+  var f=document.getElementById(fid);
+  f.classList.add('show');
+}
+</script>
+</body>
+</html>

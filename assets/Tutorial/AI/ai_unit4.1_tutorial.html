@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First-Order Predicate Logic — Detailed Q&amp;A with Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1410;--ink2:#3d3530;--ink3:#6b5f58;--paper:#faf7f2;--paper2:#f2ede4;--paper3:#e8e0d4;--accent:#c0392b;--accent2:#e67e22;--accent3:#2980b9;--accent4:#27ae60;--gold:#d4a017;--rule:#c5b8a8;--highlight:#fff3cd;--highlight2:#d5edda;--highlight3:#d0e8f5;--highlight4:#fce8e8;--code-bg:#1e1e2e;--code-fg:#cdd6f4;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:17px;}
+.cover{background:var(--ink);color:var(--paper);padding:80px 60px 60px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border:2px solid rgba(255,255,255,0.06);border-radius:50%;}
+.cover::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border:1px solid rgba(255,255,255,0.04);border-radius:50%;}
+.cover-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:24px;display:block;}
+.cover h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;line-height:1.1;margin-bottom:12px;max-width:700px;}
+.cover h1 span{color:#e67e22;}
+.cover .subtitle{font-size:20px;color:rgba(255,255,255,0.6);font-weight:300;font-style:italic;margin-bottom:40px;}
+.cover-meta{display:flex;gap:32px;flex-wrap:wrap;}
+.cover-meta-item{display:flex;flex-direction:column;gap:2px;}
+.cover-meta-item .meta-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.cover-meta-item .meta-val{font-size:14px;color:rgba(255,255,255,0.85);}
+.toc-bar{background:var(--ink2);padding:0;display:flex;overflow-x:auto;position:sticky;top:0;z-index:100;}
+.toc-bar a{color:rgba(255,255,255,0.65);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;padding:14px 20px;white-space:nowrap;transition:all 0.2s;border-bottom:2px solid transparent;}
+.toc-bar a:hover{color:#fff;background:rgba(255,255,255,0.05);border-bottom-color:var(--accent2);}
+.page{max-width:900px;margin:0 auto;padding:0 40px 80px;}
+section{padding-top:72px;}
+section+section{border-top:1px solid var(--rule);}
+.section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:8px;}
+.section-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:var(--accent);text-transform:uppercase;letter-spacing:2px;flex-shrink:0;}
+.section-title{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1.15;color:var(--ink);}
+.domain-bar{background:var(--paper2);border:1px solid var(--paper3);border-radius:6px;padding:12px 20px;margin-bottom:32px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink3);}
+.domain-bar strong{color:var(--ink2);}
+h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin:40px 0 16px;color:var(--ink);}
+h4{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;margin:20px 0 8px;color:var(--ink2);}
+p{margin-bottom:16px;}
+.callout{border-left:3px solid var(--accent2);background:var(--highlight);padding:16px 20px;border-radius:0 6px 6px 0;margin:24px 0;}
+.callout.blue{border-left-color:var(--accent3);background:var(--highlight3);}
+.callout.green{border-left-color:var(--accent4);background:var(--highlight2);}
+.callout.red{border-left-color:var(--accent);background:var(--highlight4);}
+.callout-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:block;}
+.callout p:last-child,.callout ul:last-child{margin-bottom:0;}
+/* Q Card */
+.q-card{border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin:28px 0;}
+.q-header{background:var(--ink);color:var(--paper);padding:12px 22px;display:flex;align-items:center;gap:14px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;background:var(--accent2);color:var(--ink);padding:3px 10px;border-radius:3px;flex-shrink:0;}
+.q-title{font-family:'Source Serif 4',serif;font-size:15px;font-style:italic;color:rgba(255,255,255,0.88);}
+.q-body{padding:22px 26px;background:var(--paper);}
+.q-body p:last-child{margin-bottom:0;}
+/* Verdict badges */
+.verdict{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;margin:16px 0;}
+.verdict.valid{background:var(--highlight2);border:1.5px solid var(--accent4);color:#1a6b38;}
+.verdict.sat{background:var(--highlight);border:1.5px solid var(--accent2);color:#7d4a00;}
+.verdict.unsat{background:var(--highlight4);border:1.5px solid var(--accent);color:#7d1e1e;}
+/* Formula display */
+.fol-box{background:var(--paper2);border:1px solid var(--paper3);border-radius:6px;padding:14px 20px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink);overflow-x:auto;}
+.fol-label{font-family:'Source Serif 4',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:6px;}
+.fol-formula{font-size:16px;color:var(--ink);}
+/* Steps list */
+.steps-list{list-style:none;padding:0;margin:12px 0;}
+.steps-list li{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;}
+.step-dot{flex-shrink:0;width:22px;height:22px;background:var(--accent2);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;margin-top:2px;}
+.step-content{flex:1;font-size:16px;}
+/* Resolution specific */
+.res-step{background:var(--paper2);border-left:3px solid var(--accent3);padding:10px 16px;margin:8px 0;border-radius:0 6px 6px 0;font-family:'JetBrains Mono',monospace;font-size:14px;}
+.res-step.final{border-left-color:var(--accent);background:var(--highlight4);}
+.res-step.proved{border-left-color:var(--accent4);background:var(--highlight2);}
+/* Tables */
+.table-wrap{overflow-x:auto;margin:24px 0;}
+table{width:100%;border-collapse:collapse;font-size:15px;}
+th{background:var(--ink);color:var(--paper);padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5px;font-weight:500;}
+td{padding:9px 14px;border-bottom:1px solid var(--paper3);vertical-align:middle;}
+tr:nth-child(even) td{background:var(--paper2);}
+tr:hover td{background:var(--highlight3);}
+.highlight-row td{background:var(--highlight)!important;font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:14px;background:var(--paper3);padding:1px 6px;border-radius:3px;}
+.math-block{background:var(--paper2);border:1px solid var(--paper3);border-radius:6px;padding:16px 24px;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink);overflow-x:auto;}
+.math-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);font-family:'Source Serif 4',serif;display:block;margin-bottom:8px;}
+.algo-box{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:28px 0;}
+.algo-header{background:var(--ink2);color:var(--paper);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.algo-body{background:var(--paper);padding:20px 24px;}
+.step{display:flex;gap:14px;margin-bottom:12px;align-items:flex-start;}
+.step-num{flex-shrink:0;width:26px;height:26px;background:var(--accent2);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;margin-top:2px;}
+.step-text{flex:1;}
+.step-text p{margin-bottom:0;}
+.compare-table th{background:var(--ink2);}
+.compare-table td:first-child{font-weight:600;background:var(--paper2)!important;}
+footer{background:var(--ink);color:rgba(255,255,255,0.4);padding:40px 60px;font-size:13px;margin-top:60px;}
+ul{padding-left:22px;line-height:2;}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <span class="cover-label">Artificial Intelligence — B.Tech 2nd Year · Practice Q&amp;A</span>
+  <h1>First-Order <span>Predicate Logic</span></h1>
+  <p class="subtitle">Detailed solutions &amp; explanations — translation, quantifiers, validity, satisfiability, and resolution proofs</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="meta-label">Levels</span><span class="meta-val">4 — Translation · Nested Quantifiers · Validity/Models · Resolution</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Questions</span><span class="meta-val">15 FOL problems + 5 Resolution proofs</span></div>
+    <div class="cover-meta-item"><span class="meta-label">Format</span><span class="meta-val">Step-by-step with full justifications</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc-bar">
+  <a href="#s1">Level 1 · Translation</a>
+  <a href="#s2">Level 2 · Nested Quantifiers</a>
+  <a href="#s3">Level 3 · Validity &amp; Models</a>
+  <a href="#s4">Summary Table</a>
+  <a href="#s5">Level 4 · Resolution</a>
+  <a href="#s6">Resolution Summary</a>
+</nav>
+
+<div class="page">
+
+<!-- KEY PATTERNS CALLOUT -->
+<div style="padding-top:48px;">
+<div class="callout blue">
+  <span class="callout-label">★ The Two Golden Rules — Memorise These First</span>
+  <p><strong>Universal with implication (∀ → ):</strong> "All A are B" → <code>∀x [ A(x) → B(x) ]</code><br>
+  <strong>Existential with conjunction (∃ ∧ ):</strong> "Some A is B" → <code>∃x [ A(x) ∧ B(x) ]</code><br>
+  The most common mistake in FOPL translation is mixing these up — writing <code>∃x [A(x) → B(x)]</code> which is almost always wrong.</p>
+</div>
+</div>
+
+<!-- ═══ LEVEL 1 ═══ -->
+<section id="s1">
+  <div class="section-header">
+    <span class="section-num">Level 01</span>
+    <h2 class="section-title">Translation into First-Order Logic</h2>
+  </div>
+  <div class="domain-bar">
+    <strong>Domain:</strong> All people &nbsp;|&nbsp;
+    <strong>S(x)</strong> = x is a student &nbsp;|&nbsp;
+    <strong>T(x)</strong> = x is a teacher &nbsp;|&nbsp;
+    <strong>L(x,y)</strong> = x likes y &nbsp;|&nbsp;
+    <strong>R(x,y)</strong> = x respects y
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q1</span>
+      <span class="q-title">Every student likes some teacher.</span>
+    </div>
+    <div class="q-body">
+      <h4>Step-by-step breakdown</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"Every student" → <strong>universal quantifier</strong> over x with S(x) as condition: <code>∀x S(x) →…</code></div></li>
+        <li><div class="step-dot">2</div><div class="step-content">"likes some teacher" → <strong>existential quantifier</strong> over y: there exists y such that T(y) is true AND L(x,y) is true. Use <strong>∧</strong> with ∃.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">Combine: for every x that is a student, there is at least one y that is a teacher and x likes y.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x [ S(x) → ∃y ( T(y) ∧ L(x, y) ) ]</span>
+      </div>
+      <div class="callout green">
+        <span class="callout-label">Explanation</span>
+        <p>The universal quantifier (∀) ranges over all people. The existential quantifier (∃) says "at least one". We use <strong>→ (implication) with ∀</strong>, and <strong>∧ (conjunction) with ∃</strong> — this is the standard golden pattern.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q2</span>
+      <span class="q-title">No student respects every teacher.</span>
+    </div>
+    <div class="q-body">
+      <h4>Step-by-step breakdown</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"No student respects every teacher" = it is <em>not</em> the case that some student respects every teacher.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">Equivalently: for every student x, there exists at least one teacher y that x does NOT respect.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">Two equivalent forms — Form 2 is more readable and preferred.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">Form 1 — negation outside</span>
+        <span class="fol-formula">¬∃x [ S(x) ∧ ∀y ( T(y) → R(x, y) ) ]</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Form 2 — push negation inside (preferred)</span>
+        <span class="fol-formula">∀x [ S(x) → ∃y ( T(y) ∧ ¬R(x, y) ) ]</span>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Explanation</span>
+        <p>Both forms are logically equivalent. Form 2 is more readable: <em>every student fails to respect at least one teacher.</em> The negation (¬) is pushed inside using De Morgan's laws: <code>¬∀y φ ≡ ∃y ¬φ</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q3</span>
+      <span class="q-title">Some students like all teachers, and some teachers like all students.</span>
+    </div>
+    <div class="q-body">
+      <h4>Step-by-step breakdown</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content"><strong>Part 1:</strong> ∃ a student who likes every teacher. (∃ outside, ∀ inside)</div></li>
+        <li><div class="step-dot">2</div><div class="step-content"><strong>Part 2:</strong> ∃ a teacher who likes every student. (∃ outside, ∀ inside)</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">The two parts are joined by ∧ (AND).</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">Part 1</span>
+        <span class="fol-formula">∃x [ S(x) ∧ ∀y ( T(y) → L(x, y) ) ]</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Part 2</span>
+        <span class="fol-formula">∃x [ T(x) ∧ ∀y ( S(y) → L(x, y) ) ]</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Full Formula</span>
+        <span class="fol-formula">[ ∃x ( S(x) ∧ ∀y ( T(y) → L(x,y) ) ) ] ∧ [ ∃x ( T(x) ∧ ∀y ( S(y) → L(x,y) ) ) ]</span>
+      </div>
+      <div class="callout green">
+        <span class="callout-label">Explanation</span>
+        <p>We use ∃ to say "some", and within that scope ∀ says "all teachers/students". Note x is reused as a bound variable in each separate conjunct — this is valid since the scopes do not overlap.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q4</span>
+      <span class="q-title">If a student respects a teacher, then the teacher likes that student.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"A student" and "a teacher" here mean ANY student x and ANY teacher y — universally quantified over all pairs.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content"><strong>Antecedent:</strong> S(x) ∧ T(y) ∧ R(x,y) — x is a student, y is a teacher, and x respects y.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content"><strong>Consequent:</strong> L(y, x) — the teacher y likes the student x. Note the argument reversal!</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x ∀y [ ( S(x) ∧ T(y) ∧ R(x,y) ) → L(y, x) ]</span>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Explanation</span>
+        <p>We quantify over all pairs (x, y). The implication (→) captures the conditional. The reversal of arguments in <code>L(y, x)</code> is crucial: the <em>teacher likes the student</em>, not vice versa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q5</span>
+      <span class="q-title">Only teachers respect themselves.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content"><strong>"Only P's do X"</strong> ≡ <strong>"If someone does X, then they are a P."</strong> The word "only" flips the implication direction.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">Rewritten: If person x respects themselves R(x,x), then x must be a teacher T(x).</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x [ R(x, x) → T(x) ]</span>
+      </div>
+      <div class="callout red">
+        <span class="callout-label">Watch Out — "Only" flips the arrow!</span>
+        <p>"Only teachers respect themselves" does <strong>NOT</strong> mean all teachers respect themselves.<br>
+        It means self-respect <em>implies</em> being a teacher.<br>
+        Compare: "All teachers respect themselves" → <code>∀x [T(x) → R(x,x)]</code> ← <em>this is the OPPOSITE direction</em>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LEVEL 2 ═══ -->
+<section id="s2">
+  <div class="section-header">
+    <span class="section-num">Level 02</span>
+    <h2 class="section-title">Nested Quantifiers and Identity</h2>
+  </div>
+  <div class="domain-bar">
+    <strong>Domain:</strong> All people &nbsp;|&nbsp;
+    <strong>P(x)</strong> = x is a politician &nbsp;|&nbsp;
+    <strong>K(x,y)</strong> = x knows y &nbsp;|&nbsp;
+    <strong>H(x)</strong> = x is honest &nbsp;|&nbsp;
+    <strong>T(x,y)</strong> = x is taller than y &nbsp;|&nbsp;
+    <strong>x=y</strong> (identity)
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q6</span>
+      <span class="q-title">Every politician knows some other politician.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"Every politician" → universal quantifier over x, with P(x).</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">"knows some other politician" → existential quantifier over y, with P(y) and K(x,y).</div></li>
+        <li><div class="step-dot">3</div><div class="step-content"><strong>"other"</strong> requires y ≠ x — the known politician must be a different person from x.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x [ P(x) → ∃y ( P(y) ∧ K(x,y) ∧ x ≠ y ) ]</span>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Explanation</span>
+        <p>The identity predicate <code>x ≠ y</code> (equivalently <code>¬(x=y)</code>) ensures the known politician is distinct from x. Without this, a politician could satisfy the formula by "knowing themselves".</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q7</span>
+      <span class="q-title">There is exactly one honest politician.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content"><strong>Existence:</strong> ∃ at least one honest politician. (∃x with H(x) ∧ P(x))</div></li>
+        <li><div class="step-dot">2</div><div class="step-content"><strong>Uniqueness:</strong> Any two honest politicians x and y must be the same person. (uniqueness constraint)</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">Combine into the compact "exactly one" idiom.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">Part 1 — Existence</span>
+        <span class="fol-formula">∃x ( H(x) ∧ P(x) )</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Part 2 — Uniqueness</span>
+        <span class="fol-formula">∀x ∀y [ ( H(x) ∧ P(x) ∧ H(y) ∧ P(y) ) → x = y ]</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Full Formula — Compact Form (standard idiom for ∃!)</span>
+        <span class="fol-formula">∃x [ H(x) ∧ P(x) ∧ ∀y ( ( H(y) ∧ P(y) ) → y = x ) ]</span>
+      </div>
+      <div class="callout blue">
+        <span class="callout-label">The ∃! Idiom — Exactly One</span>
+        <p>The compact form is the standard FOL idiom for "exactly one" (uniqueness quantifier ∃!): the existential witness x exists, and any other y satisfying the same conditions must equal x. Memorise this pattern — it appears in exams frequently.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q8</span>
+      <span class="q-title">No one knows every dishonest person.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"Dishonest" = ¬H(x).</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">"Knows every dishonest person" = ∀y ( ¬H(y) → K(x, y) ).</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">"No one" = negate the above for all x, then push negation inside.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x ¬ [ ∀y ( ¬H(y) → K(x, y) ) ]</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Equivalent Form — negation pushed inside (preferred)</span>
+        <span class="fol-formula">∀x ∃y ( ¬H(y) ∧ ¬K(x, y) )</span>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Explanation</span>
+        <p>The equivalence: <code>¬∀y φ ≡ ∃y ¬φ</code>, and <code>¬(A→B) ≡ A ∧ ¬B</code>.<br>
+        Reading the equivalent form: for every person x, there is some dishonest person y that x does <em>not</em> know.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q9</span>
+      <span class="q-title">The tallest person knows everyone.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">The tallest person is unique: define as x such that for all y ≠ x, T(x, y) holds (x is taller than everyone else).</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">That person must know everyone: ∀z K(x, z).</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">Introduce x existentially (as the tallest person) and apply both constraints.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">Tallness Condition</span>
+        <span class="fol-formula">∀y ( y ≠ x → T(x, y) )   — x is taller than everyone else</span>
+      </div>
+      <div class="fol-box">
+        <span class="fol-label">Full Formula</span>
+        <span class="fol-formula">∃x [ ∀y ( y ≠ x → T(x,y) ) ∧ ∀z K(x, z) ]</span>
+      </div>
+      <div class="callout blue">
+        <span class="callout-label">Definite Description</span>
+        <p>We existentially introduce x as the tallest person, constrain it with the tallness condition, and then assert K(x,z) for every z. This is called a <strong>definite description</strong> — describing a unique individual without naming it directly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q10</span>
+      <span class="q-title">If anyone knows everyone, then that person is a politician.</span>
+    </div>
+    <div class="q-body">
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">"Anyone knows everyone" = ∀y K(x, y) for some x.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">"That person is a politician" = P(x).</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">The conditional must hold for all such persons x — outer ∀x.</div></li>
+      </ul>
+      <div class="fol-box">
+        <span class="fol-label">FOL Formula</span>
+        <span class="fol-formula">∀x [ ∀y K(x, y) → P(x) ]</span>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Explanation</span>
+        <p>The outer ∀x ranges over all people x. The antecedent <code>∀y K(x, y)</code> checks whether x knows everybody. If this holds for some x, then P(x) must hold. The use of ∀x ensures the rule applies to every such person.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LEVEL 3 ═══ -->
+<section id="s3">
+  <div class="section-header">
+    <span class="section-num">Level 03</span>
+    <h2 class="section-title">Validity, Satisfiability, and Models</h2>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Three Verdicts — Know the Definitions</span>
+    <p><strong>VALID</strong> — true in <em>every</em> possible model (every interpretation of the domain and predicates).<br>
+    <strong>SATISFIABLE (not valid)</strong> — true in <em>some</em> model but not all (counterexample exists).<br>
+    <strong>UNSATISFIABLE</strong> — false in <em>every</em> model; leads to contradiction. Strategy: assume it's true and derive a contradiction.</p>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q11</span>
+      <span class="q-title">∃x P(x) ∨ ∃x ¬P(x)</span>
+    </div>
+    <div class="q-body">
+      <div class="verdict valid">✓ VALID</div>
+      <h4>Justification — Exhaustive Case Analysis</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content"><strong>Case 1:</strong> The domain has at least one element a where P(a) = true. Then ∃x P(x) is true → disjunction is true.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content"><strong>Case 2:</strong> The domain has at least one element a where P(a) = false. Then ∃x ¬P(x) is true → disjunction is true.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">These two cases are <strong>exhaustive</strong> — for any element, either P holds or it does not. At least one disjunct must always be true.</div></li>
+      </ul>
+      <div class="callout green">
+        <span class="callout-label">Conclusion</span>
+        <p>The formula is true in every non-empty model → <strong>VALID</strong>. It is essentially a tautology: "either something has property P, or something lacks property P."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q12</span>
+      <span class="q-title">∀x P(x) ∨ ∀x ¬P(x)</span>
+    </div>
+    <div class="q-body">
+      <div class="verdict sat">~ SATISFIABLE (not valid)</div>
+      <h4>Justification — Model Analysis</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Model</th><th>Configuration</th><th>∀x P(x)</th><th>∀x ¬P(x)</th><th>Formula</th></tr>
+          <tr><td>Making it TRUE</td><td>Domain={a}, P(a)=true</td><td>TRUE</td><td>FALSE</td><td style="color:#27ae60;font-weight:700">TRUE</td></tr>
+          <tr class="highlight-row"><td>Making it FALSE</td><td>Domain={a,b}, P(a)=T, P(b)=F</td><td>FALSE (b fails)</td><td>FALSE (a fails)</td><td style="color:#c0392b;font-weight:700">FALSE</td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <span class="callout-label">Conclusion</span>
+        <p>The formula says "everyone has P" OR "no one has P". A <strong>mixed world</strong> (some have P, some don't) makes both disjuncts false — this is the counterexample proving it's not valid. True in some models (pure worlds) but false in others → <strong>SATISFIABLE, NOT VALID</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q13</span>
+      <span class="q-title">∀x (P(x) → Q(x)) ∧ ∃x P(x) ∧ ∀x ¬Q(x)</span>
+    </div>
+    <div class="q-body">
+      <div class="verdict unsat">✗ UNSATISFIABLE</div>
+      <h4>Proof by Contradiction — Assume it's true in some model</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">From <strong>∃x P(x)</strong>: there is some element <em>a</em> with P(a) = true.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">From <strong>∀x (P(x) → Q(x))</strong> with x=a: since P(a) is true, Q(a) must be true.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content">From <strong>∀x ¬Q(x)</strong> with x=a: Q(a) must be false.</div></li>
+        <li><div class="step-dot">4</div><div class="step-content"><strong>Contradiction:</strong> Q(a) is both true (step 2) and false (step 3). Impossible.</div></li>
+      </ul>
+      <div class="callout red">
+        <span class="callout-label">Conclusion</span>
+        <p>Leads to contradiction in every model → <strong>UNSATISFIABLE</strong>. The three conjuncts cannot all be true simultaneously.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q14</span>
+      <span class="q-title">∀x ∃y R(x,y) → ∃y ∀x R(x,y)</span>
+    </div>
+    <div class="q-body">
+      <div class="verdict sat">~ SATISFIABLE (not valid)</div>
+      <h4>Understanding the Formula</h4>
+      <div class="table-wrap">
+        <table>
+          <tr><th></th><th>Statement</th><th>Meaning</th></tr>
+          <tr><td><strong>Antecedent</strong></td><td>∀x ∃y R(x,y)</td><td>Every x has SOME y it is related to (y may differ for each x)</td></tr>
+          <tr class="highlight-row"><td><strong>Consequent</strong></td><td>∃y ∀x R(x,y)</td><td>There is a SINGLE y related to ALL x (one common witness — stronger!)</td></tr>
+        </table>
+      </div>
+      <h4>Counterexample — Formula is FALSE</h4>
+      <div class="math-block">
+        <span class="math-label">Counterexample Model</span>
+        Domain = {a, b}
+        R(a,a) = true,  R(b,b) = true,  R(a,b) = false,  R(b,a) = false
+
+        Antecedent ∀x∃y R(x,y):   a has witness a; b has witness b → TRUE
+        Consequent ∃y∀x R(x,y):   Need y such that R(a,y) AND R(b,y) both hold
+                                   No such y exists → FALSE
+        Formula: TRUE → FALSE = FALSE  ✗
+      </div>
+      <h4>Model making it TRUE</h4>
+      <p>Domain = {a}, R(a,a) = true: both sides trivially hold → formula TRUE.</p>
+      <div class="callout">
+        <span class="callout-label">Conclusion</span>
+        <p>True in some models, false in others → <strong>SATISFIABLE, NOT VALID</strong>. The consequent is strictly stronger than the antecedent — requiring one shared witness for all x, not a different y per x.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">Q15</span>
+      <span class="q-title">∀x ∀y (R(x,y) → R(y,x)) ∧ ∃x ∃y (R(x,y) ∧ ¬R(y,x))</span>
+    </div>
+    <div class="q-body">
+      <div class="verdict unsat">✗ UNSATISFIABLE</div>
+      <h4>Proof by Contradiction</h4>
+      <ul class="steps-list">
+        <li><div class="step-dot">1</div><div class="step-content">From <strong>∃x ∃y (R(x,y) ∧ ¬R(y,x))</strong>: pick witnesses a, b such that R(a,b) = true and R(b,a) = false.</div></li>
+        <li><div class="step-dot">2</div><div class="step-content">From <strong>∀x ∀y (R(x,y) → R(y,x))</strong> with x=a, y=b: since R(a,b) is true, R(b,a) must be true.</div></li>
+        <li><div class="step-dot">3</div><div class="step-content"><strong>Contradiction:</strong> R(b,a) is both true (symmetry axiom) and false (from witness). Impossible.</div></li>
+      </ul>
+      <div class="callout red">
+        <span class="callout-label">Conclusion</span>
+        <p>The formula asserts R is <strong>symmetric</strong> (first conjunct) AND has an <strong>asymmetric pair</strong> (second conjunct) — a direct self-contradiction → <strong>UNSATISFIABLE</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SUMMARY TABLE ═══ -->
+<section id="s4">
+  <div class="section-header">
+    <span class="section-num">Summary</span>
+    <h2 class="section-title">Quick Reference Table — All 15 Questions</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Q</th><th>Topic</th><th>Formula / Verdict</th><th>Key Concept</th></tr>
+      <tr><td><strong>Q1</strong></td><td>Every student likes some teacher</td><td><code>∀x[S(x)→∃y(T(y)∧L(x,y))]</code></td><td>∀ with →; ∃ with ∧</td></tr>
+      <tr><td><strong>Q2</strong></td><td>No student respects every teacher</td><td><code>∀x[S(x)→∃y(T(y)∧¬R(x,y))]</code></td><td>Negation + De Morgan</td></tr>
+      <tr><td><strong>Q3</strong></td><td>Some like all; bidirectional</td><td>Two ∃…∀ conjuncts</td><td>∃ outside, ∀ inside</td></tr>
+      <tr><td><strong>Q4</strong></td><td>Conditional respect/like</td><td><code>∀x∀y[(S(x)∧T(y)∧R(x,y))→L(y,x)]</code></td><td>Argument reversal in L</td></tr>
+      <tr><td><strong>Q5</strong></td><td>Only teachers self-respect</td><td><code>∀x[R(x,x)→T(x)]</code></td><td>"Only" flips →</td></tr>
+      <tr><td><strong>Q6</strong></td><td>Politician knows another</td><td><code>∀x[P(x)→∃y(P(y)∧K(x,y)∧x≠y)]</code></td><td>Identity for "other"</td></tr>
+      <tr><td><strong>Q7</strong></td><td>Exactly one honest politician</td><td><code>∃x[H(x)∧P(x)∧∀y((H(y)∧P(y))→y=x)]</code></td><td>Existence + Uniqueness</td></tr>
+      <tr><td><strong>Q8</strong></td><td>No one knows all dishonest</td><td><code>∀x∃y(¬H(y)∧¬K(x,y))</code></td><td>Push negation inside</td></tr>
+      <tr><td><strong>Q9</strong></td><td>Tallest knows everyone</td><td><code>∃x[∀y(y≠x→T(x,y))∧∀zK(x,z)]</code></td><td>Definite description</td></tr>
+      <tr><td><strong>Q10</strong></td><td>Omniscient ⇒ politician</td><td><code>∀x[∀yK(x,y)→P(x)]</code></td><td>Nested universal</td></tr>
+      <tr><td><strong>Q11</strong></td><td>∃xP(x)∨∃x¬P(x)</td><td style="color:#27ae60;font-weight:700">VALID</td><td>Tautology; exhaustive cases</td></tr>
+      <tr><td><strong>Q12</strong></td><td>∀xP(x)∨∀x¬P(x)</td><td style="color:#e67e22;font-weight:700">SAT, not valid</td><td>Mixed model is counterexample</td></tr>
+      <tr><td><strong>Q13</strong></td><td>All P→Q, SomeP, None-Q</td><td style="color:#c0392b;font-weight:700">UNSATISFIABLE</td><td>Direct contradiction via Q(a)</td></tr>
+      <tr><td><strong>Q14</strong></td><td>∀x∃yR → ∃y∀xR</td><td style="color:#e67e22;font-weight:700">SAT, not valid</td><td>Witness not shared</td></tr>
+      <tr class="highlight-row"><td><strong>Q15</strong></td><td>Symmetric ∧ Asymmetric pair</td><td style="color:#c0392b;font-weight:700">UNSATISFIABLE</td><td>Self-contradictory axioms</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ LEVEL 4: RESOLUTION ═══ -->
+<section id="s5">
+  <div class="section-header">
+    <span class="section-num">Level 04</span>
+    <h2 class="section-title">Resolution in First-Order Predicate Logic</h2>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Resolution — The Method</span>
+    <p>Resolution is a <strong>refutation-based</strong> proof technique. To prove goal G from premises, negate G, convert everything to CNF, and apply the Resolution rule until the empty clause □ is derived — proving G by contradiction.</p>
+  </div>
+
+  <div class="algo-box">
+    <div class="algo-header">ALGORITHM: Resolution Refutation Proof — 5 Steps</div>
+    <div class="algo-body">
+      <div class="step"><div class="step-num">1</div><div class="step-text"><p>Write all <strong>premises</strong> as FOL formulas.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><p><strong>Negate the conclusion</strong> (goal) and add it to the premise set.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><p>Convert every formula to <strong>Conjunctive Normal Form (CNF)</strong> / clause form using the 6-step CNF algorithm.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><p>Apply <strong>Unification + Resolution rule</strong> to pairs of clauses: resolve {α ∨ P} and {β ∨ ¬P} → {α ∨ β}.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text"><p>If the <strong>empty clause □</strong> is derived → Contradiction → Original conclusion is PROVED ✓</p></div></div>
+    </div>
+  </div>
+
+  <!-- R-Q1 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">R-Q1</span>
+      <span class="q-title">Prove: Socrates is mortal.</span>
+    </div>
+    <div class="q-body">
+      <h4>Premises</h4>
+      <ul>
+        <li>All men are mortal: <code>∀x ( Man(x) → Mortal(x) )</code></li>
+        <li>Socrates is a man: <code>Man(Socrates)</code></li>
+      </ul>
+      <h4>Step 1 — Convert to CNF Clauses</h4>
+      <div class="res-step">C1: ∀x(Man(x)→Mortal(x)) ≡ ∀x(¬Man(x)∨Mortal(x)) → <strong>{¬Man(x), Mortal(x)}</strong></div>
+      <div class="res-step">C2: Man(Socrates) → <strong>{Man(Socrates)}</strong></div>
+      <h4>Step 2 — Negate Goal</h4>
+      <div class="res-step">Negate Mortal(Socrates) → C3: <strong>{¬Mortal(Socrates)}</strong></div>
+      <h4>Step 3 — Resolution Derivation</h4>
+      <div class="res-step">Resolve C1 + C2 &nbsp;·&nbsp; Unifier θ = {x/Socrates}:
+  {¬Man(x), Mortal(x)}θ + {Man(Socrates)}  →  <strong>{Mortal(Socrates)}</strong></div>
+      <div class="res-step final">Resolve {Mortal(Socrates)} + C3:
+  {Mortal(Socrates)} + {¬Mortal(Socrates)}  →  <strong>□ (Empty Clause)</strong></div>
+      <div class="verdict valid">✓ PROVED — Mortal(Socrates)</div>
+    </div>
+  </div>
+
+  <!-- R-Q2 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">R-Q2</span>
+      <span class="q-title">Prove: John is not a vegetarian.</span>
+    </div>
+    <div class="q-body">
+      <h4>Premises</h4>
+      <ul>
+        <li>Everyone who eats meat is not a vegetarian: <code>∀x ( Eats(x, meat) → ¬Vegetarian(x) )</code></li>
+        <li>John eats meat: <code>Eats(John, meat)</code></li>
+      </ul>
+      <h4>CNF Clauses</h4>
+      <div class="res-step">C1: {¬Eats(x, meat), ¬Vegetarian(x)}</div>
+      <div class="res-step">C2: {Eats(John, meat)}</div>
+      <div class="res-step">C3 (negated goal): {Vegetarian(John)}</div>
+      <h4>Resolution</h4>
+      <div class="res-step">Resolve C1 + C2 &nbsp;·&nbsp; θ = {x/John}:
+  {¬Eats(x,meat), ¬Vegetarian(x)}θ + {Eats(John,meat)}  →  <strong>{¬Vegetarian(John)}</strong></div>
+      <div class="res-step final">Resolve {¬Vegetarian(John)} + C3:
+  {¬Vegetarian(John)} + {Vegetarian(John)}  →  <strong>□</strong></div>
+      <div class="verdict valid">✓ PROVED — ¬Vegetarian(John)</div>
+    </div>
+  </div>
+
+  <!-- R-Q3 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">R-Q3</span>
+      <span class="q-title">Prove: There exists a criminal. (Crime scenario)</span>
+    </div>
+    <div class="q-body">
+      <h4>Premises</h4>
+      <ul>
+        <li>P1: <code>∀x ( American(x) ∧ Weapon(y) ∧ Sells(x,y,z) ∧ Hostile(z) → Criminal(x) )</code></li>
+        <li>P2: <code>Sells(West, M1, Nono)</code></li>
+        <li>P3: <code>Weapon(M1)</code></li>
+        <li>P4: <code>Hostile(Nono)</code></li>
+        <li>P5: <code>American(West)</code></li>
+      </ul>
+      <h4>CNF Clauses</h4>
+      <div class="res-step">C1: {¬American(x), ¬Weapon(y), ¬Sells(x,y,z), ¬Hostile(z), Criminal(x)}</div>
+      <div class="res-step">C2: {Sells(West, M1, Nono)}</div>
+      <div class="res-step">C3: {Weapon(M1)}</div>
+      <div class="res-step">C4: {Hostile(Nono)}</div>
+      <div class="res-step">C5: {American(West)}</div>
+      <div class="res-step">C6 (negate ∃x Criminal(x) → ∀x ¬Criminal(x)): {¬Criminal(x)}</div>
+      <h4>Resolution Chain</h4>
+      <div class="res-step">C1 + C5 &nbsp;(θ={x/West}):
+  → {¬Weapon(y), ¬Sells(West,y,z), ¬Hostile(z), Criminal(West)}</div>
+      <div class="res-step">+ C3 &nbsp;(θ={y/M1}):
+  → {¬Sells(West,M1,z), ¬Hostile(z), Criminal(West)}</div>
+      <div class="res-step">+ C2 &nbsp;(θ={z/Nono}):
+  → {¬Hostile(Nono), Criminal(West)}</div>
+      <div class="res-step">+ C4:
+  → <strong>{Criminal(West)}</strong></div>
+      <div class="res-step final">+ C6 &nbsp;(θ={x/West}):
+  {Criminal(West)} + {¬Criminal(West)}  →  <strong>□</strong></div>
+      <div class="verdict valid">✓ PROVED — West is a criminal → ∃x Criminal(x)</div>
+    </div>
+  </div>
+
+  <!-- R-Q4 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">R-Q4</span>
+      <span class="q-title">Prove: Mary loves the rain. (Chaining with multiple rules)</span>
+    </div>
+    <div class="q-body">
+      <h4>Premises</h4>
+      <ul>
+        <li>P1: <code>∀x ( Likes(x, rain) → Loves(x, rain) )</code></li>
+        <li>P2: <code>∀x ( Happy(x) → Likes(x, rain) )</code></li>
+        <li>P3: <code>Happy(Mary)</code></li>
+      </ul>
+      <h4>CNF Clauses</h4>
+      <div class="res-step">C1: {¬Likes(x, rain), Loves(x, rain)}</div>
+      <div class="res-step">C2: {¬Happy(x), Likes(x, rain)}</div>
+      <div class="res-step">C3: {Happy(Mary)}</div>
+      <div class="res-step">C4 (negated goal): {¬Loves(Mary, rain)}</div>
+      <h4>Resolution — Chain Proof</h4>
+      <div class="res-step">C2 + C3 &nbsp;(θ={x/Mary}):
+  {¬Happy(x), Likes(x,rain)} + {Happy(Mary)}  →  <strong>{Likes(Mary, rain)}</strong></div>
+      <div class="res-step">{Likes(Mary,rain)} + C1 &nbsp;(θ={x/Mary}):
+  → <strong>{Loves(Mary, rain)}</strong></div>
+      <div class="res-step final">{Loves(Mary,rain)} + C4:
+  {Loves(Mary,rain)} + {¬Loves(Mary,rain)}  →  <strong>□</strong></div>
+      <div class="callout green">
+        <span class="callout-label">Chain</span>
+        <p>Happy(Mary) → Likes(Mary, rain) → Loves(Mary, rain). Three premises linked by two resolution steps.</p>
+      </div>
+      <div class="verdict valid">✓ PROVED — Loves(Mary, rain)</div>
+    </div>
+  </div>
+
+  <!-- R-Q5 -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-num">R-Q5</span>
+      <span class="q-title">Show the premises are inconsistent. (Tweety cannot fly)</span>
+    </div>
+    <div class="q-body">
+      <h4>Premises (claimed consistent — prove they are NOT)</h4>
+      <ul>
+        <li>P1: <code>∀x ( Bird(x) → Flies(x) )</code></li>
+        <li>P2: <code>Bird(Tweety)</code></li>
+        <li>P3: <code>¬Flies(Tweety)</code></li>
+      </ul>
+      <p><em>No negation of goal needed — derive □ directly from the premises.</em></p>
+      <h4>CNF Clauses</h4>
+      <div class="res-step">C1: {¬Bird(x), Flies(x)}</div>
+      <div class="res-step">C2: {Bird(Tweety)}</div>
+      <div class="res-step">C3: {¬Flies(Tweety)}</div>
+      <h4>Resolution — 2 Steps to Contradiction</h4>
+      <div class="res-step">C1 + C2 &nbsp;(θ={x/Tweety}):
+  {¬Bird(x), Flies(x)} + {Bird(Tweety)}  →  <strong>{Flies(Tweety)}</strong></div>
+      <div class="res-step final">{Flies(Tweety)} + C3:
+  {Flies(Tweety)} + {¬Flies(Tweety)}  →  <strong>□</strong></div>
+      <div class="callout red">
+        <span class="callout-label">Conclusion</span>
+        <p>The three premises are mutually <strong>INCONSISTENT</strong> (unsatisfiable). The empty clause is derived in just 2 resolution steps. The classical "Tweety is a Bird that cannot fly" scenario — a famous example of the Frame Problem and non-monotonic reasoning.</p>
+      </div>
+      <div class="verdict unsat">✓ PREMISES ARE INCONSISTENT</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RESOLUTION SUMMARY ═══ -->
+<section id="s6">
+  <div class="section-header">
+    <span class="section-num">Summary</span>
+    <h2 class="section-title">Resolution Problems — Quick Reference</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Q</th><th>Problem</th><th>Key Unifier(s)</th><th>Steps</th><th>Result</th></tr>
+      <tr><td><strong>R-Q1</strong></td><td>Socrates is mortal</td><td>θ = {x/Socrates}</td><td>2</td><td style="color:#27ae60;font-weight:700">Mortal(Socrates) ✓</td></tr>
+      <tr><td><strong>R-Q2</strong></td><td>John is not vegetarian</td><td>θ = {x/John}</td><td>2</td><td style="color:#27ae60;font-weight:700">¬Vegetarian(John) ✓</td></tr>
+      <tr><td><strong>R-Q3</strong></td><td>West is a criminal</td><td>θ = {x/West, y/M1, z/Nono}</td><td>5 (chain)</td><td style="color:#27ae60;font-weight:700">Criminal(West) ✓</td></tr>
+      <tr><td><strong>R-Q4</strong></td><td>Mary loves the rain</td><td>θ = {x/Mary} (×2)</td><td>3 (chain)</td><td style="color:#27ae60;font-weight:700">Loves(Mary, rain) ✓</td></tr>
+      <tr class="highlight-row"><td><strong>R-Q5</strong></td><td>Tweety inconsistency</td><td>θ = {x/Tweety}</td><td>2</td><td style="color:#c0392b;font-weight:700">Premises inconsistent ✓</td></tr>
+    </table>
+  </div>
+
+  <h3>Common Mistakes in Resolution</h3>
+  <div class="callout red">
+    <span class="callout-label">Watch Out!</span>
+    <p><strong>Mistake 1:</strong> Forgetting to negate the goal before adding it to the clause set. Resolution proves by contradiction — you must add ¬Goal.</p>
+    <p><strong>Mistake 2:</strong> Applying unification incorrectly. In R-Q3, the unifier must bind ALL three variables simultaneously: θ = {x/West, y/M1, z/Nono}. Partial unification leaves literals unresolved.</p>
+    <p><strong>Mistake 3:</strong> Failing to convert to CNF before resolving. The implication <code>A→B</code> must become <code>¬A∨B</code> before resolution can be applied.</p>
+    <p><strong>Mistake 4:</strong> Confusing resolution with modus ponens. Resolution is a single rule for both forward and backward reasoning; it subsumes modus ponens as a special case.</p>
+  </div>
+
+  <div class="callout blue">
+    <span class="callout-label">Key Takeaways</span>
+    <p><strong>∀ uses →, ∃ uses ∧</strong> — the golden rule of FOL translation.<br>
+    <strong>"Only" flips →</strong> — "Only A does X" means X → A, not A → X.<br>
+    <strong>Exactly one:</strong> ∃x[φ(x) ∧ ∀y(φ(y)→y=x)] — existence plus uniqueness.<br>
+    <strong>Resolution = negate goal + CNF + unify + derive □.</strong></p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>First-Order Predicate Logic — Detailed Solutions &amp; Explanations. Based on: Russell, S. J., &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach, 4th Edition</em>. Chapters 8–9.</p>
+  <p style="margin-top:12px;">Artificial Intelligence · B.Tech 2nd Year · Practice Q&amp;A</p>
+</footer>
+</body>
+</html>
