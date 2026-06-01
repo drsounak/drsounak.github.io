@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikZ Diagram Builder — Sounak Sadhukhan</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
+
+    /* ── Identity strip ── */
+    .id-strip {
+      height: 38px;
+      background: #92400e;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 9999;
+    }
+    .id-back {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+      color: #fef3c7;
+      opacity: .75;
+      text-decoration: none;
+      padding: 3px 10px 3px 7px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 100px;
+      transition: opacity .15s;
+    }
+    .id-back:hover { opacity: 1; text-decoration: none; }
+    .id-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
+    .id-title {
+      font-size: .8rem; font-weight: 700;
+      color: #fef3c7;
+      letter-spacing: .04em;
+    }
+    .id-sub {
+      font-size: .68rem;
+      color: #fef3c7;
+      opacity: .55;
+      margin-left: 2px;
+      letter-spacing: .02em;
+    }
+
+    /* ── Tool fills rest of screen ── */
+    #root {
+      height: calc(100vh - 38px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Identity strip: unique per tool -->
+<div class="id-strip">
+  <a href="blog.html" class="id-back">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+         viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Blog
+  </a>
+  <div class="id-divider"></div>
+  <span class="id-title">TikZ Diagram Builder</span>
+  <span class="id-sub">Drag-and-Drop Shapes · Connectors · Flowcharts · TikZ Code Export</span>
+</div>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect, useMemo, useReducer } = React;
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  SHAPE PALETTE  — mirrors MS Word's Insert → Shapes panel
+// ═══════════════════════════════════════════════════════════════════
+const SHAPE_PALETTE = [
+  // ── Rectangles ─────────────────────────────────────────────────
+  { g:"Rectangles", type:"rect",           label:"Rectangle",        w:140, h:70  },
+  { g:"Rectangles", type:"rect_round",     label:"Rounded Rect",     w:140, h:70  },
+  { g:"Rectangles", type:"rect_snip",      label:"Snip Corner",      w:140, h:70  },
+  { g:"Rectangles", type:"rect_fold",      label:"Folded Corner",    w:140, h:70  },
+  { g:"Rectangles", type:"rect_dbl",       label:"Double Rect",      w:140, h:70  },
+  { g:"Rectangles", type:"rect_snip2",     label:"2-Snip Corner",    w:140, h:70  },
+  // ── Basic Shapes ───────────────────────────────────────────────
+  { g:"Basic",      type:"ellipse",        label:"Oval",             w:130, h:75  },
+  { g:"Basic",      type:"circle",         label:"Circle",           w:80,  h:80  },
+  { g:"Basic",      type:"triangle",       label:"Triangle",         w:110, h:95  },
+  { g:"Basic",      type:"rt_triangle",    label:"Right Triangle",   w:110, h:90  },
+  { g:"Basic",      type:"diamond",        label:"Diamond",          w:110, h:90  },
+  { g:"Basic",      type:"parallelogram",  label:"Parallelogram",    w:140, h:70  },
+  { g:"Basic",      type:"trapezoid",      label:"Trapezoid",        w:140, h:70  },
+  { g:"Basic",      type:"hexagon",        label:"Hexagon",          w:100, h:100 },
+  { g:"Basic",      type:"pentagon",       label:"Pentagon",         w:100, h:100 },
+  { g:"Basic",      type:"octagon",        label:"Octagon",          w:100, h:100 },
+  { g:"Basic",      type:"cross",          label:"Plus / Cross",     w:90,  h:90  },
+  { g:"Basic",      type:"heart",          label:"Heart",            w:90,  h:85  },
+  { g:"Basic",      type:"lightning",      label:"Lightning Bolt",   w:75,  h:100 },
+  { g:"Basic",      type:"moon",           label:"Crescent Moon",    w:80,  h:90  },
+  { g:"Basic",      type:"donut",          label:"Ring / Donut",     w:90,  h:90  },
+  { g:"Basic",      type:"brace_left",     label:"Left Brace",       w:40,  h:100 },
+  { g:"Basic",      type:"brace_right",    label:"Right Brace",      w:40,  h:100 },
+  // ── Block Arrows ───────────────────────────────────────────────
+  { g:"Arrows",     type:"arrow_right",    label:"Right Arrow",      w:140, h:70  },
+  { g:"Arrows",     type:"arrow_left",     label:"Left Arrow",       w:140, h:70  },
+  { g:"Arrows",     type:"arrow_up",       label:"Up Arrow",         w:70,  h:130 },
+  { g:"Arrows",     type:"arrow_down",     label:"Down Arrow",       w:70,  h:130 },
+  { g:"Arrows",     type:"arrow_lr",       label:"Left-Right Arrow", w:150, h:70  },
+  { g:"Arrows",     type:"arrow_ud",       label:"Up-Down Arrow",    w:70,  h:130 },
+  { g:"Arrows",     type:"chevron",        label:"Chevron →",        w:140, h:70  },
+  { g:"Arrows",     type:"chevron_left",   label:"Chevron ←",        w:140, h:70  },
+  { g:"Arrows",     type:"pentagon_arrow", label:"Pentagon Arrow",   w:140, h:70  },
+  { g:"Arrows",     type:"notch_arrow",    label:"Notched Arrow",    w:140, h:70  },
+  { g:"Arrows",     type:"arrow_quad",     label:"Quad Arrow",       w:100, h:100 },
+  { g:"Arrows",     type:"arrow_uturn",    label:"U-Turn Arrow",     w:110, h:90  },
+  { g:"Arrows",     type:"arrow_curve",    label:"Curved Arrow",     w:100, h:100 },
+  { g:"Arrows",     type:"arrow_loop",     label:"Circular Arrow",   w:100, h:100 },
+  // ── Equation Shapes ────────────────────────────────────────────
+  { g:"Equation",   type:"eq_plus",        label:"Plus (+)",         w:80,  h:80  },
+  { g:"Equation",   type:"eq_minus",       label:"Minus (−)",        w:80,  h:40  },
+  { g:"Equation",   type:"eq_multiply",    label:"Multiply (×)",     w:80,  h:80  },
+  { g:"Equation",   type:"eq_divide",      label:"Divide (÷)",       w:80,  h:90  },
+  { g:"Equation",   type:"eq_equal",       label:"Equal (=)",        w:80,  h:60  },
+  { g:"Equation",   type:"eq_nequal",      label:"Not Equal (≠)",    w:80,  h:70  },
+  // ── Flowchart ──────────────────────────────────────────────────
+  { g:"Flowchart",  type:"terminal",       label:"Start / End",      w:130, h:50  },
+  { g:"Flowchart",  type:"process",        label:"Process",          w:140, h:60  },
+  { g:"Flowchart",  type:"decision",       label:"Decision",         w:150, h:75  },
+  { g:"Flowchart",  type:"io",             label:"Input / Output",   w:140, h:60  },
+  { g:"Flowchart",  type:"document",       label:"Document",         w:140, h:65  },
+  { g:"Flowchart",  type:"predefined",     label:"Predefined Proc",  w:140, h:60  },
+  { g:"Flowchart",  type:"manual_input",   label:"Manual Input",     w:140, h:60  },
+  { g:"Flowchart",  type:"connector",      label:"Connector ○",      w:50,  h:50  },
+  { g:"Flowchart",  type:"database",       label:"Database",         w:90,  h:110 },
+  { g:"Flowchart",  type:"cylinder",       label:"Cylinder",         w:90,  h:110 },
+  { g:"Flowchart",  type:"delay",          label:"Delay (D-shape)",  w:140, h:65  },
+  { g:"Flowchart",  type:"display_shape",  label:"Display",          w:150, h:65  },
+  { g:"Flowchart",  type:"preparation",    label:"Preparation",      w:150, h:65  },
+  { g:"Flowchart",  type:"card",           label:"Card",             w:130, h:75  },
+  // ── Stars & Banners ────────────────────────────────────────────
+  { g:"Stars",      type:"star4",          label:"4-pt Star",        w:90,  h:90  },
+  { g:"Stars",      type:"star",           label:"5-pt Star",        w:90,  h:90  },
+  { g:"Stars",      type:"star6",          label:"6-pt Star",        w:90,  h:90  },
+  { g:"Stars",      type:"star8",          label:"8-pt Star",        w:90,  h:90  },
+  { g:"Stars",      type:"star16",         label:"16-pt Star",       w:90,  h:90  },
+  { g:"Stars",      type:"explosion",      label:"Explosion 1",      w:100, h:90  },
+  { g:"Stars",      type:"explosion2",     label:"Explosion 2",      w:100, h:90  },
+  { g:"Stars",      type:"banner_ribbon",  label:"Ribbon Banner",    w:150, h:55  },
+  { g:"Stars",      type:"banner_wave",    label:"Wave Banner",      w:150, h:60  },
+  { g:"Stars",      type:"banner_scroll",  label:"Scroll",           w:150, h:65  },
+  { g:"Stars",      type:"banner_diagonal",label:"Diagonal Ribbon",  w:150, h:75  },
+  // ── Callouts ───────────────────────────────────────────────────
+  { g:"Callouts",   type:"callout_rect",   label:"Rect Callout",     w:140, h:90  },
+  { g:"Callouts",   type:"callout_round",  label:"Round Callout",    w:140, h:90  },
+  { g:"Callouts",   type:"callout_oval",   label:"Oval Callout",     w:140, h:90  },
+  { g:"Callouts",   type:"callout_cloud",  label:"Cloud Callout",    w:150, h:100 },
+  { g:"Callouts",   type:"callout_thought",label:"Thought Bubble",   w:150, h:100 },
+  { g:"Callouts",   type:"callout_line",   label:"Line Callout",     w:140, h:90  },
+  { g:"Callouts",   type:"note",           label:"Note / Sticky",    w:140, h:90  },
+  { g:"Callouts",   type:"cloud",          label:"Cloud",            w:150, h:85  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  TIKZ SHAPE MAP
+// ═══════════════════════════════════════════════════════════════════
+const TIKZ_MAP = {
+  // Rectangles
+  rect:           { draw:"rectangle",                                                    libs:[] },
+  rect_round:     { draw:"rectangle, rounded corners=8pt",                               libs:[] },
+  rect_snip:      { draw:"chamfered rectangle, chamfered rectangle corners=north east",  libs:["shapes.misc"] },
+  rect_fold:      { draw:"tape, tape bend top=none",                                     libs:["shapes.misc"] },
+  rect_dbl:       { draw:"rectangle, double, double distance=2pt",                       libs:[] },
+  rect_snip2:     { draw:"chamfered rectangle",                                          libs:["shapes.misc"] },
+  // Basic
+  ellipse:        { draw:"ellipse",                                                      libs:["shapes.geometric"] },
+  circle:         { draw:"circle",                                                       libs:[] },
+  triangle:       { draw:"regular polygon, regular polygon sides=3",                    libs:["shapes.geometric"] },
+  rt_triangle:    { draw:"isosceles triangle, isosceles triangle apex angle=90",        libs:["shapes.geometric"] },
+  diamond:        { draw:"diamond",                                                      libs:["shapes.geometric"] },
+  parallelogram:  { draw:"trapezium, trapezium left angle=70, trapezium right angle=70",libs:["shapes.geometric"] },
+  trapezoid:      { draw:"trapezium, trapezium left angle=70, trapezium right angle=110",libs:["shapes.geometric"] },
+  hexagon:        { draw:"regular polygon, regular polygon sides=6",                    libs:["shapes.geometric"] },
+  pentagon:       { draw:"regular polygon, regular polygon sides=5",                    libs:["shapes.geometric"] },
+  octagon:        { draw:"regular polygon, regular polygon sides=8",                    libs:["shapes.geometric"] },
+  cross:          { draw:"cross out",                                                    libs:["shapes.misc"] },
+  heart:          { draw:"rectangle",                                                    libs:[] },  // custom path
+  lightning:      { draw:"rectangle",                                                    libs:[] },  // custom path
+  moon:           { draw:"circular sector",                                              libs:["shapes.geometric"] },
+  donut:          { draw:"circle",                                                       libs:[] },  // double circle trick
+  brace_left:     { draw:"rectangle",                                                    libs:[] },
+  brace_right:    { draw:"rectangle",                                                    libs:[] },
+  // Arrows
+  arrow_right:    { draw:"single arrow",                                                 libs:["shapes.arrows"] },
+  arrow_left:     { draw:"single arrow, shape border rotate=180",                        libs:["shapes.arrows"] },
+  arrow_up:       { draw:"single arrow, shape border rotate=90",                         libs:["shapes.arrows"] },
+  arrow_down:     { draw:"single arrow, shape border rotate=270",                        libs:["shapes.arrows"] },
+  arrow_lr:       { draw:"double arrow",                                                  libs:["shapes.arrows"] },
+  arrow_ud:       { draw:"double arrow, shape border rotate=90",                          libs:["shapes.arrows"] },
+  chevron:        { draw:"signal, signal to=east",                                        libs:["shapes.arrows"] },
+  chevron_left:   { draw:"signal, signal to=west",                                        libs:["shapes.arrows"] },
+  pentagon_arrow: { draw:"signal, signal to=east",                                        libs:["shapes.arrows"] },
+  notch_arrow:    { draw:"single arrow",                                                   libs:["shapes.arrows"] },
+  arrow_quad:     { draw:"rectangle",                                                      libs:[] },
+  arrow_uturn:    { draw:"rectangle",                                                      libs:[] },
+  arrow_curve:    { draw:"rectangle",                                                      libs:[] },
+  arrow_loop:     { draw:"rectangle",                                                      libs:[] },
+  // Equation
+  eq_plus:        { draw:"rectangle",                                                      libs:[] },
+  eq_minus:       { draw:"rectangle",                                                      libs:[] },
+  eq_multiply:    { draw:"rectangle",                                                      libs:[] },
+  eq_divide:      { draw:"rectangle",                                                      libs:[] },
+  eq_equal:       { draw:"rectangle",                                                      libs:[] },
+  eq_nequal:      { draw:"rectangle",                                                      libs:[] },
+  // Flowchart
+  terminal:       { draw:"rectangle, rounded corners=22pt",                               libs:[] },
+  process:        { draw:"rectangle",                                                      libs:[] },
+  decision:       { draw:"diamond, aspect=2",                                              libs:["shapes.geometric"] },
+  io:             { draw:"trapezium, trapezium left angle=70, trapezium right angle=110",  libs:["shapes.geometric"] },
+  document:       { draw:"tape, tape bend top=none",                                       libs:["shapes.misc"] },
+  predefined:     { draw:"rectangle",                                                      libs:[] },
+  manual_input:   { draw:"trapezium, trapezium left angle=90, trapezium right angle=75",  libs:["shapes.geometric"] },
+  connector:      { draw:"circle",                                                         libs:[] },
+  database:       { draw:"cylinder, shape border rotate=90, aspect=0.2",                  libs:["shapes.geometric"] },
+  cylinder:       { draw:"cylinder, shape border rotate=90, aspect=0.25",                 libs:["shapes.geometric"] },
+  delay:          { draw:"rectangle",                                                      libs:[] },
+  display_shape:  { draw:"rectangle",                                                      libs:[] },
+  preparation:    { draw:"regular polygon, regular polygon sides=6",                      libs:["shapes.geometric"] },
+  card:           { draw:"rectangle",                                                      libs:[] },
+  // Stars
+  star4:          { draw:"star, star points=4, star point ratio=3",                       libs:["shapes.geometric"] },
+  star:           { draw:"star, star points=5, star point ratio=2.25",                   libs:["shapes.geometric"] },
+  star6:          { draw:"star, star points=6, star point ratio=2.5",                    libs:["shapes.geometric"] },
+  star8:          { draw:"star, star points=8, star point ratio=2",                      libs:["shapes.geometric"] },
+  star16:         { draw:"star, star points=16, star point ratio=1.4",                   libs:["shapes.geometric"] },
+  explosion:      { draw:"star, star points=10, star point ratio=1.8",                   libs:["shapes.geometric"] },
+  explosion2:     { draw:"star, star points=14, star point ratio=1.5",                   libs:["shapes.geometric"] },
+  banner_ribbon:  { draw:"rectangle",                                                      libs:[] },
+  banner_wave:    { draw:"rectangle",                                                      libs:[] },
+  banner_scroll:  { draw:"tape",                                                           libs:["shapes.misc"] },
+  banner_diagonal:{ draw:"rectangle",                                                      libs:[] },
+  // Callouts
+  callout_rect:   { draw:"rectangle callout, callout absolute pointer={(0,-1)}",          libs:["shapes.callouts"] },
+  callout_round:  { draw:"rounded rectangle callout, callout absolute pointer={(0,-1)}",  libs:["shapes.callouts"] },
+  callout_oval:   { draw:"ellipse callout, callout absolute pointer={(0,-1)}",            libs:["shapes.callouts"] },
+  callout_cloud:  { draw:"cloud callout, callout absolute pointer={(0,-1)}",              libs:["shapes.callouts"] },
+  callout_thought:{ draw:"cloud callout, callout absolute pointer={(0,-1)}",              libs:["shapes.callouts"] },
+  callout_line:   { draw:"rectangle callout, callout absolute pointer={(-1,-1)}",         libs:["shapes.callouts"] },
+  // Other
+  note:           { draw:"rectangle",                                                      libs:[] },
+  cloud:          { draw:"cloud, cloud puffs=9",                                           libs:["shapes.geometric"] },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  COLORS, ARROWS, CONSTANTS
+// ═══════════════════════════════════════════════════════════════════
+const CANVAS_W = 794, CANVAS_H = 1123, PX_PER_CM = 37.8, SNAP = 20;
+const A4_W_CM = 21.0, A4_H_CM = 29.7; // actual A4 dimensions
+
+const COLORS = [
+  { label:"Sky",    fill:"#dbeafe", stroke:"#2563eb", tikzFill:"blue!15",   tikzDraw:"blue!60"   },
+  { label:"Mint",   fill:"#d1fae5", stroke:"#059669", tikzFill:"green!15",  tikzDraw:"green!60"  },
+  { label:"Rose",   fill:"#ffe4e6", stroke:"#e11d48", tikzFill:"red!15",    tikzDraw:"red!60"    },
+  { label:"Violet", fill:"#ede9fe", stroke:"#7c3aed", tikzFill:"violet!20", tikzDraw:"violet!60" },
+  { label:"Amber",  fill:"#fef3c7", stroke:"#d97706", tikzFill:"orange!20", tikzDraw:"orange!70" },
+  { label:"Cyan",   fill:"#cffafe", stroke:"#0891b2", tikzFill:"cyan!15",   tikzDraw:"cyan!60"   },
+  { label:"Slate",  fill:"#f1f5f9", stroke:"#475569", tikzFill:"gray!12",   tikzDraw:"gray!55"   },
+  { label:"White",  fill:"#ffffff", stroke:"#1e293b", tikzFill:"white",     tikzDraw:"black"     },
+];
+
+const ARROW_TYPES = [
+  { id:"->",             label:"→  Arrow",       tikz:"->"               },
+  { id:"<->",            label:"↔  Both ways",   tikz:"<->"              },
+  { id:"->, dashed",     label:"⇢  Dashed",      tikz:"->, dashed"       },
+  { id:"",               label:"─  Plain line",  tikz:""                 },
+  { id:"->, very thick", label:"━→ Thick",       tikz:"->, very thick"   },
+  { id:"->>, thick",     label:"»  Double tip",  tikz:"->>, thick"       },
+  { id:"->, dotted",     label:"·→ Dotted",      tikz:"->, dotted"       },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  SMARTART TEMPLATES  (Image 2 categories)
+// ═══════════════════════════════════════════════════════════════════
+function sa(id, type, label, x, y, w, h, ci) {
+  return { id, type, label, x, y, w, h, colorIdx: ci ?? 0 };
+}
+function sc(id, from, to, label, style) {
+  return { id, from, to, label: label ?? "", style: style ?? "->" };
+}
+
+const SMARTART = {
+  List: [
+    {
+      name:"Basic Block List", desc:"Non-sequential grouped blocks (2×2)",
+      shapes:[
+        sa("a1","rect","Item 1",200,190,165,80,0), sa("a2","rect","Item 2",430,190,165,80,4),
+        sa("a3","rect","Item 3",200,310,165,80,1), sa("a4","rect","Item 4",430,310,165,80,2),
+      ], connections:[],
+    },
+    {
+      name:"Vertical Box List", desc:"Stacked labeled boxes",
+      shapes:[
+        sa("b1","rect","Step 1",410,110,200,60,0),
+        sa("b2","rect","Step 2",410,210,200,60,4),
+        sa("b3","rect","Step 3",410,310,200,60,1),
+        sa("b4","rect","Step 4",410,410,200,60,2),
+      ], connections:[sc("c1","b1","b2"),sc("c2","b2","b3"),sc("c3","b3","b4")],
+    },
+    {
+      name:"Horizontal Bullet List", desc:"Side-by-side content blocks",
+      shapes:[
+        sa("c1","rect","Topic A",160,250,130,100,0),
+        sa("c2","rect","Topic B",350,250,130,100,4),
+        sa("c3","rect","Topic C",540,250,130,100,1),
+        sa("c4","rect","Topic D",680,250,130,100,2),
+      ], connections:[],
+    },
+    {
+      name:"Stacked List", desc:"Title with nested items",
+      shapes:[
+        sa("d1","rect","Main Title",410,100,280,60,0),
+        sa("d2","rect","• Point A",410,200,240,50,6),
+        sa("d3","rect","• Point B",410,270,240,50,6),
+        sa("d4","rect","• Point C",410,340,240,50,6),
+        sa("d5","rect","• Point D",410,410,240,50,6),
+      ], connections:[sc("c1","d1","d2"),sc("c2","d2","d3"),sc("c3","d3","d4"),sc("c4","d4","d5")],
+    },
+  ],
+  Process: [
+    {
+      name:"Basic Process", desc:"Linear sequential steps",
+      shapes:[
+        sa("p1","process","Step 1",160,270,130,60,0),
+        sa("p2","process","Step 2",360,270,130,60,4),
+        sa("p3","process","Step 3",560,270,130,60,1),
+      ], connections:[sc("c1","p1","p2"),sc("c2","p2","p3")],
+    },
+    {
+      name:"Chevron Process", desc:"Forward-moving process arrows",
+      shapes:[
+        sa("q1","chevron","Phase 1",160,260,150,70,0),
+        sa("q2","chevron","Phase 2",360,260,150,70,4),
+        sa("q3","chevron","Phase 3",560,260,150,70,1),
+      ], connections:[],
+    },
+    {
+      name:"Alternating Flow", desc:"Alternating up-down process",
+      shapes:[
+        sa("r1","process","Stage 1",140,180,130,60,0),
+        sa("r2","process","Stage 2",320,340,130,60,4),
+        sa("r3","process","Stage 3",500,180,130,60,1),
+        sa("r4","process","Stage 4",680,340,130,60,2),
+      ], connections:[sc("c1","r1","r2"),sc("c2","r2","r3"),sc("c3","r3","r4")],
+    },
+    {
+      name:"Continuous Block", desc:"Repeating cycle process",
+      shapes:[
+        sa("s1","process","Collect",210,180,130,60,0),
+        sa("s2","process","Analyse",490,180,130,60,4),
+        sa("s3","process","Improve",490,380,130,60,1),
+        sa("s4","process","Monitor",210,380,130,60,2),
+      ], connections:[
+        sc("c1","s1","s2"),sc("c2","s2","s3"),
+        sc("c3","s3","s4"),sc("c4","s4","s1"),
+      ],
+    },
+    {
+      name:"Funnel", desc:"Filter / converging process",
+      shapes:[
+        sa("f1","trapezoid","Input 1",  250,110,220,60,0),
+        sa("f2","trapezoid","Input 2",  280,200,170,55,4),
+        sa("f3","trapezoid","Filter",   310,290,120,50,1),
+        sa("f4","terminal", "Output",   380,390, 90,50,2),
+      ], connections:[sc("c1","f1","f2"),sc("c2","f2","f3"),sc("c3","f3","f4")],
+    },
+  ],
+  Cycle: [
+    {
+      name:"Basic Cycle", desc:"Continuous circular process",
+      shapes:[
+        sa("cy1","ellipse","Plan",   410, 90,140,60,0),
+        sa("cy2","ellipse","Do",     620,270,140,60,4),
+        sa("cy3","ellipse","Check",  410,450,140,60,1),
+        sa("cy4","ellipse","Act",    200,270,140,60,2),
+      ], connections:[
+        sc("c1","cy1","cy2"),sc("c2","cy2","cy3"),
+        sc("c3","cy3","cy4"),sc("c4","cy4","cy1"),
+      ],
+    },
+    {
+      name:"Pentagon Cycle", desc:"5-step cycle",
+      shapes:[
+        sa("pc1","pentagon","Step 1",410, 80,100,100,0),
+        sa("pc2","pentagon","Step 2",620,210,100,100,4),
+        sa("pc3","pentagon","Step 3",535,430,100,100,1),
+        sa("pc4","pentagon","Step 4",285,430,100,100,2),
+        sa("pc5","pentagon","Step 5",200,210,100,100,3),
+      ], connections:[
+        sc("c1","pc1","pc2"),sc("c2","pc2","pc3"),
+        sc("c3","pc3","pc4"),sc("c4","pc4","pc5"),sc("c5","pc5","pc1"),
+      ],
+    },
+    {
+      name:"Radial Cycle", desc:"Central hub with radiating steps",
+      shapes:[
+        sa("rc0","circle", "Core",   410,270, 90, 90,0),
+        sa("rc1","ellipse","Topic A",410,110,120,55,4),
+        sa("rc2","ellipse","Topic B",620,270,120,55,4),
+        sa("rc3","ellipse","Topic C",410,430,120,55,4),
+        sa("rc4","ellipse","Topic D",200,270,120,55,4),
+      ], connections:[
+        sc("c1","rc0","rc1","",""),sc("c2","rc0","rc2","",""),
+        sc("c3","rc0","rc3","",""),sc("c4","rc0","rc4","",""),
+      ],
+    },
+  ],
+  Hierarchy: [
+    {
+      name:"Organisation Chart", desc:"Top-down reporting structure",
+      shapes:[
+        sa("h1","rect","CEO",        410, 80,140,55,0),
+        sa("h2","rect","VP Sales",   190,210,130,55,4),
+        sa("h3","rect","VP Tech",    410,210,130,55,4),
+        sa("h4","rect","VP Ops",     630,210,130,55,4),
+        sa("h5","rect","Sales Mgr",  130,360,120,50,6),
+        sa("h6","rect","Dev Lead",   350,360,120,50,6),
+        sa("h7","rect","QA Lead",    480,360,120,50,6),
+      ], connections:[
+        sc("c1","h1","h2","",""),sc("c2","h1","h3","",""),sc("c3","h1","h4","",""),
+        sc("c4","h2","h5","",""),sc("c5","h3","h6","",""),sc("c6","h3","h7","",""),
+      ],
+    },
+    {
+      name:"Horizontal Hierarchy", desc:"Left-to-right tree",
+      shapes:[
+        sa("hh1","rect","Root",    110,280,120,55,0),
+        sa("hh2","rect","Branch A",310,170,120,50,4),
+        sa("hh3","rect","Branch B",310,310,120,50,4),
+        sa("hh4","rect","Leaf A1", 510,120,110,45,6),
+        sa("hh5","rect","Leaf A2", 510,220,110,45,6),
+        sa("hh6","rect","Leaf B1", 510,310,110,45,6),
+        sa("hh7","rect","Leaf B2", 510,400,110,45,6),
+      ], connections:[
+        sc("c1","hh1","hh2","",""),sc("c2","hh1","hh3","",""),
+        sc("c3","hh2","hh4","",""),sc("c4","hh2","hh5","",""),
+        sc("c5","hh3","hh6","",""),sc("c6","hh3","hh7","",""),
+      ],
+    },
+  ],
+  Relationship: [
+    {
+      name:"Basic Venn (3)", desc:"3 overlapping circles",
+      shapes:[
+        sa("v1","ellipse","Set A",280,270,160,140,0),
+        sa("v2","ellipse","Set B",410,130,160,140,4),
+        sa("v3","ellipse","Set C",540,270,160,140,1),
+      ], connections:[],
+    },
+    {
+      name:"Diverging Arrows", desc:"One source, multiple targets",
+      shapes:[
+        sa("da0","rect",   "Source",  160,270,120,60,0),
+        sa("da1","rect",   "Result A",480,140,130,55,4),
+        sa("da2","rect",   "Result B",480,270,130,55,1),
+        sa("da3","rect",   "Result C",480,400,130,55,2),
+      ], connections:[sc("c1","da0","da1"),sc("c2","da0","da2"),sc("c3","da0","da3")],
+    },
+    {
+      name:"Converging Arrows", desc:"Multiple sources, one result",
+      shapes:[
+        sa("ca1","rect","Source A",160,140,130,55,4),
+        sa("ca2","rect","Source B",160,270,130,55,1),
+        sa("ca3","rect","Source C",160,400,130,55,2),
+        sa("ca0","rect","Result",  500,270,130,60,0),
+      ], connections:[sc("c1","ca1","ca0"),sc("c2","ca2","ca0"),sc("c3","ca3","ca0")],
+    },
+    {
+      name:"Balance / Scale", desc:"Two-sided comparison",
+      shapes:[
+        sa("bl0","diamond","Compare",410,100,120,80,0),
+        sa("bl1","rect",   "Option A",220,280,160,70,4),
+        sa("bl2","rect",   "Option B",600,280,160,70,2),
+      ], connections:[sc("c1","bl0","bl1"),sc("c2","bl0","bl2")],
+    },
+  ],
+  Matrix: [
+    {
+      name:"Basic Matrix (2×2)", desc:"Four-quadrant matrix",
+      shapes:[
+        sa("m1","rect","High Value\nLow Effort",  220,175,185,105,1),
+        sa("m2","rect","High Value\nHigh Effort", 440,175,185,105,4),
+        sa("m3","rect","Low Value\nLow Effort",   220,310,185,105,6),
+        sa("m4","rect","Low Value\nHigh Effort",  440,310,185,105,2),
+      ], connections:[],
+    },
+    {
+      name:"SWOT Analysis", desc:"Strengths Weaknesses Opportunities Threats",
+      shapes:[
+        sa("sw1","rect","Strengths",    220,175,185,105,1),
+        sa("sw2","rect","Weaknesses",   440,175,185,105,2),
+        sa("sw3","rect","Opportunities",220,310,185,105,0),
+        sa("sw4","rect","Threats",      440,310,185,105,3),
+      ], connections:[],
+    },
+  ],
+  Pyramid: [
+    {
+      name:"Basic Pyramid", desc:"4-level triangular hierarchy",
+      shapes:[
+        sa("py1","triangle",  "Level 1", 410,100,260,80, 0),
+        sa("py2","trapezoid", "Level 2", 410,215,280,75, 4),
+        sa("py3","trapezoid", "Level 3", 410,325,320,75, 1),
+        sa("py4","rect",      "Level 4", 410,430,360,70, 6),
+      ], connections:[],
+    },
+    {
+      name:"Inverted Pyramid", desc:"Widest at top, narrowest at bottom",
+      shapes:[
+        sa("ip1","rect",      "Top Level",   410,110,360,70, 0),
+        sa("ip2","trapezoid", "Mid-High",    410,220,320,70, 4),
+        sa("ip3","trapezoid", "Mid-Low",     410,330,280,70, 1),
+        sa("ip4","triangle",  "Base",        410,430,240,75, 2),
+      ], connections:[],
+    },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  CLASSIC DIAGRAM TEMPLATES (keep from v1)
+// ═══════════════════════════════════════════════════════════════════
+const QUICK_TEMPLATES = [
+  {
+    name:"Flowchart",
+    shapes:[
+      sa("t1","terminal", "Start",     410, 55,130,50,1),
+      sa("t2","process",  "Process A", 410,160,140,60,0),
+      sa("t3","decision", "Decision?", 410,290,155,75,4),
+      sa("t4","process",  "Yes Path",  240,430,130,55,1),
+      sa("t5","process",  "No Path",   580,430,130,55,2),
+      sa("t6","terminal", "End",       410,510,130,50,6),
+    ],
+    connections:[
+      sc("c1","t1","t2"),sc("c2","t2","t3"),
+      sc("c3","t3","t4","Yes"),sc("c4","t3","t5","No"),
+      sc("c5","t4","t6"),sc("c6","t5","t6"),
+    ],
+  },
+  {
+    name:"ER Diagram",
+    shapes:[
+      sa("e1","rect",   "Student",  160,200,130,60,0),
+      sa("e2","diamond","Enrolls",  380,200,130,70,4),
+      sa("e3","rect",   "Course",   610,200,130,60,1),
+      sa("e4","ellipse","SID",       90, 90,100,50,6),
+      sa("e5","ellipse","Name",     205, 80,100,50,6),
+      sa("e6","ellipse","CID",      545, 90,100,50,6),
+      sa("e7","ellipse","Title",    680, 80,100,50,6),
+    ],
+    connections:[
+      sc("c1","e1","e2","N",""),sc("c2","e2","e3","M",""),
+      sc("c3","e4","e1","",""),sc("c4","e5","e1","",""),
+      sc("c5","e6","e3","",""),sc("c6","e7","e3","",""),
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════════
+let _seq = 0;
+const newId   = () => `n${++_seq}`;
+const snapTo  = v  => Math.round(v / SNAP) * SNAP;
+
+function getEdgePoint(shape, tx, ty) {
+  const { x: cx, y: cy, w, h, type } = shape;
+  const hw = w / 2, hh = h / 2;
+  const dx = tx - cx, dy = ty - cy;
+  if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return { x: cx, y: cy };
+  if (["circle","connector","donut"].includes(type)) {
+    const len = Math.hypot(dx, dy);
+    return { x: cx + hw * dx / len, y: cy + hw * dy / len };
+  }
+  if (["ellipse","terminal","cloud","callout_oval","callout_cloud","callout_thought"].includes(type)) {
+    const len = Math.hypot(dx / hw, dy / hh);
+    return { x: cx + dx / len, y: cy + dy / len };
+  }
+  if (["diamond","decision"].includes(type)) {
+    const t = 1 / (Math.abs(dx) / hw + Math.abs(dy) / hh + 1e-9);
+    return { x: cx + dx * t, y: cy + dy * t };
+  }
+  const tx_ = hw / (Math.abs(dx) + 1e-9);
+  const ty_ = hh / (Math.abs(dy) + 1e-9);
+  return { x: cx + dx * Math.min(tx_, ty_), y: cy + dy * Math.min(tx_, ty_) };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TIKZ CODE GENERATOR
+// ═══════════════════════════════════════════════════════════════════
+function generateTikz(shapes, connections) {
+  if (!shapes.length) return [
+    "% ─── Overleaf TikZ Builder ────────────────",
+    "% Add shapes, then copy this code to Overleaf",
+    "",
+    "% Preamble needed in your .tex file:",
+    "% \\usepackage{tikz}",
+    "% \\usetikzlibrary{shapes.geometric, shapes.misc,",
+    "%   shapes.arrows, shapes.callouts,",
+    "%   arrows.meta, positioning}",
+  ].join("\n");
+
+  const libs = new Set(["arrows.meta","positioning"]);
+  shapes.forEach(s => (TIKZ_MAP[s.type]?.libs ?? []).forEach(l => libs.add(l)));
+
+  const toX = px  => (px / PX_PER_CM).toFixed(2);
+  const toY = py  => ((CANVAS_H - py) / PX_PER_CM).toFixed(2);
+
+  const lines = [
+    "% ─── Generated by Overleaf TikZ Builder ───",
+    "",
+    "% Paste this into your Overleaf .tex file.",
+    "% Add to preamble (once):",
+    "% \\usepackage{tikz}",
+    `% \\usetikzlibrary{${[...libs].join(", ")}}`,
+    "",
+    "\\begin{figure}[h]",
+    "  \\centering",
+    "  \\begin{tikzpicture}[",
+    "    every node/.style={align=center, font=\\small},",
+    "    node distance=1cm",
+    "  ]",
+    "",
+    "  % Canvas: A4 (21cm × 29.7cm) — coordinates in cm from bottom-left",
+    "",
+    "  % --- Nodes ---",
+  ];
+
+  shapes.forEach(s => {
+    const col  = COLORS[s.colorIdx ?? 0];
+    const tdef = TIKZ_MAP[s.type] ?? { draw:"rectangle", libs:[] };
+    const wCm  = (s.w / PX_PER_CM).toFixed(2);
+    const hCm  = (s.h / PX_PER_CM).toFixed(2);
+    const lbl  = (s.label || "").replace(/\n/g,"\\\\").replace(/&/g,"\\&").replace(/_/g,"\\_");
+    const isCircle = ["circle","connector"].includes(s.type);
+    const sizeOpt  = isCircle ? `minimum size=${wCm}cm` : `minimum width=${wCm}cm, minimum height=${hCm}cm`;
+    const textW    = isCircle ? "" : `, text width=${wCm}cm`;
+    lines.push(
+      `  \\node[draw=${col.tikzDraw}, fill=${col.tikzFill}, ${tdef.draw},`
+      + ` ${sizeOpt}${textW}]`
+      + ` (${s.id}) at (${toX(s.x)}, ${toY(s.y)}) {${lbl}};`
+    );
+  });
+
+  if (connections.length) {
+    lines.push("", "  % --- Connections ---");
+    connections.forEach(c => {
+      const tikzStyle = ARROW_TYPES.find(a => a.id === c.style)?.tikz ?? "->";
+      const sStr  = tikzStyle ? `[${tikzStyle}]` : "";
+      const lPart = c.label ? ` node[midway, fill=white, font=\\scriptsize] {${c.label}}` : "";
+      lines.push(`  \\draw${sStr} (${c.from}) --${lPart} (${c.to});`);
+    });
+  }
+
+  lines.push("", "  \\end{tikzpicture}");
+  lines.push("  \\caption{Your figure caption}");
+  lines.push("  \\label{fig:diagram}");
+  lines.push("\\end{figure}");
+  return lines.join("\n");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SVG SHAPE BODY
+// ═══════════════════════════════════════════════════════════════════
+function star(n, outer, inner, angleOffset = -Math.PI / 2) {
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = (i * Math.PI / n) + angleOffset;
+    pts.push(`${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}`);
+  }
+  return pts.join(" ");
+}
+function poly(n, rx, ry, offset = -Math.PI / 2) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i * 2 * Math.PI / n) + offset;
+    pts.push(`${(rx * Math.cos(a)).toFixed(1)},${(ry * Math.sin(a)).toFixed(1)}`);
+  }
+  return pts.join(" ");
+}
+
+function ShapeBody({ type, w, h, fill, stroke, sw = 1.5 }) {
+  const hw = w / 2, hh = h / 2;
+  const s = { fill, stroke, strokeWidth: sw };
+
+  switch (type) {
+    /* ─── Rectangles ─── */
+    case "rect":      return <rect x={-hw} y={-hh} width={w} height={h} style={s} />;
+    case "rect_round":return <rect x={-hw} y={-hh} width={w} height={h} rx={10} ry={10} style={s} />;
+    case "rect_snip": {
+      const c = 14;
+      return <polygon points={`${-hw},${-hh} ${hw-c},${-hh} ${hw},${-hh+c} ${hw},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "rect_snip2": {
+      const c = 12;
+      return <polygon points={`${-hw+c},${-hh} ${hw-c},${-hh} ${hw},${-hh+c} ${hw},${hh-c} ${hw-c},${hh} ${-hw+c},${hh} ${-hw},${hh-c} ${-hw},${-hh+c}`} style={s} />;
+    }
+    case "rect_fold": {
+      const fc = Math.min(w, h) * 0.22;
+      return (
+        <g>
+          <polygon points={`${-hw},${-hh} ${hw-fc},${-hh} ${hw},${-hh+fc} ${hw},${hh} ${-hw},${hh}`} style={s} />
+          <polyline points={`${hw-fc},${-hh} ${hw-fc},${-hh+fc} ${hw},${-hh+fc}`}
+            fill="none" stroke={stroke} strokeWidth={sw} />
+        </g>
+      );
+    }
+    case "rect_dbl":
+      return (
+        <g>
+          <rect x={-hw} y={-hh} width={w} height={h} style={s} />
+          <rect x={-hw+5} y={-hh+5} width={w-10} height={h-10} fill="none" stroke={stroke} strokeWidth={sw * 0.7} />
+        </g>
+      );
+
+    /* ─── Basic ─── */
+    case "circle":    case "connector":
+      return <circle r={hw} style={s} />;
+    case "ellipse":
+      return <ellipse rx={hw} ry={hh} style={s} />;
+    case "terminal":
+      return <rect x={-hw} y={-hh} width={w} height={h} rx={hh} ry={hh} style={s} />;
+    case "triangle":
+      return <polygon points={`0,${-hh} ${hw},${hh} ${-hw},${hh}`} style={s} />;
+    case "rt_triangle":
+      return <polygon points={`${-hw},${-hh} ${hw},${hh} ${-hw},${hh}`} style={s} />;
+    case "diamond":   case "decision":
+      return <polygon points={`0,${-hh} ${hw},0 0,${hh} ${-hw},0`} style={s} />;
+    case "parallelogram": {
+      const sk = hw * 0.2;
+      return <polygon points={`${-hw+sk},${-hh} ${hw},${-hh} ${hw-sk},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "trapezoid": {
+      const tw = hw * 0.28;
+      return <polygon points={`${-hw+tw},${-hh} ${hw-tw},${-hh} ${hw},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "hexagon":   return <polygon points={poly(6, hw, hh)} style={s} />;
+    case "pentagon":  return <polygon points={poly(5, hw, hh)} style={s} />;
+    case "octagon":   return <polygon points={poly(8, hw, hh, -Math.PI / 8)} style={s} />;
+    case "preparation": return <polygon points={`${-hw+hw*0.25},${-hh} ${hw-hw*0.25},${-hh} ${hw},0 ${hw-hw*0.25},${hh} ${-hw+hw*0.25},${hh} ${-hw},0`} style={s} />;
+    case "cross": {
+      const t = hw * 0.32;
+      return <polygon points={`${-t},${-hh} ${t},${-hh} ${t},${-t} ${hw},${-t} ${hw},${t} ${t},${t} ${t},${hh} ${-t},${hh} ${-t},${t} ${-hw},${t} ${-hw},${-t} ${-t},${-t}`} style={s} />;
+    }
+    case "heart": {
+      const d = `M 0,${hh*0.35} C ${-hw*0.6},${hh*0.0} ${-hw},${-hh*0.3} ${-hw},${-hh*0.55}`
+        + ` C ${-hw},${-hh} ${-hw*0.4},${-hh} 0,${-hh*0.5}`
+        + ` C ${hw*0.4},${-hh} ${hw},${-hh} ${hw},${-hh*0.55}`
+        + ` C ${hw},${-hh*0.3} ${hw*0.6},${hh*0.0} 0,${hh*0.35} Z`;
+      return <path d={d} style={s} />;
+    }
+    case "lightning": {
+      const d = `M ${-hw*0.1},${-hh} L ${-hw*0.5},0 L ${hw*0.15},0 L ${-hw*0.15},${hh} L ${hw*0.5},0 L ${-hw*0.15},0 Z`;
+      return <path d={d} style={s} />;
+    }
+    case "moon": {
+      const d = `M 0,${-hh} A ${hw} ${hh} 0 1 1 0,${hh} A ${hw*0.65} ${hh*0.85} 0 1 0 0,${-hh} Z`;
+      return <path d={d} style={s} />;
+    }
+    case "donut":
+      return (
+        <g>
+          <circle r={hw} style={s} />
+          <circle r={hw * 0.45} fill="white" stroke={stroke} strokeWidth={sw} />
+        </g>
+      );
+    case "brace_left": {
+      const d = `M ${hw*0.3},${-hh} Q ${-hw*0.3},${-hh} ${-hw*0.3},${-hh*0.5}`
+        + ` Q ${-hw*0.3},0 ${-hw*0.9},0`
+        + ` Q ${-hw*0.3},0 ${-hw*0.3},${hh*0.5}`
+        + ` Q ${-hw*0.3},${hh} ${hw*0.3},${hh}`;
+      return <path d={d} fill="none" stroke={stroke} strokeWidth={sw * 1.5} />;
+    }
+    case "brace_right": {
+      const d = `M ${-hw*0.3},${-hh} Q ${hw*0.3},${-hh} ${hw*0.3},${-hh*0.5}`
+        + ` Q ${hw*0.3},0 ${hw*0.9},0`
+        + ` Q ${hw*0.3},0 ${hw*0.3},${hh*0.5}`
+        + ` Q ${hw*0.3},${hh} ${-hw*0.3},${hh}`;
+      return <path d={d} fill="none" stroke={stroke} strokeWidth={sw * 1.5} />;
+    }
+
+    /* ─── Block Arrows ─── */
+    case "arrow_right": {
+      const ah = hh, aw = hw * 0.36, sh = hh * 0.48;
+      return <polygon points={`${-hw},${-sh} ${hw-aw},${-sh} ${hw-aw},${-ah} ${hw},0 ${hw-aw},${ah} ${hw-aw},${sh} ${-hw},${sh}`} style={s} />;
+    }
+    case "arrow_left": {
+      const ah = hh, aw = hw * 0.36, sh = hh * 0.48;
+      return <polygon points={`${hw},${-sh} ${-hw+aw},${-sh} ${-hw+aw},${-ah} ${-hw},0 ${-hw+aw},${ah} ${-hw+aw},${sh} ${hw},${sh}`} style={s} />;
+    }
+    case "arrow_up": {
+      const ah = hw, sh = hw * 0.48;
+      return <polygon points={`${-sh},${hh} ${-sh},${-hh+ah} ${-ah},${-hh+ah} 0,${-hh} ${ah},${-hh+ah} ${sh},${-hh+ah} ${sh},${hh}`} style={s} />;
+    }
+    case "arrow_down": {
+      const ah = hw, sh = hw * 0.48;
+      return <polygon points={`${-sh},${-hh} ${-sh},${hh-ah} ${-ah},${hh-ah} 0,${hh} ${ah},${hh-ah} ${sh},${hh-ah} ${sh},${-hh}`} style={s} />;
+    }
+    case "arrow_lr": {
+      const ah = hw * 0.35, sh = hh * 0.48;
+      return <polygon points={`${-hw},0 ${-hw+ah},${-hh} ${-hw+ah},${-sh} ${hw-ah},${-sh} ${hw-ah},${-hh} ${hw},0 ${hw-ah},${hh} ${hw-ah},${sh} ${-hw+ah},${sh} ${-hw+ah},${hh}`} style={s} />;
+    }
+    case "arrow_ud": {
+      const ah = hh * 0.32, sh = hw * 0.48;
+      return <polygon points={`0,${-hh} ${hw},${-hh+ah} ${sh},${-hh+ah} ${sh},${hh-ah} ${hw},${hh-ah} 0,${hh} ${-hw},${hh-ah} ${-sh},${hh-ah} ${-sh},${-hh+ah} ${-hw},${-hh+ah}`} style={s} />;
+    }
+    case "chevron": {
+      const aw = hw * 0.28;
+      return <polygon points={`${-hw},${-hh} ${hw-aw},${-hh} ${hw},0 ${hw-aw},${hh} ${-hw},${hh} ${-hw+aw},0`} style={s} />;
+    }
+    case "chevron_left": {
+      const aw = hw * 0.28;
+      return <polygon points={`${hw},${-hh} ${-hw+aw},${-hh} ${-hw},0 ${-hw+aw},${hh} ${hw},${hh} ${hw-aw},0`} style={s} />;
+    }
+    case "pentagon_arrow": {
+      const aw = hw * 0.28;
+      return <polygon points={`${-hw},${-hh} ${hw-aw},${-hh} ${hw},0 ${hw-aw},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "notch_arrow": {
+      const aw = hw * 0.35, nw = hw * 0.18, sh = hh * 0.48;
+      return <polygon points={`${-hw},${-sh} ${-hw+nw},0 ${-hw},${sh} ${hw-aw},${sh} ${hw-aw},${hh} ${hw},0 ${hw-aw},${-hh} ${hw-aw},${-sh}`} style={s} />;
+    }
+    case "arrow_quad": {
+      const t = hw * 0.3, at = hw * 0.55;
+      return (
+        <g style={s}>
+          <polygon points={`0,${-hh} ${t},${-at} ${-t},${-at}`} style={s} />
+          <polygon points={`${hh},0 ${at},${t} ${at},${-t}`} style={s} />
+          <polygon points={`0,${hh} ${t},${at} ${-t},${at}`} style={s} />
+          <polygon points={`${-hh},0 ${-at},${t} ${-at},${-t}`} style={s} />
+          <rect x={-t} y={-t} width={t*2} height={t*2} style={s} />
+        </g>
+      );
+    }
+    case "arrow_uturn": {
+      // Filled U-turn block arrow: left leg up, curves right, right leg down with arrowhead
+      const thick = hw * 0.38, ow = hw * 0.46;
+      const legR = hw - thick; // inner radius
+      const stem = hh * 0.45;  // arrowhead depth
+      const d = [
+        `M ${-hw},${hh}`,           // bottom-left outer
+        `L ${-hw},${-hh*0.15}`,     // up left outer
+        `A ${ow} ${ow} 0 0 1 ${hw-thick},${-hh*0.15}`, // curve over top outer
+        `L ${hw-thick},${hh-stem}`, // down right outer
+        `L ${hw},${hh-stem}`,       // arrowhead right wing
+        `L ${hw-thick*0.5},${hh}`,  // arrowhead tip
+        `L ${-hw+thick},${hh}`,     // back along bottom
+        // inner path back
+        `L ${-hw+thick},${-hh*0.15}`,
+        `A ${legR} ${legR} 0 0 0 ${-hw+thick*0.01},${-hh*0.15}`, // tiny arc to close
+        `Z`,
+      ].join(" ");
+      // simpler solid version using two rects + semicircle fill
+      const ow2 = (hw + hw - thick) / 2;
+      const ir = ow2 - thick;
+      return (
+        <g style={s}>
+          <rect x={-hw} y={-hh*0.15} width={thick} height={hh*0.15+hh} style={s}/>
+          <rect x={-hw} y={-hh*0.5} width={hw*2-thick} height={thick} style={s}/>
+          <polygon points={`${hw-thick},${hh-stem*1.6} ${hw},${hh-stem*1.6} ${hw-thick*0.5},${hh}`} style={s}/>
+          <rect x={hw-thick} y={-hh*0.5} width={thick} height={hh*0.5+hh-stem*1.6} style={s}/>
+        </g>
+      );
+    }
+    case "arrow_curve": {
+      const r = hw * 0.7, lineW = hh * 0.45;
+      return (
+        <g>
+          <path d={`M ${-hw},0 A ${r} ${r} 0 0 1 ${hw*0.72},0`}
+            fill="none" stroke={stroke} strokeWidth={lineW} strokeLinecap="round" />
+          <polygon points={`${hw*0.6},${-hh*0.4} ${hw},0 ${hw*0.6},${hh*0.4}`} style={{...s,stroke:"none"}} />
+        </g>
+      );
+    }
+    case "arrow_loop": {
+      const r = hw * 0.55;
+      return (
+        <g>
+          <circle r={r} fill="none" stroke={stroke} strokeWidth={hh * 0.35}
+            strokeDasharray={`${r*2*Math.PI * 0.7} ${r*2*Math.PI * 0.3}`} />
+          <polygon points={`${r+hh*0.2},${hh*0.1} ${r},${hh*0.5} ${r-hh*0.2},${hh*0.1}`}
+            style={{...s,stroke:"none"}} />
+        </g>
+      );
+    }
+
+    /* ─── Equation ─── */
+    case "eq_plus": {
+      const t = hw * 0.3;
+      return <polygon points={`${-t},${-hh} ${t},${-hh} ${t},${-t} ${hw},${-t} ${hw},${t} ${t},${t} ${t},${hh} ${-t},${hh} ${-t},${t} ${-hw},${t} ${-hw},${-t} ${-t},${-t}`} style={s} />;
+    }
+    case "eq_minus": {
+      const bh = Math.max(4, hh * 0.35);
+      return <rect x={-hw} y={-bh} width={w} height={bh*2} style={s} />;
+    }
+    case "eq_multiply": {
+      const t = hw * 0.28;
+      return (
+        <g>
+          <polygon points={star(4, hw, t, -Math.PI / 4)} style={s} />
+        </g>
+      );
+    }
+    case "eq_divide": {
+      const bh = hh * 0.22, r = hw * 0.17;
+      return (
+        <g>
+          <rect x={-hw} y={-bh} width={w} height={bh * 2} style={s} />
+          <circle cx={0} cy={-hh * 0.65} r={r} style={s} />
+          <circle cx={0} cy={ hh * 0.65} r={r} style={s} />
+        </g>
+      );
+    }
+    case "eq_equal": {
+      const bh = hh * 0.22;
+      return (
+        <g>
+          <rect x={-hw} y={-bh * 2.8} width={w} height={bh * 1.8} style={s} />
+          <rect x={-hw} y={ bh * 1.0} width={w} height={bh * 1.8} style={s} />
+        </g>
+      );
+    }
+    case "eq_nequal": {
+      const bh = hh * 0.2;
+      return (
+        <g>
+          <rect x={-hw} y={-bh * 2.8} width={w} height={bh * 1.6} style={s} />
+          <rect x={-hw} y={ bh * 1.0} width={w} height={bh * 1.6} style={s} />
+          <line x1={hw * 0.4} y1={-hh * 0.9} x2={-hw * 0.4} y2={hh * 0.9}
+            stroke={stroke} strokeWidth={sw * 2} />
+        </g>
+      );
+    }
+
+    /* ─── Flowchart ─── */
+    case "process":       return <rect x={-hw} y={-hh} width={w} height={h} style={s} />;
+    case "io": {
+      const sk = Math.min(16, hw * 0.2);
+      return <polygon points={`${-hw+sk},${-hh} ${hw},${-hh} ${hw-sk},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "document": {
+      const wv = hh * 0.28;
+      const d = `M ${-hw},${-hh} L ${hw},${-hh} L ${hw},${hh-wv} Q ${hw*0.5},${hh} 0,${hh-wv} Q ${-hw*0.5},${hh-wv*2} ${-hw},${hh-wv} Z`;
+      return <path d={d} style={s} />;
+    }
+    case "predefined": {
+      const pad = 9;
+      return (
+        <g>
+          <rect x={-hw} y={-hh} width={w} height={h} style={s} />
+          <line x1={-hw+pad} y1={-hh} x2={-hw+pad} y2={hh} stroke={stroke} strokeWidth={sw} />
+          <line x1={hw-pad}  y1={-hh} x2={hw-pad}  y2={hh} stroke={stroke} strokeWidth={sw} />
+        </g>
+      );
+    }
+    case "manual_input": {
+      const sk = hh * 0.4;
+      return <polygon points={`${-hw},${-hh+sk} ${hw},${-hh} ${hw},${hh} ${-hw},${hh}`} style={s} />;
+    }
+    case "delay": {
+      const r = hh;
+      return <path d={`M ${-hw},${-hh} L ${hw-r},${-hh} A ${r} ${r} 0 0 1 ${hw-r},${hh} L ${-hw},${hh} Z`} style={s} />;
+    }
+    case "display_shape": {
+      const r = hh, aw = hw * 0.22;
+      return <path d={`M ${-hw+aw},0 L ${-hw},${-hh} L ${hw-r},${-hh} A ${r} ${r} 0 0 1 ${hw-r},${hh} L ${-hw},${hh} Z`} style={s} />;
+    }
+    case "card": {
+      const c = hh * 0.35;
+      return <polygon points={`${-hw},${-hh} ${hw},${-hh} ${hw},${hh} ${-hw+c},${hh}`} style={s} />;
+    }
+    case "cylinder": case "database": {
+      const ry2 = hh * 0.18;
+      return (
+        <g>
+          <rect x={-hw} y={-hh+ry2} width={w} height={h-ry2*2} style={s} />
+          <ellipse rx={hw} ry={ry2} cy={-hh+ry2} style={s} />
+          <ellipse rx={hw} ry={ry2} cy={hh-ry2}  style={{ ...s, fill }} />
+          <ellipse rx={hw} ry={ry2} cy={-hh+ry2} style={{ fill:"none", stroke, strokeWidth:sw }} />
+        </g>
+      );
+    }
+    case "cloud": {
+      const puffs = [[0,hh*0.0,hw*0.34],[-hw*0.32,hh*0.12,hw*0.28],[hw*0.32,hh*0.12,hw*0.28],[-hw*0.55,hh*0.03,hw*0.22],[hw*0.55,hh*0.03,hw*0.22],[-hw*0.17,-hh*0.2,hw*0.30],[hw*0.17,-hh*0.2,hw*0.30]];
+      return <g>{puffs.map(([cx,cy,r],i)=><circle key={i} cx={cx} cy={cy} r={r} style={s}/>)}</g>;
+    }
+    case "note": {
+      const fold = Math.min(w,h)*0.22;
+      return (
+        <g>
+          <path d={`M ${-hw},${-hh} L ${hw-fold},${-hh} L ${hw},${-hh+fold} L ${hw},${hh} L ${-hw},${hh} Z`} style={s} />
+          <path d={`M ${hw-fold},${-hh} L ${hw-fold},${-hh+fold} L ${hw},${-hh+fold}`}
+            fill="none" stroke={stroke} strokeWidth={sw} />
+        </g>
+      );
+    }
+
+    /* ─── Stars ─── */
+    case "star4":     return <polygon points={star(4, hw, hw*0.3)} style={s} />;
+    case "star":      return <polygon points={star(5, hw, hw*0.4)} style={s} />;
+    case "star6":     return <polygon points={star(6, hw, hw*0.5)} style={s} />;
+    case "star8":     return <polygon points={star(8, hw, hw*0.45)} style={s} />;
+    case "star16":    return <polygon points={star(16,hw, hw*0.6)} style={s} />;
+    case "explosion": return <polygon points={star(10,hw, hw*0.5)} style={s} />;
+    case "explosion2":return <polygon points={star(14,hw, hw*0.55)} style={s} />;
+    case "banner_ribbon": {
+      const tw = hw * 0.14, th = hh * 0.45;
+      return <path d={`M ${-hw},${-hh} L ${hw},${-hh} L ${hw},${hh} L ${hw-tw},${hh-th} L ${-hw+tw},${hh-th} L ${-hw},${hh} Z`} style={s} />;
+    }
+    case "banner_wave": {
+      const wh = hh * 0.3;
+      return <path d={`M ${-hw},${-hh} Q ${-hw*0.5},${-hh-wh} 0,${-hh} Q ${hw*0.5},${-hh+wh} ${hw},${-hh} L ${hw},${hh} Q ${hw*0.5},${hh-wh} 0,${hh} Q ${-hw*0.5},${hh+wh} ${-hw},${hh} Z`} style={s} />;
+    }
+    case "banner_scroll": {
+      const rc = hh * 0.35;
+      return (
+        <g>
+          <rect x={-hw+rc} y={-hh} width={w-rc*2} height={h} style={s} />
+          <ellipse cx={-hw+rc} rx={rc} ry={hh} style={s} />
+          <ellipse cx={hw-rc}  rx={rc} ry={hh} style={s} />
+          <ellipse cx={-hw+rc} rx={rc*0.6} ry={hh} fill={fill} stroke="none" />
+        </g>
+      );
+    }
+    case "banner_diagonal": {
+      const bw = hh * 0.45;
+      return <path d={`M ${-hw+bw},${-hh} L ${hw},${-hh} L ${hw-bw},${hh} L ${-hw},${hh} Z`} style={s} />;
+    }
+
+    /* ─── Callouts ─── */
+    case "callout_rect": {
+      const ih = hh * 0.65, tx = -hw * 0.25;
+      return <path d={`M ${-hw},${-ih} L ${-hw},${ih} L ${tx-9},${ih} L ${tx},${hh} L ${tx+9},${ih} L ${hw},${ih} L ${hw},${-ih} Z`} style={s} />;
+    }
+    case "callout_round": {
+      const ih = hh * 0.65, tx = -hw * 0.2, rr = 10;
+      return <path d={`M ${-hw+rr},${-ih} Q ${-hw},${-ih} ${-hw},${-ih+rr} L ${-hw},${ih-rr} Q ${-hw},${ih} ${-hw+rr},${ih} L ${tx-9},${ih} L ${tx},${hh} L ${tx+9},${ih} L ${hw-rr},${ih} Q ${hw},${ih} ${hw},${ih-rr} L ${hw},${-ih+rr} Q ${hw},${-ih} ${hw-rr},${-ih} Z`} style={s} />;
+    }
+    case "callout_oval": {
+      const tx = hw * 0.2;
+      return (
+        <g>
+          <ellipse rx={hw} ry={hh * 0.7} style={s} />
+          <polygon points={`${tx-5},${hh*0.55} ${tx+5},${hh*0.55} ${hw*0.75},${hh*1.2}`} style={{...s}} />
+        </g>
+      );
+    }
+    case "callout_cloud":
+    case "callout_thought": {
+      const off = hh * 0.2;
+      const puffs = [[0,-off,hw*0.32],[-hw*0.3,hh*0.08-off,hw*0.26],[hw*0.3,hh*0.08-off,hw*0.26],[-hw*0.52,hh*0.0-off,hw*0.20],[hw*0.52,hh*0.0-off,hw*0.20],[-hw*0.16,-hh*0.22-off,hw*0.28],[hw*0.16,-hh*0.22-off,hw*0.28]];
+      const dots = type === "callout_thought"
+        ? [[hw*0.35,hh*0.55,5],[hw*0.5,hh*0.82,3.5],[hw*0.62,hh*1.05,2.5]]
+        : [[-hw*0.3,hh*0.55,4],[-hw*0.15,hh*0.88,3]];
+      return (
+        <g>
+          {puffs.map(([cx,cy,r],i)=><circle key={i} cx={cx} cy={cy} r={r} style={s}/>)}
+          {dots.map(([cx,cy,r],i)=><circle key={`d${i}`} cx={cx} cy={cy} r={r} style={s}/>)}
+        </g>
+      );
+    }
+    case "callout_line": {
+      const ih = hh * 0.65;
+      return (
+        <g>
+          <rect x={-hw} y={-ih} width={w} height={ih*2} style={s} />
+          <line x1={-hw*0.5} y1={ih} x2={-hw*0.7} y2={hh*1.4} stroke={stroke} strokeWidth={sw*1.2} />
+        </g>
+      );
+    }
+
+    default:
+      return <rect x={-hw} y={-hh} width={w} height={h} style={s} />;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MINI PALETTE PREVIEW
+// ═══════════════════════════════════════════════════════════════════
+function MiniPreview({ type }) {
+  return (
+    <svg width={28} height={22} viewBox="-14 -11 28 22" style={{ flexShrink:0 }}>
+      <ShapeBody type={type} w={24} h={18} fill="#1e3a6e" stroke="#4f8ef7" sw={1.2} />
+    </svg>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TOOLBAR BUTTON
+// ═══════════════════════════════════════════════════════════════════
+const Btn = ({ onClick, disabled, active, danger, children, title, style: x={} }) => (
+  <button title={title} disabled={disabled} onClick={onClick} style={{
+    background: active?"#1d4ed8":danger?"#3f1515":"#1a2240",
+    border:`1px solid ${active?"#3b82f6":danger?"#7f1d1d":"#2a3560"}`,
+    color: disabled?"#334155":active?"#fff":danger?"#f87171":"#94a3b8",
+    borderRadius:6, padding:"5px 11px", cursor:disabled?"default":"pointer",
+    fontSize:11, fontFamily:"inherit", opacity:disabled?0.5:1,
+    transition:"all .15s", whiteSpace:"nowrap", ...x,
+  }}>{children}</button>
+);
+
+// ═══════════════════════════════════════════════════════════════════
+//  MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════
+// ── Local-state input for connection label (avoids commit-on-every-keystroke) ──
+function ConnLabelInput({ selConnection, updateConn, INP }) {
+  const [val, setVal] = useState(selConnection.label);
+  useEffect(() => { setVal(selConnection.label); }, [selConnection.id, selConnection.label]);
+  return (
+    <input value={val} placeholder="Yes / No / data…"
+      onChange={e => setVal(e.target.value)}
+      onBlur={() => updateConn({ label: val })}
+      onKeyDown={e => { if (e.key === "Enter") e.target.blur(); }}
+      style={INP}/>
+  );
+}
+
+function TikzBuilder() {
+  const [shapes,       setShapes]       = useState([]);
+  const [connections,  setConnections]  = useState([]);
+  const [selected,     setSelected]     = useState(null);
+  const [selConn,      setSelConn]      = useState(null);
+  const [mode,         setMode]         = useState("select");
+  const [connStart,    setConnStart]    = useState(null);
+  const [editingId,    setEditingId]    = useState(null);
+  const [editText,     setEditText]     = useState("");
+  const [arrowStyle,   setArrowStyle]   = useState("->");
+  const [showGrid,     setShowGrid]     = useState(true);
+  const [showCode,     setShowCode]     = useState(true);
+  const [copied,       setCopied]       = useState(false);
+  const [dragging,     setDragging]     = useState(null);
+  const [dragOff,      setDragOff]      = useState({x:0,y:0});
+  const [leftTab,      setLeftTab]      = useState("shapes"); // "shapes"|"smartart"
+  const [shapeGroup,   setShapeGroup]   = useState("Rectangles");
+  const [saCategory,   setSaCategory]   = useState("List");
+  const [recentTypes,  setRecentTypes]  = useState([]);
+  const [canUndo,      setCanUndo]      = useState(false);
+  const [canRedo,      setCanRedo]      = useState(false);
+
+  const histRef   = useRef([{shapes:[],connections:[]}]);
+  const histIdx   = useRef(0);
+  const shapesRef = useRef(shapes);
+  const connsRef  = useRef(connections);
+  const svgRef    = useRef(null);
+  const inputRef  = useRef(null);
+  shapesRef.current = shapes;
+  connsRef.current  = connections;
+
+  const commit = useCallback((ns, nc) => {
+    const h = histRef.current.slice(0, histIdx.current + 1);
+    h.push({shapes:ns, connections:nc});
+    if (h.length > 60) h.shift();
+    histRef.current = h;
+    histIdx.current = h.length - 1;
+    setShapes(ns); setConnections(nc);
+    setCanUndo(histIdx.current > 0);
+    setCanRedo(false);
+  }, []);
+
+  const undo = useCallback(() => {
+    if (histIdx.current > 0) {
+      histIdx.current--;
+      const p = histRef.current[histIdx.current];
+      setShapes(p.shapes); setConnections(p.connections);
+      setCanUndo(histIdx.current > 0); setCanRedo(true);
+    }
+  },[]);
+  const redo = useCallback(() => {
+    if (histIdx.current < histRef.current.length - 1) {
+      histIdx.current++;
+      const p = histRef.current[histIdx.current];
+      setShapes(p.shapes); setConnections(p.connections);
+      setCanUndo(true); setCanRedo(histIdx.current < histRef.current.length-1);
+    }
+  },[]);
+
+  const addShape = (def) => {
+    const s = { id:newId(), type:def.type, label:def.label, x:snapTo(CANVAS_W/2), y:snapTo(CANVAS_H/2), w:def.w, h:def.h, colorIdx:0 };
+    commit([...shapesRef.current, s], connsRef.current);
+    setSelected(s.id); setMode("select");
+    setRecentTypes(prev => [def, ...prev.filter(d=>d.type!==def.type)].slice(0,8));
+  };
+
+  const loadTemplate = (tpl) => {
+    const idMap = {};
+    const ns = tpl.shapes.map(s => { const nid=newId(); idMap[s.id]=nid; return {...s,id:nid}; });
+    const nc = tpl.connections.map(c => ({...c, id:newId(), from:idMap[c.from], to:idMap[c.to]}));
+    commit(ns, nc); setSelected(null); setSelConn(null);
+  };
+
+  const getSvgPt = e => {
+    const r = svgRef.current.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+
+  const onShapeDown = (e, id) => {
+    e.stopPropagation();
+    if (mode === "connect") {
+      if (!connStart) { setConnStart(id); return; }
+      if (connStart !== id) {
+        const dup = connsRef.current.find(c=>c.from===connStart && c.to===id);
+        if (!dup) commit(shapesRef.current, [...connsRef.current, {id:newId(),from:connStart,to:id,label:"",style:arrowStyle}]);
+        setConnStart(null); setMode("select");
+      }
+      return;
+    }
+    setSelected(id); setSelConn(null);
+    const shape = shapesRef.current.find(s=>s.id===id);
+    const pt = getSvgPt(e);
+    setDragging(id); setDragOff({x:pt.x-shape.x, y:pt.y-shape.y});
+  };
+
+  const onSvgMove = e => {
+    if (!dragging) return;
+    const pt = getSvgPt(e);
+    const nx = snapTo(Math.max(50,Math.min(CANVAS_W-50, pt.x-dragOff.x)));
+    const ny = snapTo(Math.max(35,Math.min(CANVAS_H-35, pt.y-dragOff.y)));
+    setShapes(ss => ss.map(s => s.id===dragging ? {...s,x:nx,y:ny} : s));
+  };
+  const onSvgUp = () => { if (dragging) { commit(shapesRef.current, connsRef.current); setDragging(null); } };
+  const onSvgClick = e => { const t=e.target; if (t===svgRef.current||t.tagName==="svg"||t.classList.contains("canvas-bg")) { setSelected(null); setSelConn(null); setConnStart(null); } };
+
+  const onDblClick = (e, id) => {
+    e.stopPropagation();
+    const sh = shapesRef.current.find(s=>s.id===id);
+    setEditingId(id); setEditText(sh.label);
+    setTimeout(()=>inputRef.current?.focus(),30);
+  };
+  const commitLabel = () => {
+    if (!editingId) return;
+    commit(shapesRef.current.map(s=>s.id===editingId?{...s,label:editText}:s), connsRef.current);
+    setEditingId(null);
+  };
+
+  useEffect(()=>{
+    const h = e => {
+      if (editingId) return;
+      if ((e.key==="Delete"||e.key==="Backspace") && document.activeElement===document.body) {
+        if (selected) { commit(shapesRef.current.filter(s=>s.id!==selected), connsRef.current.filter(c=>c.from!==selected&&c.to!==selected)); setSelected(null); }
+        if (selConn)  { commit(shapesRef.current, connsRef.current.filter(c=>c.id!==selConn)); setSelConn(null); }
+      }
+      if (e.ctrlKey&&e.key==="z"){e.preventDefault();undo();}
+      if (e.ctrlKey&&(e.key==="y"||(e.shiftKey&&e.key==="Z"))){e.preventDefault();redo();}
+      if (e.key==="Escape"){setConnStart(null);setMode("select");}
+      if (e.key==="v"&&!e.ctrlKey&&mode!=="connect") setMode("select");
+      if (e.key==="c"&&!e.ctrlKey&&mode!=="connect") setMode("connect");
+    };
+    window.addEventListener("keydown",h);
+    return ()=>window.removeEventListener("keydown",h);
+  },[selected,selConn,editingId,commit,undo,redo,mode]);
+
+  const copyCode = async () => {
+    const code = generateTikz(shapes,connections);
+    let ok=false;
+    try{await navigator.clipboard.writeText(code);ok=true;}catch{}
+    if(!ok){try{const ta=document.createElement("textarea");ta.value=code;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.focus();ta.select();document.execCommand("copy");document.body.removeChild(ta);ok=true;}catch{}}
+    if(ok){setCopied(true);setTimeout(()=>setCopied(false),2200);}
+  };
+
+  const selShape = shapes.find(s=>s.id===selected);
+  const selConnection = connections.find(c=>c.id===selConn);
+  const tikzCode = generateTikz(shapes,connections);
+  const GROUPS = [...new Set(SHAPE_PALETTE.map(s=>s.g))];
+  const SA_CATS = Object.keys(SMARTART);
+
+  const updateSel  = patch => commit(shapes.map(s=>s.id===selected?{...s,...patch}:s), connections);
+  const updateConn = patch => commit(shapes, connections.map(c=>c.id===selConn?{...c,...patch}:c));
+
+  const INP = { width:"100%", background:"#0d1830", border:"1px solid #1a2d50", color:"#c8d8f8", borderRadius:5, padding:"5px 8px", fontSize:11, fontFamily:"inherit", boxSizing:"border-box", outline:"none" };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",height:"100vh",background:"#0c1015",color:"#e2e8f0",fontFamily:"'IBM Plex Mono','Fira Code','Courier New',monospace",overflow:"hidden"}}>
+
+      {/* ════ TOP BAR ════════════════════════════════════════════ */}
+      <div style={{background:"#0f1520",borderBottom:"1px solid #1a2440",padding:"7px 14px",display:"flex",alignItems:"center",gap:8,flexShrink:0,flexWrap:"wrap"}}>
+        <svg width={22} height={22} viewBox="0 0 22 22">
+          <circle cx={11} cy={11} r={10} fill="none" stroke="#3b82f6" strokeWidth={1.5}/>
+          <path d="M5 11 Q11 4 17 11 Q11 18 5 11Z" fill="#3b82f6" opacity={0.3}/>
+          <circle cx={11} cy={11} r={2.5} fill="#7ab8ff"/>
+        </svg>
+        <span style={{fontSize:13,fontWeight:800,color:"#f1f5f9",letterSpacing:"-0.5px",marginRight:4}}>
+          TikZ<span style={{color:"#3b82f6"}}>Builder</span>
+          <span style={{fontSize:9,color:"#3a4f70",marginLeft:8}}>for Overleaf · A4</span>
+        </span>
+        <div style={{width:1,height:22,background:"#1a2440"}}/>
+        {[{id:"select",icon:"✦",label:"Select",tip:"Select / move  (V)"},{id:"connect",icon:"⇢",label:"Connect",tip:"Connect shapes  (C)"}].map(m=>(
+          <Btn key={m.id} active={mode===m.id} title={m.tip} onClick={()=>{setMode(m.id);setConnStart(null);}}>
+            {m.icon} {m.label}
+          </Btn>
+        ))}
+        <select value={arrowStyle} onChange={e=>setArrowStyle(e.target.value)} title="Arrow style"
+          style={{background:"#1a2240",border:"1px solid #2a3560",color:"#94a3b8",borderRadius:6,padding:"5px 8px",fontSize:11,fontFamily:"inherit",cursor:"pointer"}}>
+          {ARROW_TYPES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}
+        </select>
+        <div style={{width:1,height:22,background:"#1a2440"}}/>
+        <Btn onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">↩ Undo</Btn>
+        <Btn onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Y)">↪ Redo</Btn>
+        <div style={{width:1,height:22,background:"#1a2440"}}/>
+        <Btn onClick={()=>setShowGrid(v=>!v)} active={showGrid} title="Toggle dot grid">⊞ Grid</Btn>
+        <Btn danger onClick={()=>{commit([],[]);setSelected(null);setSelConn(null);}} title="Clear canvas">✕ Clear</Btn>
+        <div style={{flex:1}}/>
+        <Btn onClick={()=>setShowCode(v=>!v)}>{showCode?"▸ Hide Code":"◂ Show Code"}</Btn>
+      </div>
+
+      {/* ════ BODY ══════════════════════════════════════════════ */}
+      <div style={{display:"flex",flex:1,overflow:"hidden"}}>
+
+        {/* ── LEFT PANEL ─────────────────────────────────────── */}
+        <div style={{width:210,background:"#0e1520",borderRight:"1px solid #1a2440",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0}}>
+          {/* Main tabs: Shapes | SmartArt */}
+          <div style={{display:"flex",borderBottom:"1px solid #1a2440",flexShrink:0}}>
+            {[{id:"shapes",label:"Shapes"},{ id:"smartart",label:"SmartArt"}].map(t=>(
+              <button key={t.id} onClick={()=>setLeftTab(t.id)} style={{
+                flex:1,background:"transparent",border:"none",
+                borderBottom:`2px solid ${leftTab===t.id?"#3b82f6":"transparent"}`,
+                color:leftTab===t.id?"#7ab8ff":"#4a5a78",
+                padding:"9px 4px",cursor:"pointer",fontSize:11,fontFamily:"inherit",fontWeight:700,
+              }}>{t.label}</button>
+            ))}
+          </div>
+
+          {leftTab === "shapes" && (
+            <>
+              {/* Recent shapes */}
+              {recentTypes.length > 0 && (
+                <div style={{padding:"6px 8px",flexShrink:0}}>
+                  <div style={{fontSize:9,fontWeight:700,color:"#3a4f70",letterSpacing:"1px",marginBottom:5}}>RECENTLY USED</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                    {recentTypes.map((def,i)=>(
+                      <button key={i} title={def.label} onClick={()=>addShape(def)}
+                        style={{background:"#111d30",border:"1px solid #1a2d50",borderRadius:5,padding:4,cursor:"pointer",lineHeight:0}}>
+                        <MiniPreview type={def.type}/>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Group selector */}
+              <div style={{padding:"6px 8px 4px",flexShrink:0}}>
+                <select value={shapeGroup} onChange={e=>setShapeGroup(e.target.value)}
+                  style={{...INP,background:"#111d30",border:"1px solid #1a2d50",color:"#7a98c8",padding:"5px 8px",cursor:"pointer"}}>
+                  {GROUPS.map(g=><option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+              {/* Shape list */}
+              <div style={{flex:1,overflowY:"auto",padding:"4px 6px 8px",display:"flex",flexDirection:"column",gap:3}}>
+                {SHAPE_PALETTE.filter(s=>s.g===shapeGroup).map(def=>(
+                  <button key={def.type} onClick={()=>addShape(def)} style={{
+                    background:"#111d30",border:"1px solid #1a2d50",borderRadius:6,
+                    color:"#8aaad8",padding:"6px 10px",cursor:"pointer",
+                    fontSize:11,fontFamily:"inherit",textAlign:"left",
+                    display:"flex",alignItems:"center",gap:9,transition:"background .1s",
+                  }}>
+                    <MiniPreview type={def.type}/>{def.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {leftTab === "smartart" && (
+            <>
+              {/* SmartArt category */}
+              <div style={{padding:"6px 8px 4px",flexShrink:0}}>
+                <select value={saCategory} onChange={e=>setSaCategory(e.target.value)}
+                  style={{...INP,background:"#111d30",border:"1px solid #1a2d50",color:"#7a98c8",padding:"5px 8px",cursor:"pointer"}}>
+                  {SA_CATS.map(c=><option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div style={{flex:1,overflowY:"auto",padding:"4px 6px 8px",display:"flex",flexDirection:"column",gap:5}}>
+                {(SMARTART[saCategory]||[]).map(tpl=>(
+                  <button key={tpl.name} onClick={()=>loadTemplate(tpl)} style={{
+                    background:"#111d30",border:"1px solid #1a2d50",borderRadius:7,
+                    color:"#8aaad8",padding:"9px 10px",cursor:"pointer",
+                    fontSize:11,fontFamily:"inherit",textAlign:"left",
+                    transition:"background .1s",
+                  }}>
+                    <div style={{fontWeight:700,color:"#7ab8ff",marginBottom:3}}>📊 {tpl.name}</div>
+                    <div style={{fontSize:9,color:"#4a5a78",lineHeight:1.5}}>{tpl.desc}</div>
+                  </button>
+                ))}
+                <div style={{height:1,background:"#1a2440",margin:"4px 0"}}/>
+                <div style={{fontSize:9,fontWeight:700,color:"#3a4f70",letterSpacing:"1px",padding:"4px 2px"}}>QUICK TEMPLATES</div>
+                {QUICK_TEMPLATES.map(tpl=>(
+                  <button key={tpl.name} onClick={()=>loadTemplate(tpl)} style={{
+                    background:"#111d30",border:"1px solid #1a2d50",borderRadius:7,
+                    color:"#8aaad8",padding:"9px 10px",cursor:"pointer",
+                    fontSize:11,fontFamily:"inherit",textAlign:"left",
+                  }}>
+                    <div style={{fontWeight:700,color:"#7ab8ff",marginBottom:3}}>📐 {tpl.name}</div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* ── CANVAS — A4 white page ─────────────────────────── */}
+        <div style={{flex:1,overflow:"auto",position:"relative",background:"#525659",display:"flex",justifyContent:"center",alignItems:"flex-start",padding:"24px 20px"}}>
+          <div style={{position:"relative",flexShrink:0}}>
+          {mode==="connect" && (
+            <div style={{position:"fixed",top:70,left:"50%",transform:"translateX(-50%)",zIndex:50,
+              background:connStart?"#4c1d95":"#1e3a8a",color:connStart?"#c4b5fd":"#93c5fd",
+              border:`1px solid ${connStart?"#7c3aed":"#2563eb"}`,
+              borderRadius:20,padding:"5px 18px",fontSize:11,zIndex:20,pointerEvents:"none"}}>
+              {connStart?"✓ Source selected — click the target shape":"Click a shape to start the connection"}
+            </div>
+          )}
+          {shapes.length===0 && (
+            <div style={{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",pointerEvents:"none",userSelect:"none",zIndex:5}}>
+              <div style={{fontSize:48,opacity:0.1,marginBottom:12}}>⬡</div>
+              <div style={{fontSize:13,color:"#2a3a5a",lineHeight:1.9}}>
+                Pick a shape from the left panel<br/>
+                or choose a SmartArt layout
+              </div>
+            </div>
+          )}
+          <svg ref={svgRef} width={CANVAS_W} height={CANVAS_H}
+            onMouseMove={onSvgMove} onMouseUp={onSvgUp} onMouseLeave={onSvgUp}
+            onClick={onSvgClick}
+            style={{display:"block",cursor:mode==="connect"?"crosshair":"default",userSelect:"none",
+              background:"white",
+              boxShadow:"0 4px 20px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2)",
+              border:"1px solid #bdbdbd",
+            }}>
+            <defs>
+              <pattern id="dotgrid" width={SNAP} height={SNAP} patternUnits="userSpaceOnUse">
+                <circle cx={SNAP/2} cy={SNAP/2} r={0.7} fill="#b0bec5"/>
+              </pattern>
+              {[{id:"arr",col:"#374151"},{id:"arr-s",col:"#3b82f6"},{id:"arr-c",col:"#7c3aed"}].map(({id,col})=>(
+                <marker key={id} id={id} markerWidth={9} markerHeight={7} refX={9} refY={3.5} orient="auto">
+                  <polygon points="0 0, 9 3.5, 0 7" fill={col}/>
+                </marker>
+              ))}
+            </defs>
+            {/* Always-white paper background */}
+            <rect width={CANVAS_W} height={CANVAS_H} fill="white" className="canvas-bg"/>
+            {/* Optional dot grid overlay */}
+            {showGrid && <rect width={CANVAS_W} height={CANVAS_H} fill="url(#dotgrid)" pointerEvents="none"/>}
+            {/* A4 margin guides (10mm each side ≈ 38px) */}
+            <rect x={38} y={38} width={CANVAS_W-76} height={CANVAS_H-76}
+              fill="none" stroke="#e8eaf0" strokeWidth={0.5} strokeDasharray="4 4"
+              pointerEvents="none"/>
+
+            {/* Connections */}
+            {connections.map(c=>{
+              const from=shapes.find(s=>s.id===c.from), to=shapes.find(s=>s.id===c.to);
+              if(!from||!to) return null;
+              const p1=getEdgePoint(from,to.x,to.y), p2=getEdgePoint(to,from.x,from.y);
+              const mid={x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2};
+              const isSel=c.id===selConn;
+              const isDash=c.style.includes("dashed")||c.style.includes("dotted");
+              const isThick=c.style.includes("thick");
+              const hasArr=c.style!=="";
+              const mEnd=hasArr?(isSel?"url(#arr-s)":"url(#arr)"):undefined;
+              const mStart=c.style.includes("<->")?( isSel?"url(#arr-s)":"url(#arr)"):undefined;
+              return (
+                <g key={c.id} style={{cursor:"pointer"}} onClick={e=>{e.stopPropagation();setSelConn(c.id);setSelected(null);}}>
+                  <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="transparent" strokeWidth={14}/>
+                  <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+                    stroke={isSel?"#1d4ed8":"#374151"}
+                    strokeWidth={isSel?2.5:isThick?2.5:1.5}
+                    strokeDasharray={isDash?(c.style.includes("dotted")?"2 4":"7 4"):undefined}
+                    markerEnd={mEnd} markerStart={mStart}/>
+                  {c.label && (
+                    <g>
+                      <rect x={mid.x-c.label.length*3.5-4} y={mid.y-9} width={c.label.length*7+8} height={15} fill="#0d1420" rx={3}/>
+                      <text x={mid.x} y={mid.y+1} textAnchor="middle" dominantBaseline="central" fontSize={10} fill="#94a3b8" style={{pointerEvents:"none"}}>{c.label}</text>
+                    </g>
+                  )}
+                  {isSel && <circle cx={mid.x} cy={mid.y} r={4} fill="#3b82f6"/>}
+                </g>
+              );
+            })}
+
+            {/* Connect-start ring */}
+            {connStart && (()=>{ const sh=shapes.find(s=>s.id===connStart); return sh?(<circle cx={sh.x} cy={sh.y} r={Math.max(sh.w,sh.h)/2+8} fill="none" stroke="#7c3aed" strokeWidth={2} strokeDasharray="5 3"/>):null; })()}
+
+            {/* Shapes */}
+            {shapes.map(s=>{
+              const col=COLORS[s.colorIdx??0], isSel=s.id===selected;
+              return (
+                <g key={s.id} transform={`translate(${s.x},${s.y})`}
+                  onMouseDown={e=>onShapeDown(e,s.id)}
+                  onDoubleClick={e=>onDblClick(e,s.id)}
+                  style={{cursor:mode==="connect"?"crosshair":dragging===s.id?"grabbing":"grab"}}>
+                  {isSel&&<rect x={-s.w/2-5} y={-s.h/2-5} width={s.w+10} height={s.h+10} fill="none" stroke="#2563eb" strokeWidth={2} strokeDasharray="5 3" rx={5}/>}
+                  <ShapeBody type={s.type} w={s.w} h={s.h} fill={col.fill} stroke={col.stroke}/>
+                  {editingId===s.id ? (
+                    <foreignObject x={-s.w/2} y={-s.h/2} width={s.w} height={s.h}>
+                      <div xmlns="http://www.w3.org/1999/xhtml" style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        <input ref={inputRef} value={editText} onChange={e=>setEditText(e.target.value)}
+                          onBlur={commitLabel}
+                          onKeyDown={e=>{if(e.key==="Enter")commitLabel();if(e.key==="Escape")setEditingId(null);}}
+                          style={{width:"90%",background:"rgba(255,255,255,0.95)",border:"2px solid #3b82f6",borderRadius:4,textAlign:"center",fontSize:11,padding:"2px 4px",outline:"none",fontFamily:"inherit"}}/>
+                      </div>
+                    </foreignObject>
+                  ) : (
+                    <text textAnchor="middle" dominantBaseline="central"
+                      fontSize={s.label.length>14?9:11} fill={col.stroke}
+                      style={{pointerEvents:"none",userSelect:"none",fontWeight:600}}>
+                      {s.label.length>18?s.label.slice(0,16)+"…":s.label}
+                    </text>
+                  )}
+                  {isSel&&(
+                    <rect x={s.w/2-5} y={s.h/2-5} width={10} height={10} fill="#3b82f6" rx={2} style={{cursor:"se-resize"}}
+                      onMouseDown={e=>{
+                        e.stopPropagation();
+                        const sx=e.clientX,sy=e.clientY,sw2=s.w,sh2=s.h;
+                        const mv=me=>{const nw=Math.max(40,snapTo(sw2+(me.clientX-sx)));const nh=Math.max(30,snapTo(sh2+(me.clientY-sy)));setShapes(ss=>ss.map(sh=>sh.id===s.id?{...sh,w:nw,h:nh}:sh));};
+                        const up=()=>{commit(shapesRef.current,connsRef.current);window.removeEventListener("mousemove",mv);window.removeEventListener("mouseup",up);};
+                        window.addEventListener("mousemove",mv);window.addEventListener("mouseup",up);
+                      }}/>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+          </div>
+        </div>
+
+        {/* ── RIGHT PANEL ────────────────────────────────────── */}
+        {showCode && (
+          <div style={{width:288,background:"#0e1520",borderLeft:"1px solid #1a2440",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0}}>
+
+            {/* Properties */}
+            <div style={{borderBottom:"1px solid #1a2440",padding:"10px 12px",flexShrink:0,maxHeight:320,overflowY:"auto"}}>
+              <div style={{fontSize:9,fontWeight:700,color:"#3a4f70",letterSpacing:"1px",marginBottom:8}}>PROPERTIES</div>
+              {selShape ? (
+                <div style={{display:"flex",flexDirection:"column",gap:9}}>
+                  <div style={{fontSize:10,color:"#4f8ef7"}}>{selShape.type} · <span style={{color:"#3a4f70"}}>{selShape.id}</span></div>
+                  <div>
+                    <div style={{fontSize:9,color:"#3a4f70",marginBottom:3}}>LABEL</div>
+                    <input value={selShape.label}
+                      onChange={e=>setShapes(ss=>ss.map(s=>s.id===selected?{...s,label:e.target.value}:s))}
+                      onBlur={()=>commit(shapesRef.current,connsRef.current)} style={INP}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:9,color:"#3a4f70",marginBottom:5}}>FILL COLOR</div>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                      {COLORS.map((c,i)=>(
+                        <button key={i} title={c.label} onClick={()=>updateSel({colorIdx:i})} style={{
+                          width:22,height:22,borderRadius:"50%",background:c.fill,
+                          border:`2px solid ${selShape.colorIdx===i?c.stroke:"#1a2440"}`,
+                          cursor:"pointer",padding:0,
+                          boxShadow:selShape.colorIdx===i?`0 0 0 1px ${c.stroke}`:"none",
+                        }}/>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{display:"flex",gap:7}}>
+                    {[["W","w"],["H","h"]].map(([lbl,key])=>(
+                      <div key={key} style={{flex:1}}>
+                        <div style={{fontSize:9,color:"#3a4f70",marginBottom:3}}>{lbl} (px)</div>
+                        <input type="number" min={30} max={400} value={selShape[key]}
+                          onChange={e=>setShapes(ss=>ss.map(s=>s.id===selected?{...s,[key]:Math.max(30,parseInt(e.target.value)||s[key])}:s))}
+                          onBlur={()=>commit(shapesRef.current,connsRef.current)}
+                          style={INP}/>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{fontSize:9,color:"#3a4f70"}}>Node ID in TikZ: <span style={{color:"#4f8ef7"}}>({selShape.id})</span></div>
+                  <Btn danger onClick={()=>{commit(shapes.filter(s=>s.id!==selected),connections.filter(c=>c.from!==selected&&c.to!==selected));setSelected(null);}}>
+                    🗑 Delete Shape
+                  </Btn>
+                </div>
+              ) : selConnection ? (
+                <div style={{display:"flex",flexDirection:"column",gap:9}}>
+                  <div style={{fontSize:10,color:"#4f8ef7"}}>Connection: <span style={{color:"#94a3b8"}}>{selConnection.from} → {selConnection.to}</span></div>
+                  <div>
+                    <div style={{fontSize:9,color:"#3a4f70",marginBottom:3}}>LABEL</div>
+                    <ConnLabelInput selConnection={selConnection} updateConn={updateConn} INP={INP}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:9,color:"#3a4f70",marginBottom:3}}>ARROW STYLE</div>
+                    <select value={selConnection.style} onChange={e=>updateConn({style:e.target.value})}
+                      style={{...INP,cursor:"pointer"}}>
+                      {ARROW_TYPES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}
+                    </select>
+                  </div>
+                  <Btn danger onClick={()=>{commit(shapes,connections.filter(c=>c.id!==selConn));setSelConn(null);}}>
+                    🗑 Delete Connection
+                  </Btn>
+                </div>
+              ) : (
+                <div style={{fontSize:11,color:"#2a3a5a",lineHeight:1.9}}>
+                  Click a shape or arrow to edit.<br/>
+                  Double-click to rename.<br/>
+                  Delete key removes selection.<br/>
+                  Drag corner ■ to resize.
+                </div>
+              )}
+            </div>
+
+            {/* TikZ Code */}
+            <div style={{flex:1,display:"flex",flexDirection:"column",padding:"10px 12px",overflow:"hidden",minHeight:0}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7,flexShrink:0}}>
+                <div style={{fontSize:9,fontWeight:700,color:"#3a4f70",letterSpacing:"1px"}}>TIKZ CODE</div>
+                <button onClick={copyCode} style={{
+                  background:copied?"#14532d":"#1a2d50",
+                  border:`1px solid ${copied?"#16a34a":"#2a4080"}`,
+                  color:copied?"#4ade80":"#7ab8ff",
+                  borderRadius:5,padding:"4px 11px",cursor:"pointer",
+                  fontSize:10,fontFamily:"inherit",fontWeight:700,transition:"all .2s",
+                }}>{copied?"✓ Copied!":"⎘ Copy"}</button>
+              </div>
+              <textarea readOnly value={tikzCode} style={{
+                flex:1,background:"#070c14",border:"1px solid #1a2440",
+                color:"#7dd3fc",borderRadius:6,padding:"10px 12px",
+                fontSize:9.5,fontFamily:"'Fira Code','Cascadia Code','Courier New',monospace",
+                resize:"none",lineHeight:1.65,outline:"none",minHeight:0,
+              }}/>
+              <div style={{fontSize:9,color:"#2a3a5a",marginTop:7,lineHeight:1.7,flexShrink:0}}>
+                Paste into Overleaf. Preamble:<br/>
+                <code style={{color:"#3a5070"}}>\usepackage{"{"} tikz {"}"}</code><br/>
+                <code style={{color:"#3a5070"}}>\usetikzlibrary{"{"} shapes.geometric, shapes.misc, shapes.arrows, shapes.callouts, arrows.meta {"}"}</code>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  React.createElement(TikzBuilder)
+);
+</script>
+</body>
+</html>

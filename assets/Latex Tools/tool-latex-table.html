@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaTeX Table Generator — Sounak Sadhukhan</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
+
+    /* ── Identity strip ── */
+    .id-strip {
+      height: 38px;
+      background: #92400e;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 9999;
+    }
+    .id-back {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+      color: #fef3c7;
+      opacity: .75;
+      text-decoration: none;
+      padding: 3px 10px 3px 7px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 100px;
+      transition: opacity .15s;
+    }
+    .id-back:hover { opacity: 1; text-decoration: none; }
+    .id-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
+    .id-title {
+      font-size: .8rem; font-weight: 700;
+      color: #fef3c7;
+      letter-spacing: .04em;
+    }
+    .id-sub {
+      font-size: .68rem;
+      color: #fef3c7;
+      opacity: .55;
+      margin-left: 2px;
+      letter-spacing: .02em;
+    }
+
+    /* ── Tool fills rest of screen ── */
+    #root {
+      height: calc(100vh - 38px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Identity strip: unique per tool -->
+<div class="id-strip">
+  <a href="blog.html" class="id-back">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+         viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Blog
+  </a>
+  <div class="id-divider"></div>
+  <span class="id-title">LaTeX Table Generator</span>
+  <span class="id-sub">Booktabs · Longtable · Tabularx · Colored · Multirow</span>
+</div>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect, useMemo, useReducer } = React;
+
+/**
+ * LaTeX Table Generator — Full-Featured
+ * Supports: standard, booktabs, longtable, tabularx, multirow/multicolumn,
+ *           math/matrix, threeparttable, tabularray, colored, sideways
+ * Drop into any React project (Vite / Next.js / CRA)
+ * Dependencies: React only
+ */
+
+
+// ─────────────────────────────────────────────
+//  DESIGN TOKENS
+// ─────────────────────────────────────────────
+const C = {
+  bg:       "#0d0d10",
+  surf:     "#141417",
+  surf2:    "#1a1a1f",
+  bdr:      "#252528",
+  bdr2:     "#2e2e33",
+  acc:      "#c8a96e",
+  accG:     "rgba(200,169,110,0.12)",
+  accD:     "#9a7d4f",
+  txt:      "#e4e0d8",
+  muted:    "#6e6a64",
+  dim:      "#9a9590",
+  paper:    "#f8f6f2",
+  paperL:   "#e6e2dc",
+  ink:      "#18160f",
+  inkM:     "#504840",
+  green:    "#6dbf8a",
+  red:      "#e06c75",
+  blue:     "#61afef",
+  purple:   "#c678dd",
+  orange:   "#e5975a",
+  yellow:   "#e5c07b",
+};
+const F = {
+  ui:   "'DM Sans', sans-serif",
+  disp: "'Playfair Display', serif",
+  mono: "'JetBrains Mono', monospace",
+};
+
+// ─────────────────────────────────────────────
+//  TABLE TYPE DEFINITIONS
+// ─────────────────────────────────────────────
+const TABLE_TYPES = [
+  { id: "standard",      label: "Standard",       desc: "Basic tabular — simple tables" },
+  { id: "booktabs",      label: "Booktabs",        desc: "Publication-quality rules" },
+  { id: "longtable",     label: "Long Table",      desc: "Spans multiple pages" },
+  { id: "tabularx",      label: "Tabularx",        desc: "Auto-width columns (X col)" },
+  { id: "tabularray",    label: "Tabularray",      desc: "Modern tblr environment" },
+  { id: "multirow",      label: "Multirow/col",    desc: "Merged cells support" },
+  { id: "math",          label: "Math / Matrix",   desc: "pmatrix, bmatrix, array…" },
+  { id: "threeparttable",label: "Threeparttable",  desc: "Notes below table" },
+  { id: "colored",       label: "Colored",         desc: "Cell & row coloring" },
+  { id: "sideways",      label: "Sideways",        desc: "Landscape / rotated" },
+];
+
+const MATH_ENVS = ["pmatrix","bmatrix","vmatrix","Vmatrix","matrix","array","cases","aligned"];
+const FLOAT_OPTS = [["ht","ht"],["h","h — here"],["t","t — top"],["b","b — bottom"],["H","H — exact (float)"],["htbp","htbp"],["p","p — page"]];
+const ALIGN_OPTS  = ["l","c","r","p{2cm}","m{2cm}","b{2cm}","X","S","@{}l","@{}r"];
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+const mkData = (rows, cols, type) =>
+  Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => {
+      if (type === "math") return r === 0 && c === 0 ? "a_{11}" : `a_{${r+1}${c+1}}`;
+      if (r === 0) return `Header ${c + 1}`;
+      if (r === 1) return c === 0 ? "Row 1" : c === 1 ? "Alpha" : "3.14";
+      if (r === 2) return c === 0 ? "Row 2" : c === 1 ? "Beta" : "2.72";
+      return "";
+    })
+  );
+
+const escTex = (s) => s; // user controls LaTeX content directly
+
+// ─────────────────────────────────────────────
+//  MERGE CELL STATE
+// ─────────────────────────────────────────────
+// merges: { "r,c": { colspan, rowspan, hidden } }
+
+// ─────────────────────────────────────────────
+//  MAIN COMPONENT
+// ─────────────────────────────────────────────
+function LaTeXTableGenerator() {
+  const [tableType,  setTableType]  = useState("booktabs");
+  const [rows,       setRows]       = useState(4);
+  const [cols,       setCols]       = useState(3);
+  const [data,       setData]       = useState(() => mkData(4, 3, "booktabs"));
+  const [aligns,     setAligns]     = useState(["l","c","r"]);
+  const [colWidths,  setColWidths]  = useState(["","",""]);
+  const [caption,    setCaption]    = useState("Experimental Results");
+  const [label,      setLabel]      = useState("tab:results");
+  const [landscape,  setLandscape]  = useState(false);
+  const [floatPos,   setFloatPos]   = useState("ht");
+  const [mathEnv,    setMathEnv]    = useState("pmatrix");
+  const [merges,     setMerges]     = useState({});
+  const [mergeMode,  setMergeMode]  = useState(false);
+  const [mergeStart, setMergeStart] = useState(null);
+  const [notes,      setNotes]      = useState(["a. First note.", "b. Second note."]);
+  const [tblrStyle,  setTblrStyle]  = useState("hlines,vlines");
+  const [cellColors, setCellColors] = useState({});
+  const [rowColors,  setRowColors]  = useState({});
+  const [colorInput, setColorInput] = useState("blue!20");
+  const [activeTab,  setActiveTab]  = useState("preview");
+  const [copied,     setCopied]     = useState(false);
+  const [opts, setOpts] = useState({
+    booktabs: true, header: true, vlines: false, hlines: false,
+    centering: true, resize: true, rowcolors: false,
+    captionTop: false, longHead: false, longFoot: false,
+    boldHeader: true, mathMode: false, tableWidth: "\\textwidth",
+  });
+
+  const toggleOpt = (k) => setOpts(o => ({ ...o, [k]: !o[k] }));
+
+  // ── Data helpers ──
+  const setCell = useCallback((r, c, v) => {
+    setData(prev => { const n = prev.map(row => [...row]); n[r][c] = v; return n; });
+  }, []);
+
+  const setAlign = (c, v) => setAligns(prev => { const n=[...prev]; n[c]=v; return n; });
+  const setColW  = (c, v) => setColWidths(prev => { const n=[...prev]; n[c]=v; return n; });
+
+  const resizeGrid = (newRows, newCols) => {
+    setRows(newRows); setCols(newCols);
+    setData(prev => Array.from({ length: newRows }, (_, r) =>
+      Array.from({ length: newCols }, (_, c) => (prev[r] && prev[r][c] != null ? prev[r][c] : ""))
+    ));
+    setAligns(prev => Array.from({ length: newCols }, (_, c) => prev[c] || "c"));
+    setColWidths(prev => Array.from({ length: newCols }, (_, c) => prev[c] || ""));
+    setMerges({});
+  };
+
+  const addCol    = () => resizeGrid(rows, cols + 1);
+  const removeCol = () => { if (cols > 1) resizeGrid(rows, cols - 1); };
+  const addRow    = () => resizeGrid(rows + 1, cols);
+  const removeRow = () => { if (rows > 1) resizeGrid(rows - 1, cols); };
+
+  // ── Merge helpers ──
+  const handleCellClick = (r, c) => {
+    if (!mergeMode) return;
+    if (!mergeStart) { setMergeStart([r, c]); return; }
+    const [sr, sc] = mergeStart;
+    if (sr === r && sc === c) { setMergeStart(null); return; }
+    const r1 = Math.min(sr, r), r2 = Math.max(sr, r);
+    const c1 = Math.min(sc, c), c2 = Math.max(sc, c);
+    const colspan = c2 - c1 + 1, rowspan = r2 - r1 + 1;
+    const newMerges = { ...merges };
+    for (let rr = r1; rr <= r2; rr++)
+      for (let cc = c1; cc <= c2; cc++) {
+        if (rr === r1 && cc === c1) newMerges[`${rr},${cc}`] = { colspan, rowspan, hidden: false };
+        else newMerges[`${rr},${cc}`] = { colspan: 1, rowspan: 1, hidden: true };
+      }
+    setMerges(newMerges);
+    setMergeStart(null);
+  };
+
+  const clearMerges = () => setMerges({});
+
+  const setCellColor = (r, c) => {
+    const key = `${r},${c}`;
+    setCellColors(prev => ({ ...prev, [key]: colorInput }));
+  };
+  const setRowColor = (r) => {
+    setRowColors(prev => ({ ...prev, [r]: colorInput }));
+  };
+
+  // ── LaTeX generation ──
+  const generateLatex = () => {
+    switch (tableType) {
+      case "math":          return genMath();
+      case "longtable":     return genLongtable();
+      case "tabularx":      return genTabularx();
+      case "tabularray":    return genTabularray();
+      case "multirow":      return genMultirow();
+      case "threeparttable":return genThreeparttable();
+      case "colored":       return genColored();
+      case "sideways":      return genSideways();
+      case "standard":      return genStandard(false);
+      case "booktabs":
+      default:              return genStandard(true);
+    }
+  };
+
+  // shared tabular body builder
+  const buildTabularBody = (useBooktabs, useHlines, useVlines, boldHdr, altRow) => {
+    const lines = [];
+    for (let r = 0; r < rows; r++) {
+      const isHdr = r === 0 && opts.header;
+      const rowParts = [];
+      let c = 0;
+      while (c < cols) {
+        const key = `${r},${c}`;
+        const m = merges[key];
+        if (m && m.hidden) { c++; continue; }
+        let cell = (data[r] && data[r][c] != null ? data[r][c] : "");
+        if (isHdr && boldHdr && tableType !== "math") cell = `\\textbf{${cell}}`;
+        if (m && (m.colspan > 1 || m.rowspan > 1)) {
+          const align = aligns[c] || "c";
+          if (m.colspan > 1 && m.rowspan > 1) {
+            cell = `\\multicolumn{${m.colspan}}{${align}}{\\multirow{${m.rowspan}}{*}{${cell}}}`;
+          } else if (m.colspan > 1) {
+            cell = `\\multicolumn{${m.colspan}}{${align}}{${cell}}`;
+          } else {
+            cell = `\\multirow{${m.rowspan}}{*}{${cell}}`;
+          }
+        }
+        rowParts.push(cell);
+        c += (m && m.colspan > 1) ? m.colspan : 1;
+      }
+      // row color
+      const rCol = rowColors[r];
+      if (altRow && r % 2 === 0 && !isHdr) lines.push(`    \\rowcolor{gray!12}`);
+      else if (rCol) lines.push(`    \\rowcolor{${rCol}}`);
+      // cell colors
+      const cColParts = rowParts.map((cell, ci) => {
+        const ckey = `${r},${ci}`;
+        if (cellColors[ckey]) return `\\cellcolor{${cellColors[ckey]}}${cell}`;
+        return cell;
+      });
+      lines.push(`    ${cColParts.join(" & ")} \\\\`);
+      if (r === 0 && opts.header) {
+        if (useBooktabs) lines.push("    \\midrule");
+        else if (useHlines) lines.push("    \\hline");
+      }
+    }
+    return lines;
+  };
+
+  const buildColSpec = (useVlines, customAligns) => {
+    const a = customAligns || aligns;
+    if (useVlines) return "|" + a.map(x => x + "|").join("");
+    return a.join(" ");
+  };
+
+  const pkgComment = (...pkgs) => pkgs.map(p => `% \\usepackage{${p}}`);
+
+  // ── STANDARD ──
+  const genStandard = (booktabs) => {
+    const env = "table";
+    const L = [...pkgComment(...(booktabs ? ["booktabs"] : []), ...(opts.resize ? ["graphicx"] : []), ...(opts.rowcolors ? ["xcolor"] : [])), ""];
+    if (opts.rowcolors) L.push("\\rowcolors{2}{gray!12}{white}");
+    L.push(`\\begin{${env}}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    if (opts.resize) L.push(`  \\resizebox{${opts.tableWidth}}{!}{%`);
+    L.push(`  \\begin{tabular}{${buildColSpec(opts.vlines)}}`);
+    if (booktabs) L.push("    \\toprule");
+    else if (opts.hlines) L.push("    \\hline");
+    L.push(...buildTabularBody(booktabs, opts.hlines, opts.vlines, opts.boldHeader, opts.rowcolors));
+    if (booktabs) L.push("    \\bottomrule");
+    else if (opts.hlines) L.push("    \\hline");
+    L.push("  \\end{tabular}");
+    if (opts.resize) L.push("  }%");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push(`\\end{${env}}`);
+    return L.join("\n");
+  };
+
+  // ── LONGTABLE ──
+  const genLongtable = () => {
+    const L = [...pkgComment("longtable", "booktabs"), ""];
+    L.push(`\\begin{longtable}{${buildColSpec(opts.vlines)}}`);
+    if (opts.captionTop) L.push(`  \\caption{${caption}} \\label{${label}} \\\\`);
+    L.push("  \\toprule");
+    if (opts.header && data[0]) {
+      const hdr = data[0].map((c, i) => opts.boldHeader ? `\\textbf{${c||""}}` : (c||"")).join(" & ");
+      L.push(`  ${hdr} \\\\`);
+    }
+    L.push("  \\midrule");
+    L.push("  \\endfirsthead");
+    if (opts.longHead) {
+      L.push(`  \\multicolumn{${cols}}{c}{\\tablename\\ \\thetable{} -- continued} \\\\`);
+      L.push("  \\toprule");
+      if (opts.header && data[0]) {
+        const hdr = data[0].map((c, i) => opts.boldHeader ? `\\textbf{${c||""}}` : (c||"")).join(" & ");
+        L.push(`  ${hdr} \\\\`);
+      }
+      L.push("  \\midrule");
+      L.push("  \\endhead");
+    }
+    if (opts.longFoot) {
+      L.push("  \\midrule");
+      L.push(`  \\multicolumn{${cols}}{r}{\\textit{continued on next page}} \\\\`);
+      L.push("  \\endfoot");
+    }
+    L.push("  \\bottomrule");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}} \\label{${label}} \\\\`);
+    L.push("  \\endlastfoot");
+    for (let r = (opts.header ? 1 : 0); r < rows; r++) {
+      const cells = (data[r] || []).map(c => c || "").join(" & ");
+      L.push(`  ${cells} \\\\`);
+    }
+    L.push("\\end{longtable}");
+    return L.join("\n");
+  };
+
+  // ── TABULARX ──
+  const genTabularx = () => {
+    const a = aligns.map(x => x === "l" || x === "c" || x === "r" ? x : "X");
+    const L = [...pkgComment("tabularx", "booktabs"), ""];
+    L.push(`\\begin{table}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push(`  \\begin{tabularx}{${opts.tableWidth}}{${buildColSpec(opts.vlines, a)}}`);
+    L.push("    \\toprule");
+    L.push(...buildTabularBody(true, false, opts.vlines, opts.boldHeader, false));
+    L.push("    \\bottomrule");
+    L.push("  \\end{tabularx}");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push("\\end{table}");
+    return L.join("\n");
+  };
+
+  // ── TABULARRAY ──
+  const genTabularray = () => {
+    const L = [...pkgComment("tabularray"), ""];
+    L.push(`\\begin{table}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    const spec = aligns.join(", ");
+    L.push(`  \\begin{tblr}{${tblrStyle}, colspec={${spec}}}`);
+    for (let r = 0; r < rows; r++) {
+      const cells = (data[r] || []).map(c => c || "").join(" & ");
+      L.push(`    ${cells} \\\\`);
+    }
+    L.push("  \\end{tblr}");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push("\\end{table}");
+    return L.join("\n");
+  };
+
+  // ── MULTIROW ──
+  const genMultirow = () => {
+    const L = [...pkgComment("multirow", "booktabs"), ""];
+    L.push(`\\begin{table}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push(`  \\begin{tabular}{${buildColSpec(opts.vlines)}}`);
+    L.push("    \\toprule");
+    L.push(...buildTabularBody(true, false, opts.vlines, opts.boldHeader, false));
+    L.push("    \\bottomrule");
+    L.push("  \\end{tabular}");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push("\\end{table}");
+    return L.join("\n");
+  };
+
+  // ── MATH / MATRIX ──
+  const genMath = () => {
+    const L = [];
+    if (mathEnv === "array") {
+      const spec = aligns.join("");
+      L.push("\\[");
+      L.push(`  \\begin{array}{${spec}}`);
+      for (let r = 0; r < rows; r++) {
+        const cells = (data[r] || []).map(c => c || "0").join(" & ");
+        L.push(`    ${cells} \\\\`);
+      }
+      L.push("  \\end{array}");
+      L.push("\\]");
+    } else if (mathEnv === "cases") {
+      L.push("\\[");
+      L.push("  f(x) = \\begin{cases}");
+      for (let r = 0; r < rows; r++) {
+        const row = data[r] || [];
+        const val = row[0] || "0";
+        const cond = row[1] || "";
+        L.push(`    ${val} & ${cond} \\\\`);
+      }
+      L.push("  \\end{cases}");
+      L.push("\\]");
+    } else if (mathEnv === "aligned") {
+      L.push("\\begin{equation}");
+      L.push("  \\begin{aligned}");
+      for (let r = 0; r < rows; r++) {
+        const row = data[r] || [];
+        const lhs = row[0] || "";
+        const rhs = row[1] || "";
+        L.push(`    ${lhs} &= ${rhs} \\\\`);
+      }
+      L.push("  \\end{aligned}");
+      L.push("\\end{equation}");
+    } else {
+      L.push("\\[");
+      L.push(`  \\begin{${mathEnv}}`);
+      for (let r = 0; r < rows; r++) {
+        const cells = (data[r] || []).map(c => c || "0").join(" & ");
+        L.push(`    ${cells} \\\\`);
+      }
+      L.push(`  \\end{${mathEnv}}`);
+      L.push("\\]");
+    }
+    return L.join("\n");
+  };
+
+  // ── THREEPARTTABLE ──
+  const genThreeparttable = () => {
+    const L = [...pkgComment("threeparttable", "booktabs"), ""];
+    L.push(`\\begin{table}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    L.push(`  \\caption{${caption}}`);
+    L.push(`  \\label{${label}}`);
+    L.push("  \\begin{threeparttable}");
+    L.push(`    \\begin{tabular}{${buildColSpec(opts.vlines)}}`);
+    L.push("      \\toprule");
+    L.push(...buildTabularBody(true, false, opts.vlines, opts.boldHeader, false).map(l => "  " + l));
+    L.push("      \\bottomrule");
+    L.push("    \\end{tabular}");
+    L.push("    \\begin{tablenotes}");
+    L.push("      \\small");
+    notes.filter(Boolean).forEach(n => L.push(`      \\item ${n}`));
+    L.push("    \\end{tablenotes}");
+    L.push("  \\end{threeparttable}");
+    L.push("\\end{table}");
+    return L.join("\n");
+  };
+
+  // ── COLORED ──
+  const genColored = () => {
+    const L = [...pkgComment("xcolor", "colortbl", "booktabs"), ""];
+    if (opts.rowcolors) L.push("\\rowcolors{2}{gray!12}{white}");
+    L.push(`\\begin{table}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    if (opts.resize) L.push(`  \\resizebox{${opts.tableWidth}}{!}{%`);
+    L.push(`  \\begin{tabular}{${buildColSpec(opts.vlines)}}`);
+    L.push("    \\toprule");
+    L.push(...buildTabularBody(true, false, opts.vlines, opts.boldHeader, opts.rowcolors));
+    L.push("    \\bottomrule");
+    L.push("  \\end{tabular}");
+    if (opts.resize) L.push("  }%");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push("\\end{table}");
+    return L.join("\n");
+  };
+
+  // ── SIDEWAYS ──
+  const genSideways = () => {
+    const L = [...pkgComment("rotating", "booktabs", ...(opts.resize ? ["graphicx"] : [])), ""];
+    L.push(`\\begin{sidewaystable}[${floatPos}]`);
+    if (opts.centering) L.push("  \\centering");
+    if (opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    if (opts.resize) L.push(`  \\resizebox{${opts.tableWidth}}{!}{%`);
+    L.push(`  \\begin{tabular}{${buildColSpec(opts.vlines)}}`);
+    L.push("    \\toprule");
+    L.push(...buildTabularBody(true, false, opts.vlines, opts.boldHeader, false));
+    L.push("    \\bottomrule");
+    L.push("  \\end{tabular}");
+    if (opts.resize) L.push("  }%");
+    if (!opts.captionTop) L.push(`  \\caption{${caption}}`, `  \\label{${label}}`);
+    L.push("\\end{sidewaystable}");
+    return L.join("\n");
+  };
+
+  const latex = generateLatex();
+
+  const copyLatex = () => {
+    navigator.clipboard.writeText(latex).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  // ─────────────────────────────────────────────
+  //  RENDER
+  // ─────────────────────────────────────────────
+  return (
+    <div style={{ fontFamily: F.ui, background: C.bg, minHeight: "100vh", color: C.txt, display: "flex", flexDirection: "column" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+      {/* ── Top bar ── */}
+      <div style={{ borderBottom: `0.5px solid ${C.bdr}`, padding: "13px 22px", display: "flex", alignItems: "center", gap: 14, background: C.surf, flexShrink: 0 }}>
+        <Logo />
+        <div>
+          <div style={{ fontFamily: F.disp, fontSize: 16, fontWeight: 500, letterSpacing: "-0.02em" }}>LaTeX Table Generator</div>
+          <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>All table types · A4 preview · Live LaTeX</div>
+        </div>
+        <div style={{ flex: 1 }} />
+        <div style={{ fontSize: 11, color: C.muted }}>{rows} × {cols} · {TABLE_TYPES.find(t => t.id === tableType)?.label}</div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "330px 1fr", flex: 1, overflow: "hidden" }}>
+
+        {/* ══════════════ LEFT PANEL ══════════════ */}
+        <div style={{ borderRight: `0.5px solid ${C.bdr}`, overflowY: "auto", background: C.surf }}>
+
+          {/* Table Type Picker */}
+          <Sec title="Table Type">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
+              {TABLE_TYPES.map(t => (
+                <button key={t.id} onClick={() => {
+                  setTableType(t.id);
+                  setData(mkData(rows, cols, t.id));
+                  setMerges({});
+                }}
+                  title={t.desc}
+                  style={{ padding: "6px 8px", borderRadius: 7, border: `0.5px solid ${tableType === t.id ? C.acc : C.bdr}`,
+                    background: tableType === t.id ? C.accG : "transparent",
+                    color: tableType === t.id ? C.acc : C.dim,
+                    fontSize: 11, cursor: "pointer", fontFamily: F.ui, textAlign: "left", lineHeight: 1.3 }}>
+                  <div style={{ fontWeight: 500 }}>{t.label}</div>
+                  <div style={{ fontSize: 9, opacity: 0.7, marginTop: 1 }}>{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          </Sec>
+
+          {/* Table Settings */}
+          <Sec title="Settings">
+            {tableType !== "math" && (
+              <>
+                <Row label="Caption"><Inp value={caption} onChange={setCaption} /></Row>
+                <Row label="Label"><Inp value={label} onChange={setLabel} mono /></Row>
+                <Row label="Float"><Sel value={floatPos} onChange={setFloatPos} opts={FLOAT_OPTS} /></Row>
+                <Row label="Width"><Inp value={opts.tableWidth} onChange={v => setOpts(o=>({...o,tableWidth:v}))} mono /></Row>
+              </>
+            )}
+            {tableType === "math" && (
+              <Row label="Env"><Sel value={mathEnv} onChange={setMathEnv} opts={MATH_ENVS.map(e=>[e,e])} /></Row>
+            )}
+            {tableType === "tabularray" && (
+              <Row label="tblr opts"><Inp value={tblrStyle} onChange={setTblrStyle} mono /></Row>
+            )}
+            {tableType === "longtable" && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
+                <Tog active={opts.longHead} onClick={() => toggleOpt("longHead")}>repeat header</Tog>
+                <Tog active={opts.longFoot} onClick={() => toggleOpt("longFoot")}>continue footer</Tog>
+              </div>
+            )}
+          </Sec>
+
+          {/* Style Toggles */}
+          {tableType !== "math" && (
+            <Sec title="Style Options">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {[
+                  ["header","header row"],
+                  ["boldHeader","bold header"],
+                  ["vlines","vertical lines"],
+                  ["hlines","horiz. lines"],
+                  ["centering","\\centering"],
+                  ["resize","resizebox"],
+                  ["rowcolors","alt. row colors"],
+                  ["captionTop","caption top"],
+                ].map(([k, lbl]) => (
+                  <Tog key={k} active={opts[k]} onClick={() => toggleOpt(k)}>{lbl}</Tog>
+                ))}
+              </div>
+            </Sec>
+          )}
+
+          {/* Column Controls */}
+          <Sec title="Columns & Rows">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
+              {aligns.map((a, c) => (
+                <div key={c} style={{ background: C.bg, border: `0.5px solid ${C.bdr}`, borderRadius: 8, padding: "3px 7px", display: "flex", alignItems: "center", gap: 3 }}>
+                  <span style={{ fontSize: 10, color: C.muted, marginRight: 2 }}>C{c+1}</span>
+                  {["l","c","r","X","p"].map(v => (
+                    <button key={v} onClick={() => setAlign(c, v === "p" ? "p{2cm}" : v)}
+                      style={{ fontSize: 10, padding: "1px 5px", borderRadius: 4, border: "none", cursor: "pointer", fontFamily: F.mono,
+                        background: (a === v || (v === "p" && a.startsWith("p"))) ? C.acc : "transparent",
+                        color: (a === v || (v === "p" && a.startsWith("p"))) ? C.bg : C.muted, fontWeight: 500 }}>
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+              {[["+ col",addCol],["− col",removeCol],["+ row",addRow],["− row",removeRow]].map(([lbl,fn]) => (
+                <button key={lbl} onClick={fn} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui }}>{lbl}</button>
+              ))}
+              <span style={{ fontSize: 11, color: C.muted, padding: "3px 0" }}>{rows}×{cols}</span>
+            </div>
+          </Sec>
+
+          {/* Merge Cells */}
+          {(tableType === "multirow" || tableType === "booktabs" || tableType === "standard" || tableType === "colored") && (
+            <Sec title="Cell Merging">
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                <Tog active={mergeMode} onClick={() => { setMergeMode(m => !m); setMergeStart(null); }}>
+                  {mergeMode ? (mergeStart ? "→ click second cell" : "click first cell") : "merge mode"}
+                </Tog>
+                <button onClick={clearMerges} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui }}>clear all</button>
+              </div>
+              {mergeMode && <div style={{ fontSize: 10, color: C.muted, marginTop: 6 }}>Click two cells to merge the rectangular region.</div>}
+            </Sec>
+          )}
+
+          {/* Cell Coloring */}
+          {tableType === "colored" && (
+            <Sec title="Cell Coloring">
+              <Row label="Color">
+                <Inp value={colorInput} onChange={setColorInput} mono placeholder="blue!20" />
+              </Row>
+              <div style={{ fontSize: 10, color: C.muted, margin: "4px 0 6px" }}>Click a cell in the grid to apply color. Use LaTeX color names: red!30, blue!20, green!15, yellow!25, gray!10, etc.</div>
+              <button onClick={() => setCellColors({})} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui, marginRight: 6 }}>clear cell colors</button>
+              <button onClick={() => setRowColors({})} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui }}>clear row colors</button>
+            </Sec>
+          )}
+
+          {/* Table Notes */}
+          {tableType === "threeparttable" && (
+            <Sec title="Table Notes">
+              {notes.map((n, i) => (
+                <div key={i} style={{ display: "flex", gap: 5, marginBottom: 5 }}>
+                  <Inp value={n} onChange={v => setNotes(prev => { const nx=[...prev]; nx[i]=v; return nx; })} placeholder={`Note ${i+1}`} />
+                  <button onClick={() => setNotes(prev => prev.filter((_,j) => j!==i))} style={{ fontSize: 11, padding: "3px 7px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.red, cursor: "pointer" }}>✕</button>
+                </div>
+              ))}
+              <button onClick={() => setNotes(prev => [...prev, ""])} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui }}>+ add note</button>
+            </Sec>
+          )}
+
+          {/* Data Grid */}
+          <Sec title="Table Data">
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ borderCollapse: "collapse", fontSize: 11, width: "100%" }}>
+                <thead>
+                  <tr>
+                    <th style={{ width: 20, fontSize: 9, color: C.muted, padding: "2px 4px", fontWeight: 400 }}>#</th>
+                    {Array.from({ length: cols }, (_, c) => (
+                      <th key={c} style={{ fontSize: 9, color: C.muted, padding: "2px 4px", fontWeight: 400, textAlign: "left" }}>
+                        {aligns[c] || "c"}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: rows }, (_, r) => (
+                    <tr key={r}>
+                      <td style={{ textAlign: "center", fontSize: 9, color: C.muted, padding: "1px 4px" }}>{r === 0 && opts.header ? "H" : r}</td>
+                      {Array.from({ length: cols }, (_, c) => {
+                        const key = `${r},${c}`;
+                        const mg = merges[key];
+                        const isHidden = mg && mg.hidden;
+                        const isMergeHead = mg && !mg.hidden && (mg.colspan > 1 || mg.rowspan > 1);
+                        const cColor = cellColors[key];
+                        const rColor = rowColors[r];
+                        const isSelected = mergeStart && mergeStart[0] === r && mergeStart[1] === c;
+                        return (
+                          <td key={c} style={{ padding: 1 }}
+                            onClick={() => {
+                              if (mergeMode) { handleCellClick(r, c); return; }
+                              if (tableType === "colored") setCellColor(r, c);
+                            }}>
+                            {isHidden ? (
+                              <div style={{ width: "100%", minWidth: 44, height: 26, background: `${C.acc}22`, borderRadius: 4, border: `0.5px dashed ${C.accD}` }} />
+                            ) : (
+                              <input
+                                value={(data[r] && data[r][c] != null ? data[r][c] : "")}
+                                onChange={e => setCell(r, c, e.target.value)}
+                                style={{ width: "100%", minWidth: 50, padding: "3px 5px", fontSize: 11,
+                                  background: isSelected ? C.accG : cColor ? `${C.acc}18` : rColor ? `${C.blue}12` : r === 0 && opts.header ? `${C.acc}10` : C.bg,
+                                  border: `0.5px solid ${isSelected ? C.acc : isMergeHead ? C.purple : C.bdr}`,
+                                  borderRadius: 4, color: C.txt, fontFamily: tableType === "math" ? F.mono : F.ui,
+                                  fontWeight: r === 0 && opts.header ? 500 : 400, outline: "none",
+                                  cursor: mergeMode || tableType === "colored" ? "pointer" : "text" }}
+                              />
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {tableType === "colored" && (
+                <div style={{ marginTop: 8, display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {Array.from({ length: rows }, (_, r) => (
+                    <button key={r} onClick={() => setRowColor(r)}
+                      style={{ fontSize: 10, padding: "2px 7px", borderRadius: 5, border: `0.5px solid ${C.bdr}`, background: "transparent", color: C.dim, cursor: "pointer", fontFamily: F.ui }}>
+                      color row {r}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Sec>
+
+        </div>
+
+        {/* ══════════════ RIGHT PANEL ══════════════ */}
+        <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ display: "flex", borderBottom: `0.5px solid ${C.bdr}`, padding: "0 20px", background: C.surf, flexShrink: 0 }}>
+            {[["preview","A4 Preview"],["code","LaTeX Code"]].map(([id,lbl]) => (
+              <button key={id} onClick={() => setActiveTab(id)}
+                style={{ padding: "11px 15px", fontSize: 12, border: "none", background: "transparent", cursor: "pointer", fontFamily: F.ui,
+                  color: activeTab === id ? C.acc : C.muted,
+                  borderBottom: `2px solid ${activeTab === id ? C.acc : "transparent"}`, marginBottom: -1 }}>
+                {lbl}
+              </button>
+            ))}
+            <div style={{ flex: 1 }} />
+            <button onClick={copyLatex}
+              style={{ margin: "7px 0", padding: "4px 13px", fontSize: 11, borderRadius: 6,
+                border: `0.5px solid ${copied ? C.green : C.bdr}`,
+                background: copied ? `${C.green}15` : "transparent",
+                color: copied ? C.green : C.dim, cursor: "pointer", fontFamily: F.ui }}>
+              {copied ? "✓ Copied" : "Copy LaTeX"}
+            </button>
+          </div>
+
+          <div style={{ flex: 1, overflow: "auto", padding: 24, display: "flex", justifyContent: "center", background: C.bg }}>
+            {activeTab === "preview" && (
+              <A4Preview
+                data={data} rows={rows} cols={cols} aligns={aligns}
+                opts={opts} merges={merges} cellColors={cellColors} rowColors={rowColors}
+                caption={caption} label={label} landscape={landscape || tableType === "sideways"}
+                tableType={tableType} mathEnv={mathEnv} notes={notes}
+              />
+            )}
+            {activeTab === "code" && (
+              <div style={{ width: "100%", maxWidth: 740 }}>
+                <pre style={{ fontFamily: F.mono, fontSize: 12, lineHeight: 1.75, color: "#c9c0b0",
+                  background: C.surf, padding: 24, borderRadius: 10, border: `0.5px solid ${C.bdr}`,
+                  overflowX: "auto", whiteSpace: "pre", margin: 0 }}>
+                  <ColorizedLatex code={latex} />
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+//  A4 PREVIEW
+// ─────────────────────────────────────────────
+function A4Preview({ data, rows, cols, aligns, opts, merges, cellColors, rowColors, caption, label, landscape, tableType, mathEnv, notes }) {
+  const pw = landscape ? 842 : 595;
+  const ph = landscape ? 595 : 842;
+  const MG = 55;
+  const contentW = pw - MG * 2;
+
+  const cellPH = 9, cellPV = 6, fs = 10.5;
+  const rowH = fs * 1.5 + cellPV * 2;
+  const colW = Math.floor(contentW / cols);
+  const tableW = colW * cols;
+  const tableX = MG + (contentW - tableW) / 2;
+  const captionY = MG + 58;
+  const tableY = captionY + 24;
+
+  const textAlignOf = (a) => a === "c" ? "center" : a.startsWith("r") ? "right" : "left";
+
+  const isMath = tableType === "math";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+      <div style={{ fontSize: 10, color: C.muted, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+        A4 · {landscape ? "Landscape" : "Portrait"} · 210 × 297 mm · {TABLE_TYPES.find(t=>t.id===tableType)?.label}
+      </div>
+
+      <div style={{ width: pw, height: ph, background: C.paper, boxShadow: "0 8px 48px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3)", borderRadius: 3, position: "relative", overflow: "hidden", flexShrink: 0 }}>
+        {/* margin guide */}
+        <div style={{ position: "absolute", top: MG, left: MG, right: MG, bottom: MG, border: `0.5px dashed ${C.paperL}`, pointerEvents: "none" }} />
+        {/* page number */}
+        <div style={{ position: "absolute", bottom: 22, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#bbb", fontFamily: F.ui }}>1</div>
+
+        {/* Math preview */}
+        {isMath && (
+          <div style={{ position: "absolute", top: tableY, left: MG, right: MG, textAlign: "center" }}>
+            <div style={{ fontFamily: "'Times New Roman', serif", fontSize: fs + 1, color: C.ink }}>
+              <span style={{ fontSize: fs - 1, color: C.inkM }}>
+                [{mathEnv} — {rows}×{cols} matrix]
+              </span>
+              <div style={{ marginTop: 8, display: "inline-block", border: `1.5px solid ${C.ink}`, borderLeft: "2.5px solid", borderRight: "2.5px solid", padding: "4px 12px" }}>
+                <table style={{ borderCollapse: "collapse" }}>
+                  {Array.from({ length: rows }, (_, r) => (
+                    <tr key={r}>
+                      {Array.from({ length: cols }, (_, c) => (
+                        <td key={c} style={{ padding: "2px 10px", fontFamily: "'Times New Roman', serif", fontSize: fs, fontStyle: "italic", color: C.ink, textAlign: "center" }}>
+                          {(data[r] && data[r][c]) || "0"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Standard table preview */}
+        {!isMath && (
+          <>
+            {/* Caption */}
+            <div style={{ position: "absolute", top: captionY, left: MG, right: MG, textAlign: opts.captionTop ? "left" : "center" }}>
+              <span style={{ fontSize: 9.5, fontFamily: F.ui, color: C.inkM }}>
+                Table {label ? label.replace(/^tab:/, "") : "1"}: {caption || "My Table"}
+              </span>
+            </div>
+
+            {/* Table */}
+            <div style={{ position: "absolute", top: tableY, left: tableX, width: tableW }}>
+              {/* Top rule */}
+              {opts.booktabs || tableType === "booktabs" || tableType === "longtable" || tableType === "tabularx" || tableType === "tabularray" || tableType === "multirow" || tableType === "threeparttable" || tableType === "colored" || tableType === "sideways"
+                ? <div style={{ height: 1.5, background: C.ink }} />
+                : opts.hlines ? <div style={{ height: 0.5, background: "#999" }} /> : null
+              }
+              {tableType === "tabularray" && tblrStyleHasHlines(opts) && <div style={{ height: 0.5, background: "#999" }} />}
+
+              {Array.from({ length: rows }, (_, r) => {
+                const isHdr = r === 0 && opts.header;
+                const isAlt = opts.rowcolors && !isHdr && r % 2 === 0;
+                const rBg = rowColors[r] ? previewColorBg(rowColors[r]) : isAlt ? "#ede9e2" : "transparent";
+                return (
+                  <div key={r}>
+                    <div style={{ display: "flex", background: rBg }}>
+                      {Array.from({ length: cols }, (_, c) => {
+                        const key = `${r},${c}`;
+                        const mg = merges[key];
+                        if (mg && mg.hidden) return null;
+                        const cBg = cellColors[key] ? previewColorBg(cellColors[key]) : "transparent";
+                        const span = mg ? mg.colspan : 1;
+                        return (
+                          <div key={c} style={{
+                            width: colW * span, padding: `${cellPV}px ${cellPH}px`,
+                            textAlign: textAlignOf(aligns[c] || "l"),
+                            fontWeight: isHdr ? 700 : 400,
+                            fontSize: isHdr ? fs : fs - 0.5,
+                            borderLeft: opts.vlines && c > 0 ? "0.5px solid #ccc" : "none",
+                            borderRight: opts.vlines && c === cols - 1 ? "0.5px solid #ccc" : "none",
+                            background: cBg,
+                            fontFamily: "'Times New Roman', Times, serif",
+                            color: C.ink, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis",
+                          }}>
+                            {(data[r] && data[r][c]) || ""}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* header rule */}
+                    {isHdr && (opts.booktabs || tableType !== "standard")
+                      ? <div style={{ height: 0.75, background: C.ink }} />
+                      : isHdr && opts.hlines ? <div style={{ height: 0.5, background: "#999" }} /> : null
+                    }
+                    {/* row hlines */}
+                    {!isHdr && opts.hlines && tableType === "standard"
+                      ? <div style={{ height: 0.5, background: "#ddd" }} /> : null
+                    }
+                  </div>
+                );
+              })}
+
+              {/* Bottom rule */}
+              {opts.booktabs || tableType !== "standard"
+                ? <div style={{ height: 1.5, background: C.ink }} />
+                : opts.hlines ? <div style={{ height: 0.5, background: "#999" }} /> : null
+              }
+
+              {/* Threeparttable notes */}
+              {tableType === "threeparttable" && notes.filter(Boolean).length > 0 && (
+                <div style={{ marginTop: 6, borderTop: "0.5px solid #ccc", paddingTop: 4 }}>
+                  {notes.filter(Boolean).map((n, i) => (
+                    <div key={i} style={{ fontSize: 8, color: C.inkM, fontFamily: "'Times New Roman', serif", lineHeight: 1.4 }}>{n}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function tblrStyleHasHlines(opts) { return false; }
+
+function previewColorBg(latexColor) {
+  const map = {
+    "red!30":"#fcc","red!20":"#fdd","red!15":"#fee",
+    "blue!20":"#cce","blue!30":"#bbf","blue!15":"#ddf",
+    "green!20":"#cfc","green!15":"#dfd","green!30":"#afa",
+    "yellow!25":"#ffe8a0","yellow!20":"#ffecb3",
+    "gray!10":"#eee","gray!12":"#e8e8e8","gray!15":"#e4e4e4","gray!20":"#ddd",
+    "orange!20":"#ffe0c0","pink!20":"#ffd0e0","purple!15":"#e8d0f0",
+    "cyan!15":"#d0f0f0","teal!15":"#d0ece8",
+  };
+  const lower = latexColor.toLowerCase();
+  if (map[lower]) return map[lower];
+  // fallback: try to parse simple xcolor
+  const m = lower.match(/^([a-z]+)!(\d+)$/);
+  if (m) {
+    const pct = parseInt(m[2]) / 100;
+    const base = { red:[255,100,100], blue:[100,100,255], green:[100,200,100], yellow:[255,220,100], gray:[180,180,180], orange:[255,160,80], pink:[255,160,200], purple:[160,100,240], cyan:[100,220,220] };
+    const rgb = base[m[1]];
+    if (rgb) {
+      const r = Math.round(255 - (255 - rgb[0]) * pct);
+      const g = Math.round(255 - (255 - rgb[1]) * pct);
+      const b = Math.round(255 - (255 - rgb[2]) * pct);
+      return `rgb(${r},${g},${b})`;
+    }
+  }
+  return "#fff8e1";
+}
+
+// ─────────────────────────────────────────────
+//  SYNTAX HIGHLIGHTER
+// ─────────────────────────────────────────────
+function ColorizedLatex({ code }) {
+  const lines = code.split("\n");
+  return lines.map((line, i) => {
+    if (line.trim().startsWith("%")) return <span key={i} style={{ color: C.green }}>{line}{"\n"}</span>;
+    const parts = [];
+    const re = /(\\[a-zA-Z@]+\*?|\{[^{}]*\}|&|\\\\|\[\d*[htbpH]+\*?\])/g;
+    let last = 0, m;
+    while ((m = re.exec(line)) !== null) {
+      if (m.index > last) parts.push(<span key={last}>{line.slice(last, m.index)}</span>);
+      const t = m[0];
+      let col = C.txt;
+      if (t.startsWith("\\")) col = C.purple;
+      else if (t.startsWith("{")) col = C.orange;
+      else if (t === "&") col = C.blue;
+      else if (t === "\\\\") col = C.yellow;
+      else if (t.startsWith("[")) col = C.green;
+      parts.push(<span key={m.index} style={{ color: col }}>{t}</span>);
+      last = m.index + t.length;
+    }
+    if (last < line.length) parts.push(<span key={last}>{line.slice(last)}</span>);
+    return <span key={i}>{parts}{"\n"}</span>;
+  });
+}
+
+// ─────────────────────────────────────────────
+//  UI ATOMS
+// ─────────────────────────────────────────────
+function Logo() {
+  return (
+    <div style={{ width: 30, height: 30, borderRadius: 7, background: C.accG, border: `1px solid ${C.acc}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <span style={{ color: C.acc, fontSize: 15, fontFamily: F.disp, fontWeight: 600 }}>Λ</span>
+    </div>
+  );
+}
+
+function Sec({ title, children }) {
+  return (
+    <div style={{ padding: "12px 16px", borderBottom: `0.5px solid ${C.bdr}` }}>
+      <div style={{ fontSize: 9, fontWeight: 500, color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 9 }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function Row({ label, children }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+      <span style={{ fontSize: 11, color: C.muted, minWidth: 64, flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1 }}>{children}</div>
+    </div>
+  );
+}
+
+function Inp({ value, onChange, placeholder, mono }) {
+  return (
+    <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      style={{ width: "100%", padding: "4px 8px", fontSize: 11, background: C.bg, border: `0.5px solid ${C.bdr}`,
+        borderRadius: 6, color: C.txt, fontFamily: mono ? F.mono : F.ui, outline: "none" }} />
+  );
+}
+
+function Sel({ value, onChange, opts }) {
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)}
+      style={{ width: "100%", padding: "4px 8px", fontSize: 11, background: C.bg, border: `0.5px solid ${C.bdr}`,
+        borderRadius: 6, color: C.txt, fontFamily: F.ui, outline: "none", cursor: "pointer" }}>
+      {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+    </select>
+  );
+}
+
+function Tog({ active, onClick, children }) {
+  return (
+    <button onClick={onClick}
+      style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6,
+        border: `0.5px solid ${active ? C.acc : C.bdr}`,
+        background: active ? C.accG : "transparent",
+        color: active ? C.acc : C.muted,
+        cursor: "pointer", fontFamily: F.ui, transition: "all 0.12s" }}>
+      {children}
+    </button>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  React.createElement(LaTeXTableGenerator)
+);
+</script>
+</body>
+</html>

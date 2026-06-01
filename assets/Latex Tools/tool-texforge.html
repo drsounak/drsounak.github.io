@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeXForge — Sounak Sadhukhan</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
+    .id-strip {
+      height: 38px; background: #92400e;
+      display: flex; align-items: center; padding: 0 14px; gap: 12px;
+      flex-shrink: 0; position: relative; z-index: 9999;
+    }
+    .id-back {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+      color: #fef3c7; opacity: .75; text-decoration: none;
+      padding: 3px 10px 3px 7px;
+      border: 1px solid rgba(255,255,255,.2); border-radius: 100px;
+      transition: opacity .15s;
+    }
+    .id-back:hover { opacity: 1; text-decoration: none; }
+    .id-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
+    .id-title { font-size: .8rem; font-weight: 700; color: #fef3c7; letter-spacing: .04em; }
+    .id-sub { font-size: .68rem; color: #fef3c7; opacity: .55; margin-left: 2px; letter-spacing: .02em; }
+    #root { height: calc(100vh - 38px); display: flex; flex-direction: column; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<div class="id-strip">
+  <a href="blog.html" class="id-back">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+         viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Blog
+  </a>
+  <div class="id-divider"></div>
+  <span class="id-title">TeXForge</span>
+  <span class="id-sub">No-Code LaTeX Document Builder · Article · Journal · Conference · Presentation</span>
+</div>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect, useMemo, useReducer } = React;
+
+
+/* ============================================================
+   TeXForge — no-code LaTeX builder (React single-file component)
+   ============================================================ */
+
+/* ---------------- FORMAT REGISTRY ---------------- */
+const C = { GEN: "General", JOU: "Journal", CONF: "Conference", PRES: "Presentation" };
+const yearCh = ["2025", "2024", "2023", "2022"];
+const FORMATS = [
+  { id: "article", cat: C.GEN, label: "Article (standard)", cls: "article", engine: "article", geom: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }, { k: "cols", l: "Columns", ch: ["onecolumn","twocolumn"], d: "onecolumn" }] },
+  { id: "report", cat: C.GEN, label: "Report", cls: "report", engine: "article", geom: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }] },
+  { id: "book", cat: C.GEN, label: "Book", cls: "book", engine: "article", geom: 1, noAbs: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }] },
+  { id: "memoir", cat: C.GEN, label: "Memoir (configurable book)", cls: "memoir", engine: "article", geom: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }] },
+  { id: "scrartcl", cat: C.GEN, label: "KOMA-Script Article", cls: "scrartcl", engine: "article", geom: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }] },
+  { id: "extarticle", cat: C.GEN, label: "Extended Article (8–20pt)", cls: "extarticle", engine: "article", geom: 1,
+    controls: [{ k: "fontSize", l: "Font", ch: ["8pt","9pt","10pt","11pt","12pt","14pt","17pt","20pt"], d: "12pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "a4paper" }] },
+  { id: "amsart", cat: C.GEN, label: "AMS Article", cls: "amsart", engine: "amsart",
+    controls: [{ k: "fontSize", l: "Font", ch: ["10pt","11pt","12pt"], d: "11pt" }, { k: "paper", l: "Paper", ch: ["a4paper","letterpaper"], d: "letterpaper" }] },
+  { id: "tufte", cat: C.GEN, label: "Tufte Handout", cls: "tufte-handout", engine: "article", controls: [] },
+  { id: "apa7", cat: C.GEN, label: "APA 7th Edition", cls: "apa7", engine: "apa7",
+    controls: [{ k: "apaMode", l: "Mode", ch: ["jou","man","stu","doc"], d: "man" }] },
+
+  { id: "ieeej", cat: C.JOU, label: "IEEE Transactions / Journal", cls: "IEEEtran", engine: "ieee",
+    controls: [{ k: "ieeeMode", l: "Mode", ch: ["journal","conference","technote"], d: "journal" }] },
+  { id: "acmj", cat: C.JOU, label: "ACM Journal (acmart)", cls: "acmart", engine: "acm",
+    controls: [{ k: "acmFmt", l: "Format", ch: ["acmsmall","acmlarge","acmtog","manuscript"], d: "acmsmall" }] },
+  { id: "elsevier", cat: C.JOU, label: "Elsevier (elsarticle)", cls: "elsarticle", engine: "elsevier",
+    controls: [{ k: "elsOpt", l: "Layout", ch: ["preprint","review","5p","3p","1p"], d: "preprint" }, { k: "elsFont", l: "Font", ch: ["10pt","11pt","12pt"], d: "12pt" }] },
+  { id: "snjnl", cat: C.JOU, label: "Springer Nature (sn-jnl)", cls: "sn-jnl", engine: "springer",
+    controls: [{ k: "snRef", l: "Reference style", ch: ["sn-mathphys-num","sn-mathphys-ay","sn-aps","sn-vancouver","sn-apa","sn-chicago","sn-nature","default"], d: "sn-mathphys-num" }] },
+  { id: "revtex", cat: C.JOU, label: "REVTeX (APS / AIP)", cls: "revtex4-2", engine: "revtex",
+    controls: [{ k: "rtxJ", l: "Journal", ch: ["prl","prd","pra","prb","prc","pre","prx","rmp","aip"], d: "prl" }, { k: "rtxL", l: "Layout", ch: ["reprint","preprint","twocolumn"], d: "reprint" }] },
+  { id: "siam", cat: C.JOU, label: "SIAM Article", cls: "siamart", engine: "siam",
+    controls: [{ k: "siamOpt", l: "Mode", ch: ["review","final","supplement"], d: "review" }], note: "SIAM ships a date-stamped class (e.g. siamart220329); match the version in your TeX tree." },
+
+  { id: "ieeec", cat: C.CONF, label: "IEEE Conference", cls: "IEEEtran", engine: "ieee",
+    controls: [{ k: "ieeeMode", l: "Mode", ch: ["conference","journal","technote"], d: "conference" }] },
+  { id: "acmc", cat: C.CONF, label: "ACM Conference (acmart)", cls: "acmart", engine: "acm",
+    controls: [{ k: "acmFmt", l: "Format", ch: ["sigconf","sigplan","sigchi","sigchi-a"], d: "sigconf" }] },
+  { id: "llncs", cat: C.CONF, label: "Springer LNCS", cls: "llncs", engine: "lncs", controls: [] },
+  { id: "lipics", cat: C.CONF, label: "Dagstuhl LIPIcs", cls: "lipics-v2021", engine: "lipics",
+    controls: [{ k: "lipLang", l: "Language", ch: ["UKenglish","USenglish"], d: "UKenglish" }] },
+  { id: "neurips", cat: C.CONF, label: "NeurIPS", cls: "neurips", engine: "mlconf",
+    controls: [{ k: "year", l: "Year", ch: yearCh, d: "2024" }, { k: "mlState", l: "State", ch: ["final","preprint","review"], d: "final" }] },
+  { id: "iclr", cat: C.CONF, label: "ICLR", cls: "iclr_conference", engine: "mlconf",
+    controls: [{ k: "year", l: "Year", ch: yearCh, d: "2024" }, { k: "mlState", l: "State", ch: ["final","review"], d: "review" }] },
+  { id: "icml", cat: C.CONF, label: "ICML", cls: "icml", engine: "icml",
+    controls: [{ k: "year", l: "Year", ch: yearCh, d: "2024" }] },
+  { id: "aaai", cat: C.CONF, label: "AAAI", cls: "aaai", engine: "aaai",
+    controls: [{ k: "aaaiYr", l: "Year", ch: ["aaai25","aaai24","aaai23","aaai22"], d: "aaai24" }] },
+  { id: "ijcai", cat: C.CONF, label: "IJCAI", cls: "ijcai", engine: "ijcai",
+    controls: [{ k: "ijcaiYr", l: "Year", ch: ["ijcai24","ijcai23","ijcai22"], d: "ijcai24" }] },
+  { id: "acl", cat: C.CONF, label: "ACL / EMNLP / NAACL", cls: "acl", engine: "acl",
+    controls: [{ k: "aclState", l: "State", ch: ["review","final"], d: "review" }] },
+  { id: "cvpr", cat: C.CONF, label: "CVPR / ICCV / WACV", cls: "cvpr", engine: "cvpr",
+    controls: [{ k: "cvprConf", l: "Venue", ch: ["cvpr","iccv","wacv"], d: "cvpr" }, { k: "cvprState", l: "State", ch: ["review","final"], d: "review" }] },
+
+  { id: "beamer", cat: C.PRES, label: "Beamer (slides)", cls: "beamer", engine: "beamer", controls: [] },
+  { id: "powerdot", cat: C.PRES, label: "Powerdot (slides)", cls: "powerdot", engine: "powerdot",
+    controls: [{ k: "pdStyle", l: "Style", ch: ["default","simple","tycja","klope","ikeda","fyma","sailor","elcolors","husky","paintings","ciment","aggie","upen","jefka","bframe"], d: "default" }] },
+];
+const byId = (id) => FORMATS.find((f) => f.id === id);
+
+/* ---- beamer themes & palettes ---- */
+const BTHEMES = ["default","Bergen","Boadilla","Madrid","AnnArbor","CambridgeUS","Pittsburgh","Rochester","Antibes","JuanLesPins","Montpellier","Berkeley","PaloAlto","Goettingen","Marburg","Hannover","Berlin","Ilmenau","Dresden","Darmstadt","Frankfurt","Singapore","Szeged","Copenhagen","Luebeck","Malmoe","Warsaw","metropolis"];
+const BLAYOUT = { default:"plain",Bergen:"left",Boadilla:"bars",Madrid:"bars",AnnArbor:"bars",CambridgeUS:"bars",Warsaw:"bars",Copenhagen:"minihdr",Malmoe:"minihdr",Pittsburgh:"plain",Rochester:"block",Antibes:"tree",JuanLesPins:"tree",Montpellier:"tree",Berkeley:"sidebar",PaloAlto:"sidebar",Goettingen:"sidebar",Marburg:"sidebar",Hannover:"sidebar",Berlin:"mini",Ilmenau:"mini",Dresden:"mini",Darmstadt:"mini",Frankfurt:"mini",Singapore:"minihdr",Szeged:"mini",Luebeck:"mini",metropolis:"metro" };
+const BFONTS = ["default","serif","structurebold","structuresmallcapsserif","professionalfonts"];
+const BINNER = ["default","circles","rectangles","rounded","inmargin"];
+const BOUTER = ["default","infolines","miniframes","smoothbars","sidebar","split","shadow","tree","smoothtree"];
+const BPAL = {
+  default:{s:"#3333b2",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"}, albatross:{s:"#ffcf4d",a:"#ff7a59",bg:"#232a44",fg:"#e9ecff"},
+  beaver:{s:"#b22222",a:"#7a1212",bg:"#ffffff",fg:"#1a1a1a"}, beetle:{s:"#5a5a7a",a:"#b22222",bg:"#d9d9d9",fg:"#1a1a1a"},
+  crane:{s:"#cc7a00",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"}, dolphin:{s:"#2b2b6b",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"},
+  dove:{s:"#3a3a3a",a:"#7a7a7a",bg:"#ffffff",fg:"#111111"}, fly:{s:"#b3b3b3",a:"#e0e0e0",bg:"#808080",fg:"#ffffff"},
+  lily:{s:"#222222",a:"#666666",bg:"#ffffff",fg:"#000000"}, monarca:{s:"#2e6b2e",a:"#d97a00",bg:"#ffffff",fg:"#1a1a1a"},
+  orchid:{s:"#800080",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"}, rose:{s:"#cc6699",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"},
+  seagull:{s:"#808080",a:"#404040",bg:"#ffffff",fg:"#1a1a1a"}, seahorse:{s:"#9999cc",a:"#b27ab2",bg:"#f0eef6",fg:"#2a2a3a"},
+  whale:{s:"#1f3a93",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"}, wolverine:{s:"#c8a000",a:"#1f3a93",bg:"#ffffff",fg:"#1a1a1a"},
+  spruce:{s:"#1f5f3f",a:"#b22222",bg:"#ffffff",fg:"#1a1a1a"},
+};
+
+/* ---------------- pure helpers ---------------- */
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function tex(s){
+  if(!s) return "";
+  const o = s.replace(/\\/g,"\\textbackslash{}").replace(/([&%$#_{}])/g,"\\$1").replace(/~/g,"\\textasciitilde{}").replace(/\^/g,"\\textasciicircum{}");
+  return o.replace(/\*\*(.+?)\*\*/g,"\\textbf{$1}").replace(/\*(.+?)\*/g,"\\textit{$1}");
+}
+function bodyToTex(raw, bulletDefault){
+  const lines=(raw||"").replace(/\r/g,"").split("\n"); let out=[],buf=[],items=null;
+  const fp=()=>{ if(buf.length){ out.push(tex(buf.join(" ").trim())); buf=[]; } };
+  const fi=()=>{ if(items){ out.push("\\begin{itemize}\n"+items.map(t=>"  \\item "+t).join("\n")+"\n\\end{itemize}"); items=null; } };
+  lines.forEach(ln=>{ const t=ln.trim(); const b=/^[-*•]\s+/.test(t)||(bulletDefault&&t!=="");
+    if(t===""){ fp(); fi(); return; }
+    if(b){ fp(); if(!items) items=[]; items.push(tex(t.replace(/^[-*•]\s+/,""))); }
+    else { fi(); buf.push(t); } });
+  fp(); fi(); return out.join("\n\n");
+}
+const A = (S) => S.authors.filter(a=>a.name.trim());
+const fdate = (S) => S.date.trim()? tex(S.date) : "\\today";
+const kwLine = (S) => S.keywords.trim()? `\n\\noindent\\textbf{Keywords:} ${tex(S.keywords)}\n` : "";
+const sectionsTex = (S) => "\n"+S.content.map(c=>`\\section{${tex(c.title.trim()||"Section")}}\n${bodyToTex(c.body,false)}`).join("\n\n")+"\n";
+const bibTex = (S) => { const it=S.refs.split("\n").map(l=>l.trim()).filter(Boolean); if(!it.length) return ""; return `\n\\begin{thebibliography}{${it.length}}\n`+it.map((r,i)=>`\\bibitem{ref${i+1}} ${tex(r)}`).join("\n")+`\n\\end{thebibliography}\n`; };
+const commonPkgs = () => `\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{amsmath,amssymb}\n\\usepackage{graphicx}\n\\usepackage{hyperref}`;
+const titleLine = (S) => { let t=tex(S.title||"Untitled"); if(S.subtitle.trim()) t+="\\\\[2pt] \\large "+tex(S.subtitle); return t; };
+
+/* ---------------- generators ---------------- */
+const G = {};
+G.article = (F,S) => {
+  const opts=[S.ctl.fontSize,S.ctl.paper,S.ctl.cols].filter(Boolean).join(",");
+  const au=A(S).length?A(S).map(a=>{const ft=[a.aff,a.email].filter(x=>x.trim()).map(tex).join("\\\\ ");return tex(a.name)+(ft?`\\thanks{${ft}}`:"");}).join(" \\and "):"Anonymous";
+  let s=`\\documentclass[${opts}]{${F.cls}}\n${commonPkgs()}\n`;
+  if(F.geom) s+=`\\usepackage[margin=1in]{geometry}\n`;
+  s+=`\n\\title{${titleLine(S)}}\n\\author{${au}}\n\\date{${fdate(S)}}\n\n\\begin{document}\n\\maketitle\n`;
+  if(!F.noAbs&&S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  if(!F.noAbs) s+=kwLine(S);
+  s+=sectionsTex(S)+bibTex(S)+`\n\\end{document}\n`; return s;
+};
+G.amsart = (F,S) => {
+  const opts=[S.ctl.fontSize,S.ctl.paper].join(",");
+  const blk=A(S).length?A(S).map(a=>`\\author{${tex(a.name)}}\n${a.aff.trim()?`\\address{${tex(a.aff)}}`:""}\n${a.email.trim()?`\\email{${tex(a.email)}}`:""}`).join("\n"):"\\author{Anonymous}";
+  let s=`\\documentclass[${opts}]{amsart}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage{hyperref}\n\n\\title{${tex(S.title||"Untitled")}}\n${blk}\n`;
+  if(S.keywords.trim()) s+=`\\keywords{${tex(S.keywords)}}\n`;
+  s+=`\n\\begin{document}\n`;
+  if(S.abstract.trim()) s+=`\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=`\\maketitle\n`+sectionsTex(S)+bibTex(S)+`\n\\end{document}\n`; return s;
+};
+G.apa7 = (F,S) => {
+  const names=A(S).length?A(S).map(a=>tex(a.name)).join(" \\and "):"Anonymous";
+  const affs=[...new Set(A(S).map(a=>a.aff.trim()).filter(Boolean))].map(tex).join(" \\and ")||"~";
+  let s=`\\documentclass[${S.ctl.apaMode}]{apa7}\n\\usepackage[american]{babel}\n\\usepackage{csquotes}\n\\usepackage[style=apa]{biblatex}\n\n\\title{${tex(S.title||"Untitled")}}\n\\shorttitle{${tex((S.title||"Title").slice(0,40))}}\n\\author{${names}}\n\\affiliation{${affs}}\n`;
+  if(S.abstract.trim()) s+=`\\abstract{${bodyToTex(S.abstract,false)}}\n`;
+  if(S.keywords.trim()) s+=`\\keywords{${tex(S.keywords)}}\n`;
+  s+=`\n\\begin{document}\n\\maketitle\n`+sectionsTex(S)+`\n\\end{document}\n`; return s;
+};
+G.ieee = (F,S) => {
+  const mode=S.ctl.ieeeMode; let au;
+  if(mode==="conference"){
+    au="\\author{\n"+(A(S).length?A(S).map(a=>`  \\IEEEauthorblockN{${tex(a.name)}}\n  \\IEEEauthorblockA{${[a.aff,a.email].filter(x=>x.trim()).map(tex).join("\\\\ ")||"~"}}`).join("\n  \\and\n"):"  \\IEEEauthorblockN{Anonymous}")+"\n}";
+  } else {
+    const names=A(S).length?A(S).map(a=>tex(a.name)).join(", "):"Anonymous";
+    const th=A(S).map(a=>[a.aff,a.email].filter(x=>x.trim()).map(tex).join(", ")).filter(Boolean).join("; ");
+    au=`\\author{${names}${th?`\\thanks{${th}}`:""}}`;
+  }
+  const opt=mode==="conference"?"conference":(mode==="technote"?"technote":"journal");
+  let s=`\\documentclass[${opt}]{IEEEtran}\n\\usepackage{cite}\n\\usepackage{amsmath,amssymb,amsfonts}\n\\usepackage{graphicx}\n\\usepackage{hyperref}\n\n\\title{${tex(S.title||"Untitled")}}\n${au}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  if(S.keywords.trim()) s+=`\n\\begin{IEEEkeywords}\n${tex(S.keywords)}\n\\end{IEEEkeywords}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{IEEEtran}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.acm = (F,S) => {
+  const blk=A(S).length?A(S).map(a=>`\\author{${tex(a.name)}}\n\\affiliation{\\institution{${tex(a.aff||"~")}}}\n${a.email.trim()?`\\email{${tex(a.email)}}`:""}`).join("\n\n"):"\\author{Anonymous}";
+  let s=`\\documentclass[${S.ctl.acmFmt},nonacm]{acmart}\n\\usepackage{booktabs}\n\n\\title{${tex(S.title||"Untitled")}}\n\n${blk}\n`;
+  if(S.keywords.trim()) s+=`\n\\keywords{${tex(S.keywords)}}\n`;
+  s+=`\n\\begin{document}\n`;
+  if(S.abstract.trim()) s+=`\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=`\\maketitle\n`+sectionsTex(S)+bibTex(S)+`\n\\end{document}\n`; return s;
+};
+G.lncs = (F,S) => {
+  const names=A(S).length?A(S).map((a,i)=>tex(a.name)+(A(S).length>1?`\\inst{${i+1}}`:"")).join(" \\and "):"Anonymous";
+  const insts=A(S).length?A(S).map(a=>[a.aff,a.email].filter(x=>x.trim()).map(tex).join(" \\\\ ")||"~").join(" \\and "):"~";
+  const run=A(S).length?A(S).map(a=>{const p=a.name.trim().split(/\s+/);return (p[0]?p[0][0]+".":"")+" "+(p[p.length-1]||"");}).join(", "):"Anonymous";
+  let s=`\\documentclass[runningheads]{llncs}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\n\\begin{document}\n\n\\title{${tex(S.title||"Untitled")}}\n${S.subtitle.trim()?`\\subtitle{${tex(S.subtitle)}}\n`:""}\\titlerunning{${tex((S.title||"Title").slice(0,45))}}\n\\author{${names}}\n\\authorrunning{${tex(run)}}\n\\institute{${insts}}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n${S.keywords.trim()?`\\keywords{${S.keywords.split(",").map(k=>tex(k.trim())).join(" \\and ")}}`:""}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{splncs04}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.lipics = (F,S) => {
+  const au=A(S).length?A(S).map(a=>`\\author{${tex(a.name)}}{${tex(a.aff||"Affiliation")}}{${tex(a.email||"")}}{}{}`).join("\n"):"\\author{Anonymous}{Affiliation}{}{}{}";
+  const run=A(S).length?A(S).map(a=>{const p=a.name.trim().split(/\s+/);return(p[0]?p[0][0]+".":"")+" "+(p[p.length-1]||"");}).join(", "):"Anonymous";
+  let s=`\\documentclass[a4paper,${S.ctl.lipLang},cleveref,autoref,thm-restate]{lipics-v2021}\n\n\\title{${tex(S.title||"Untitled")}}\n${au}\n\\authorrunning{${tex(run)}}\n\\Copyright{${tex(run)}}\n\\ccsdesc[100]{Replace ccsdesc macro}\n\\keywords{${S.keywords.trim()?tex(S.keywords):"keyword1, keyword2"}}\n\\relatedversion{}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.elsevier = (F,S) => {
+  let blk="";
+  A(S).forEach((a,i)=>{blk+=`\\author[${i+1}]{${tex(a.name)}${i===0?"\\corref{cor1}":""}}\n${a.email.trim()?`\\ead{${tex(a.email)}}\n`:""}\\affiliation[${i+1}]{organization={${tex(a.aff||"Organization")}}}\n`;});
+  if(!A(S).length) blk="\\author{Anonymous}\n";
+  let s=`\\documentclass[${S.ctl.elsOpt},${S.ctl.elsFont}]{elsarticle}\n\\usepackage{amsmath}\n\\usepackage{graphicx}\n\n\\begin{document}\n\\begin{frontmatter}\n\n\\title{${tex(S.title||"Untitled")}}\n\n${blk}\\cortext[cor1]{Corresponding author}\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  if(S.keywords.trim()) s+=`\n\\begin{keyword}\n${S.keywords.split(",").map(k=>tex(k.trim())).join(" \\sep ")}\n\\end{keyword}\n`;
+  s+=`\n\\end{frontmatter}\n`+sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{elsarticle-num}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.revtex = (F,S) => {
+  const blk=A(S).length?A(S).map(a=>`\\author{${tex(a.name)}}\n${a.email.trim()?`\\email{${tex(a.email)}}\n`:""}\\affiliation{${tex(a.aff||"Affiliation")}}`).join("\n"):"\\author{Anonymous}\n\\affiliation{Affiliation}";
+  let s=`\\documentclass[aps,${S.ctl.rtxJ},${S.ctl.rtxL},amsmath,amssymb]{revtex4-2}\n\\usepackage{graphicx}\n\n\\begin{document}\n\n\\title{${tex(S.title||"Untitled")}}\n${blk}\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=`\n\\maketitle\n`+sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.springer = (F,S) => {
+  let blk="";
+  A(S).forEach((a,i)=>{const p=a.name.trim().split(/\s+/);const sur=p.length>1?p.pop():"";const fnm=p.join(" ")||a.name;
+    blk+=`\\author[${i+1}]{\\fnm{${tex(fnm)}} \\sur{${tex(sur)}}}${i===0?"\\email{"+tex(a.email||"corresponding@author")+"}":""}\n\\affil[${i+1}]{\\orgname{${tex(a.aff||"Organization")}}}\n`;});
+  if(!A(S).length) blk="\\author{Anonymous}\n";
+  let s=`\\documentclass[pdflatex,${S.ctl.snRef}]{sn-jnl}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\n\\begin{document}\n\n\\title{${tex(S.title||"Untitled")}}\n${S.subtitle.trim()?`\\subtitle{${tex(S.subtitle)}}\n`:""}\n${blk}\n`;
+  if(S.abstract.trim()) s+=`\\abstract{${bodyToTex(S.abstract,false)}}\n`;
+  if(S.keywords.trim()) s+=`\\keywords{${S.keywords.split(",").map(k=>tex(k.trim())).join(", ")}}\n`;
+  s+=`\n\\maketitle\n`+sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.siam = (F,S) => {
+  const au=A(S).length?A(S).map(a=>{const ft=[a.aff,a.email].filter(x=>x.trim()).map(tex).join(", ");return tex(a.name)+(ft?`\\thanks{${ft}}`:"");}).join(" \\and "):"Anonymous";
+  let s=`\\documentclass[${S.ctl.siamOpt}]{siamart}\n\\usepackage{amsmath,amssymb}\n\\usepackage{graphicx}\n\n\\title{${tex(S.title||"Untitled")}}\n\\author{${au}}\n\\headers{${tex((S.title||"Title").slice(0,40))}}{${au.replace(/\\thanks\{[^}]*\}/g,"")}}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  if(S.keywords.trim()) s+=`\n\\begin{keywords}\n${tex(S.keywords)}\n\\end{keywords}\n`;
+  s+=sectionsTex(S)+bibTex(S)+`\n\\end{document}\n`; return s;
+};
+G.mlconf = (F,S) => {
+  const isNip=F.id==="neurips";const yr=S.ctl.year;const st=S.ctl.mlState;
+  const sty=isNip?`neurips_${yr}`:`iclr${yr}_conference`;
+  const opt=isNip?(st==="final"?"[final]":st==="preprint"?"[preprint]":""):"";
+  const au=A(S).length?A(S).map(a=>`  ${tex(a.name)} \\\\\n  ${tex(a.aff||"Affiliation")} \\\\\n  \\texttt{${tex(a.email||"email@domain")}}`).join(" \\And\n"):"  Anonymous";
+  let s=`\\documentclass{article}\n\\usepackage${opt}{${sty}}\n\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{hyperref}\n\\usepackage{url}\n\\usepackage{amsmath,amssymb}\n\\usepackage{graphicx}\n\n\\title{${tex(S.title||"Untitled")}}\n\n\\author{%\n${au}\n}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{plainnat}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.icml = (F,S) => {
+  const yr=S.ctl.year;
+  const list=A(S).length?A(S).map((a,i)=>`\\icmlauthor{${tex(a.name)}}{aff${i+1}}`).join("\n"):"\\icmlauthor{Anonymous}{aff1}";
+  const affs=A(S).length?A(S).map((a,i)=>`\\icmlaffiliation{aff${i+1}}{${tex(a.aff||"Affiliation")}}`).join("\n"):"\\icmlaffiliation{aff1}{Affiliation}";
+  const corr=A(S).length?`\\icmlcorrespondingauthor{${tex(A(S)[0].name)}}{${tex(A(S)[0].email||"email@domain")}}`:"";
+  let s=`\\documentclass{article}\n\\usepackage{microtype}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\\usepackage{hyperref}\n\\usepackage[accepted]{icml${yr}}\n\n\\icmltitlerunning{${tex((S.title||"Title").slice(0,40))}}\n\n\\begin{document}\n\n\\twocolumn[\n\\icmltitle{${tex(S.title||"Untitled")}}\n\\begin{icmlauthorlist}\n${list}\n\\end{icmlauthorlist}\n${affs}\n${corr}\n\\icmlkeywords{${S.keywords.trim()?tex(S.keywords):"Machine Learning, ICML"}}\n\\vskip 0.3in\n]\n\\printAffiliationsAndNotice{}\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{icml${yr}}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.aaai = (F,S) => {
+  const sty=S.ctl.aaaiYr;
+  const names=A(S).length?A(S).map(a=>tex(a.name)).join(", "):"Anonymous";
+  const affs=[...new Set(A(S).map(a=>a.aff.trim()).filter(Boolean))].map(tex).join("\\\\ ")||"Affiliation";
+  const emails=A(S).map(a=>a.email.trim()).filter(Boolean).map(tex).join(", ");
+  let s=`\\documentclass[letterpaper]{article}\n\\usepackage{${sty}}\n\\usepackage{times}\n\\usepackage{helvet}\n\\usepackage{courier}\n\\usepackage[hyphens]{url}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\\setcounter{secnumdepth}{0}\n\n\\title{${tex(S.title||"Untitled")}}\n\\author{${names} \\\\\n${affs}${emails?` \\\\\n${emails}`:""}\n}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{aaai}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.ijcai = (F,S) => {
+  const sty=S.ctl.ijcaiYr;
+  const names=A(S).length?A(S).map((a,i)=>tex(a.name)+(A(S).length>1?`$^{${i+1}}$`:"")).join("\\and "):"Anonymous";
+  const affs=A(S).length?A(S).map((a,i)=>(A(S).length>1?`$^{${i+1}}$`:"")+tex(a.aff||"Affiliation")).join("\\\\\n"):"Affiliation";
+  const emails=A(S).map(a=>a.email.trim()).filter(Boolean).map(tex).join(",\n");
+  let s=`\\documentclass{article}\n\\pdfpagewidth=8.5in\n\\pdfpageheight=11in\n\\usepackage{${sty}}\n\\usepackage{times}\n\\usepackage{soul}\n\\usepackage{url}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\\urlstyle{same}\n\n\\title{${tex(S.title||"Untitled")}}\n\n\\author{\n${names}\n\\affiliations\n${affs}\n\\emails\n${emails||"email@domain"}\n}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{named}\n% \\bibliography{references}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.acl = (F,S) => {
+  const opt=S.ctl.aclState==="review"?"[review]":"";
+  const au=A(S).length?A(S).map(a=>`  ${tex(a.name)} \\\\\n  ${tex(a.aff||"Affiliation")} \\\\\n  \\texttt{${tex(a.email||"email@domain")}}`).join(" \\And\n"):"  Anonymous";
+  let s=`\\documentclass[11pt]{article}\n\\usepackage${opt}{acl}\n\\usepackage{times}\n\\usepackage{latexsym}\n\\usepackage[T1]{fontenc}\n\\usepackage[utf8]{inputenc}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\n\\title{${tex(S.title||"Untitled")}}\n\n\\author{%\n${au}\n}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{acl_natbib}\n% \\bibliography{custom}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.cvpr = (F,S) => {
+  const conf=S.ctl.cvprConf;const review=S.ctl.cvprState==="review";
+  const names=A(S).length?A(S).map(a=>tex(a.name)).join(" \\quad "):"Anonymous";
+  const affs=[...new Set(A(S).map(a=>a.aff.trim()).filter(Boolean))].map(tex).join(" \\quad ")||"Affiliation";
+  const emails=A(S).map(a=>a.email.trim()).filter(Boolean).map(a=>`{\\tt ${tex(a)}}`).join(" \\quad ");
+  let s=`\\documentclass[10pt,twocolumn,letterpaper]{article}\n\\usepackage{${conf}}\n\\usepackage{graphicx}\n\\usepackage{amsmath,amssymb}\n\\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}\n\n\\def\\${conf}PaperID{*****}\n\\def\\confName{${conf.toUpperCase()}}\n\\def\\confYear{2025}\n${review?`\\${conf}finalfalse`:`\\${conf}finaltrue`}\n\n\\title{${tex(S.title||"Untitled")}}\n\\author{${names}\\\\\n${affs}${emails?`\\\\\n${emails}`:""}\n}\n\n\\begin{document}\n\\maketitle\n`;
+  if(S.abstract.trim()) s+=`\n\\begin{abstract}\n${bodyToTex(S.abstract,false)}\n\\end{abstract}\n`;
+  s+=sectionsTex(S);
+  s+=S.refs.trim()?bibTex(S):`\n% \\bibliographystyle{ieeenat_fullname}\n% \\bibliography{main}\n`;
+  s+=`\n\\end{document}\n`; return s;
+};
+G.beamer = (F,S) => {
+  const aspect=S.bAspect?`[${S.bAspect}]`:"";
+  const authorLine=A(S).length?A(S).map(a=>tex(a.name)).join(" \\and "):"Anonymous";
+  const inst=A(S).map(a=>a.aff.trim()).filter(Boolean).map(tex).join(" \\and ");
+  let s=`\\documentclass${aspect}{beamer}\n\\usetheme{${S.bTheme}}\n\\usecolortheme{${S.bColor}}\n`;
+  if(S.bFont!=="default") s+=`\\usefonttheme{${S.bFont}}\n`;
+  if(S.bInner!=="default") s+=`\\useinnertheme{${S.bInner}}\n`;
+  if(S.bOuter!=="default") s+=`\\useoutertheme{${S.bOuter}}\n`;
+  s+=`\\usepackage{graphicx}\n\\setbeamertemplate{navigation symbols}{}\n\n\\title{${tex(S.title||"Untitled")}}\n${S.subtitle.trim()?`\\subtitle{${tex(S.subtitle)}}\n`:""}\\author{${authorLine}}\n${inst?`\\institute{${inst}}\n`:""}\\date{${fdate(S)}}\n\n\\begin{document}\n\n\\begin{frame}\n  \\titlepage\n\\end{frame}\n\n\\begin{frame}{Outline}\n  \\tableofcontents\n\\end{frame}\n`;
+  S.content.forEach(c=>{const t=c.title.trim()||"Slide";const body=bodyToTex(c.body,true);
+    s+=`\n\\section{${tex(t)}}\n\\begin{frame}{${tex(t)}}\n${body?"  "+body.replace(/\n/g,"\n  "):"  "}\n\\end{frame}\n`;});
+  s+=`\n\\end{document}\n`; return s;
+};
+G.powerdot = (F,S) => {
+  const authorLine=A(S).length?A(S).map(a=>tex(a.name)).join(" \\and "):"Anonymous";
+  let s=`\\documentclass[style=${S.ctl.pdStyle},mode=present,paper=screen]{powerdot}\n\\usepackage{graphicx}\n\n\\title{${tex(S.title||"Untitled")}}\n\\author{${authorLine}}\n\\date{${fdate(S)}}\n\n\\begin{document}\n\\maketitle\n`;
+  S.content.forEach(c=>{const t=c.title.trim()||"Slide";const body=bodyToTex(c.body,true);
+    s+=`\n\\begin{slide}{${tex(t)}}\n${body?"  "+body.replace(/\n/g,"\n  "):"  "}\n\\end{slide}\n`;});
+  s+=`\n\\end{document}\n`; return s;
+};
+
+/* ---------------- syntax highlight + beamer mock ---------------- */
+function highlight(src){
+  let h=src.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  h=h.replace(/(^|\n)(%[^\n]*)/g,(m,a,b)=>a+'<span class="cmt">'+b+'</span>');
+  h=h.replace(/(\\[a-zA-Z@]+\*?)/g,'<span class="cmd">$1</span>');
+  h=h.replace(/(\\begin|\\end)<\/span>(\{)([^}]*)(\})/g,'$1</span>$2<span class="env">$3</span>$4');
+  h=h.replace(/(\[)([^\]\n]*)(\])/g,'$1<span class="opt">$2</span>$3');
+  return h;
+}
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return"#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0");}
+function shorten(s,n){return s.length>n?s.slice(0,n-1)+"…":s;}
+function dots2(y,p){let d="";for(let i=0;i<5;i++)d+=`<rect x="${24+i*22}" y="${y-3}" width="16" height="5" rx="2" fill="${i===0?'#fff':shade(p.s,30)}"/>`;return d;}
+function drawMockSVG(S){
+  const p=BPAL[S.bColor]||BPAL.default, lay=BLAYOUT[S.bTheme]||"bars";
+  const W=320,H=240;
+  const sl=esc((S.content[0]&&S.content[0].title)||"Slide Title").slice(0,30);
+  const ttl=esc(S.title||"Presentation Title").slice(0,34);
+  let chrome="",cx=0,cy=0,cw=W,ch=H,titleColor="#fff";
+  const bar=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  const dots=(y)=>{let d="";for(let i=0;i<6;i++)d+=`<circle cx="${30+i*16}" cy="${y}" r="3.2" fill="${i<2?p.s:'#fff'}" opacity="${i<2?1:.55}"/>`;return d;};
+  if(lay==="bars"){chrome=bar(0,0,W,26,p.s)+bar(0,H-16,W,16,p.s);cy=26;ch=H-42;}
+  else if(lay==="minihdr"){chrome=bar(0,0,W,30,p.s)+`<rect x="0" y="24" width="${W}" height="6" fill="${p.a}" opacity=".8"/>`;cy=30;ch=H-30;}
+  else if(lay==="mini"){chrome=bar(0,0,W,34,p.s)+dots(12);cy=34;ch=H-34;titleColor="#fff";}
+  else if(lay==="tree"){chrome=bar(0,0,W,22,p.s)+bar(0,22,W,12,shade(p.s,18))+dots2(28,p);cy=34;ch=H-34;}
+  else if(lay==="sidebar"){chrome=bar(0,0,84,H,p.s);cx=84;cw=W-84;cy=10;}
+  else if(lay==="left"){chrome=bar(0,0,W,24,p.s);cy=24;ch=H-24;}
+  else if(lay==="block"){chrome="";cy=0;}
+  else if(lay==="metro"){chrome=bar(0,0,W,4,p.s);cy=8;}
+  else {chrome="";}
+  let titleSVG;
+  if(lay==="sidebar") titleSVG=`<text x="10" y="20" fill="#fff" font-size="11" font-family="Georgia">${shorten(ttl,12)}</text>`;
+  else if(lay==="metro") titleSVG=`<text x="16" y="34" fill="${p.s}" font-size="14" font-weight="700" font-family="Georgia">${sl}</text><rect x="16" y="40" width="48" height="3" fill="${p.s}"/>`;
+  else if(lay==="block") titleSVG=`<rect x="14" y="14" width="${W-28}" height="26" rx="3" fill="${p.s}"/><text x="22" y="32" fill="#fff" font-size="12" font-family="Georgia">${sl}</text>`;
+  else if(lay==="plain"||lay==="left") titleSVG=`<text x="16" y="${cy+20}" fill="${p.s}" font-size="13" font-weight="700" font-family="Georgia">${sl}</text>`;
+  else titleSVG=`<text x="${cx+8}" y="17" fill="${titleColor}" font-size="11" font-family="Georgia">${sl}</text>`;
+  const by=(lay==="metro")?60:(lay==="block"?54:(lay==="plain"||lay==="left"?cy+40:cy+20));
+  const bx=cx+18;let bullets="";
+  ["Key idea one","Supporting detail","Result highlight"].forEach((t,i)=>{const y=by+i*22;bullets+=`<circle cx="${bx}" cy="${y-4}" r="2.6" fill="${p.s}"/><rect x="${bx+8}" y="${y-8}" width="${Math.min(cw-50,150-i*18)}" height="6" rx="3" fill="${p.fg}" opacity=".62"/>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%"><rect width="${W}" height="${H}" fill="${p.bg}"/>${chrome}${titleSVG}${bullets}<text x="${W-8}" y="${H-5}" text-anchor="end" fill="${lay==='bars'||lay==='minihdr'||lay==='mini'||lay==='tree'?'#fff':p.s}" font-size="8" font-family="Georgia" opacity=".8">${esc(S.bTheme)}</text></svg>`;
+}
+
+/* ---------------- styles ---------------- */
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+.tf{--paper:#f3ecdf;--card:#fbf7ee;--ink:#211b14;--ink2:#5a4f40;--line:#d8ccb4;--ox:#7d2b22;--ox2:#9c3a2c;--accentbg:#f6ede0;--shadow:0 1px 0 #fff8 inset,0 10px 30px -12px #4a3a2055;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--serif:"Spectral",Georgia,serif;--disp:"Fraunces","Spectral",serif;
+  font-family:var(--serif);color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100%;
+  background-image:radial-gradient(1200px 600px at 80% -10%,#fff7e8 0%,transparent 60%);}
+.tf *{box-sizing:border-box}
+.tf .top{padding:28px clamp(16px,4vw,56px) 16px;border-bottom:2px solid var(--ink);display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.tf .brand h1{font-family:var(--disp);font-weight:900;font-size:clamp(28px,5vw,50px);margin:0;letter-spacing:-.02em;line-height:.95}
+.tf .brand h1 .x{color:var(--ox)}
+.tf .brand p{margin:6px 0 0;color:var(--ink2);font-style:italic;font-size:15px;max-width:54ch}
+.tf .ribbon{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);background:var(--card);padding:7px 12px;border-radius:2px}
+.tf .wrap{max-width:1340px;margin:0 auto;padding:clamp(16px,3vw,28px)}
+.tf .cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tf .cat{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:9px 16px;border-radius:30px;transition:.15s}
+.tf .cat:hover{border-color:var(--ox);color:var(--ox)}
+.tf .cat.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tf .selbar{background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:24px}
+.tf .selbar .row2{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:16px;align-items:end}
+@media(max-width:680px){.tf .selbar .row2{grid-template-columns:1fr}}
+.tf .meta{font-size:14px;color:var(--ink2)}
+.tf .meta .cls{font-family:var(--mono);font-size:12px;color:var(--ox);background:var(--accentbg);border:1px solid var(--line);padding:2px 7px;border-radius:3px}
+.tf .note{font-style:italic;font-size:13px;color:var(--ink2);margin-top:6px}
+.tf .grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+@media(max-width:960px){.tf .grid{grid-template-columns:1fr}}
+.tf .panel{background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
+.tf .panel>h2{font-family:var(--disp);font-weight:600;font-size:15px;margin:0;padding:13px 18px;border-bottom:1px solid var(--line);background:linear-gradient(var(--accentbg),var(--card));display:flex;align-items:center;gap:9px}
+.tf .panel>h2 .num{font-family:var(--mono);font-size:11px;color:#fff;background:var(--ink);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
+.tf .pbody{padding:16px 18px}
+.tf label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 5px}
+.tf input[type=text],.tf textarea,.tf select{width:100%;font-family:var(--serif);font-size:15px;color:var(--ink);background:#fffdf8;border:1px solid var(--line);border-radius:4px;padding:9px 11px;transition:.12s}
+.tf select{font-family:var(--mono);font-size:13px}
+.tf input:focus,.tf textarea:focus,.tf select:focus{outline:none;border-color:var(--ox);box-shadow:0 0 0 3px #7d2b2222}
+.tf textarea{resize:vertical;line-height:1.55;font-family:var(--serif)}
+.tf .row{display:grid;gap:13px;margin-bottom:13px}
+.tf .row.two{grid-template-columns:1fr 1fr}
+@media(max-width:520px){.tf .row.two{grid-template-columns:1fr}}
+.tf .field{margin-bottom:13px}
+.tf .ctlgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
+.tf .hint{font-size:12px;color:var(--ink2);font-style:italic;margin-top:6px}
+.tf .item{border:1px dashed var(--line);border-radius:6px;padding:13px;margin-bottom:12px;background:#fffdf8}
+.tf .item .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.tf .item .bar .lab{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ox);text-transform:uppercase}
+.tf .icons{display:flex;gap:4px}
+.tf .ibtn{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink2);width:28px;height:28px;border-radius:4px;font-size:14px;display:grid;place-items:center;line-height:1}
+.tf .ibtn:hover{border-color:var(--ox);color:var(--ox)}
+.tf .ibtn.del:hover{border-color:var(--ox2);color:var(--ox2)}
+.tf .ibtn:disabled{opacity:.3;cursor:default}
+.tf .btn{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:5px;transition:.15s}
+.tf .btn:hover{background:var(--ox);border-color:var(--ox)}
+.tf .btn.ghost{background:transparent;color:var(--ink);border-style:dashed}
+.tf .btn.ghost:hover{background:var(--accentbg);color:var(--ox);border-color:var(--ox)}
+.tf .btn.full{width:100%}
+.tf .markhint{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--accentbg);border:1px solid var(--line);border-radius:5px;padding:8px 10px;margin-bottom:14px;line-height:1.7}
+.tf .markhint code{background:#fff;border:1px solid var(--line);padding:1px 5px;border-radius:3px;color:var(--ox)}
+.tf .studio{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:520px){.tf .studio{grid-template-columns:1fr}}
+.tf .mock{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;aspect-ratio:4/3}
+.tf .mock.wide{aspect-ratio:16/9}
+.tf .swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px}
+.tf .sw{cursor:pointer;border:2px solid transparent;border-radius:5px;overflow:hidden;text-align:center}
+.tf .sw.on{border-color:var(--ink)}
+.tf .sw .chip{height:26px;display:flex}
+.tf .sw .nm{font-family:var(--mono);font-size:8.5px;padding:2px 0;color:var(--ink2);background:var(--card);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tf .out{position:sticky;top:18px}
+.tf .outhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.tf .outhead .lbl{font-family:var(--disp);font-weight:600;font-size:16px;display:flex;align-items:center;gap:9px}
+.tf .dot{width:9px;height:9px;border-radius:50%;background:var(--ox);box-shadow:0 0 0 3px #7d2b2230;animation:tfpulse 2s infinite}
+@keyframes tfpulse{50%{box-shadow:0 0 0 6px #7d2b2200}}
+.tf .actions{display:flex;gap:8px;flex-wrap:wrap}
+.tf pre.code{margin:0;background:#231d16;color:#ece3d1;border-radius:8px;border:1px solid #000;padding:18px;overflow:auto;max-height:74vh;font-family:var(--mono);font-size:12.5px;line-height:1.65;box-shadow:inset 0 0 60px #0006}
+.tf .code .cmd{color:#e8b25e}.tf .code .arg{color:#9fc08a}.tf .code .cmt{color:#7c6f5c;font-style:italic}.tf .code .env{color:#d98a78}.tf .code .opt{color:#c9a0d8}
+.tf .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:11px 18px;border-radius:6px;transition:.25s;pointer-events:none;z-index:50}
+.tf .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tf footer{text-align:center;color:var(--ink2);font-size:12.5px;font-style:italic;padding:28px 16px 40px}
+.tf .mobtabs{display:none}
+@media(max-width:960px){.tf .mobtabs{display:flex;gap:8px;margin-bottom:16px;position:sticky;top:0;z-index:30;background:var(--paper);padding:8px 0;border-bottom:1px solid var(--line)}.tf .mobtabs .btn{flex:1}.tf .pane.hide{display:none}.tf .out{position:static}}
+`;
+
+/* ---------------- component ---------------- */
+const DEFAULT = {
+  format:"article", ctl:{ fontSize:"11pt", paper:"a4paper", cols:"onecolumn" },
+  title:"", subtitle:"", date:"", abstract:"", keywords:"", refs:"",
+  authors:[{ name:"", aff:"", email:"" }],
+  content:[{ title:"", body:"" }],
+  bTheme:"Madrid", bColor:"default", bFont:"default", bInner:"default", bOuter:"default", bAspect:"",
+};
+
+function TeXForge(){
+  const [doc, setDoc] = useState(DEFAULT);
+  const [cat, setCat] = useState(C.GEN);
+  const [pane, setPane] = useState("edit");
+  const [mobile, setMobile] = useState(false);
+  const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    const f = () => setMobile(window.innerWidth <= 960);
+    f(); window.addEventListener("resize", f); return () => window.removeEventListener("resize", f);
+  }, []);
+  useEffect(() => { if(!toast) return; const t=setTimeout(()=>setToast(""),1800); return ()=>clearTimeout(t); }, [toast]);
+
+  const F = byId(doc.format);
+  const isPres = F.cat === C.PRES;
+  const isBeamer = F.id === "beamer";
+  const latex = useMemo(() => (G[F.engine]||G.article)(F, doc), [doc, F]);
+  const mock = useMemo(() => drawMockSVG(doc), [doc]);
+
+  /* updaters */
+  const patch = (p) => setDoc(d => ({ ...d, ...p }));
+  const setCtl = (k,v) => setDoc(d => ({ ...d, ctl:{ ...d.ctl, [k]:v } }));
+  const pickFormat = (id) => setDoc(d => { const nf=byId(id); const ctl={}; (nf.controls||[]).forEach(c=>ctl[c.k]=c.d); return { ...d, format:id, ctl }; });
+  const pickCat = (c) => { setCat(c); const first = FORMATS.find(f=>f.cat===c); pickFormat(first.id); if(mobile) setPane("edit"); };
+
+  const updAuthor = (i,f,v) => setDoc(d => ({ ...d, authors:d.authors.map((x,j)=>j===i?{...x,[f]:v}:x) }));
+  const addAuthor = () => setDoc(d => ({ ...d, authors:[...d.authors,{name:"",aff:"",email:""}] }));
+  const delAuthor = (i) => setDoc(d => d.authors.length>1?{...d,authors:d.authors.filter((_,j)=>j!==i)}:d);
+  const moveAuthor = (i,dir) => setDoc(d => { const a=[...d.authors]; const j=i+dir; if(j<0||j>=a.length) return d; [a[i],a[j]]=[a[j],a[i]]; return {...d,authors:a}; });
+
+  const updContent = (i,f,v) => setDoc(d => ({ ...d, content:d.content.map((x,j)=>j===i?{...x,[f]:v}:x) }));
+  const addContent = () => setDoc(d => ({ ...d, content:[...d.content,{title:"",body:""}] }));
+  const delContent = (i) => setDoc(d => d.content.length>1?{...d,content:d.content.filter((_,j)=>j!==i)}:d);
+  const moveContent = (i,dir) => setDoc(d => { const a=[...d.content]; const j=i+dir; if(j<0||j>=a.length) return d; [a[i],a[j]]=[a[j],a[i]]; return {...d,content:a}; });
+
+  /* actions */
+  const copy = async () => { try{ await navigator.clipboard.writeText(latex); }catch{ const ta=document.createElement("textarea"); ta.value=latex; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); } setToast("LaTeX copied ✓"); };
+  const download = () => { const blob=new Blob([latex],{type:"text/x-tex"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); const slug=(doc.title||"document").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"document"; a.download=slug+".tex"; a.click(); URL.revokeObjectURL(a.href); setToast("Downloaded "+a.download); };
+  const overleaf = () => { const f=document.createElement("form"); f.action="https://www.overleaf.com/docs"; f.method="post"; f.target="_blank"; f.style.display="none"; const i=document.createElement("input"); i.type="hidden"; i.name="snip"; i.value=latex; const e=document.createElement("input"); e.type="hidden"; e.name="engine"; e.value="pdflatex"; f.appendChild(i); f.appendChild(e); document.body.appendChild(f); f.submit(); f.remove(); setToast("Opening in Overleaf…"); };
+
+  const moveBtns = (i, len, move) => (
+    <div className="icons">
+      <button className="ibtn" disabled={i===0} onClick={()=>move(i,-1)}>↑</button>
+      <button className="ibtn" disabled={i===len-1} onClick={()=>move(i,1)}>↓</button>
+      <button className="ibtn del" disabled={len===1} onClick={()=> (move===moveAuthor?delAuthor:delContent)(i)}>✕</button>
+    </div>
+  );
+
+  const hideEdit = mobile && pane!=="edit";
+  const hideOut = mobile && pane!=="out";
+
+  return (
+    <div className="tf">
+      <style>{CSS}</style>
+      <header className="top">
+        <div className="brand">
+          <h1>Te<span className="x">X</span>Forge</h1>
+          <p>Fill in forms, get compile-ready LaTeX. Articles, journal &amp; conference templates, and presentations — with a live Beamer theme studio.</p>
+        </div>
+        <div className="ribbon">general · journal · conference · slides</div>
+      </header>
+
+      <div className="wrap">
+        <div className="cats">
+          {[C.GEN,C.JOU,C.CONF,C.PRES].map(c=>(
+            <button key={c} className={"cat"+(c===cat?" on":"")} onClick={()=>pickCat(c)}>{c}</button>
+          ))}
+        </div>
+        <div className="selbar">
+          <div className="row2">
+            <div>
+              <label>Template</label>
+              <select value={doc.format} onChange={e=>pickFormat(e.target.value)}>
+                {FORMATS.filter(f=>f.cat===cat).map(f=>(<option key={f.id} value={f.id}>{f.label}</option>))}
+              </select>
+            </div>
+            <div className="meta">
+              {({General:"General-purpose document.",Journal:"Journal submission template.",Conference:"Conference paper template.",Presentation:"Slide presentation."})[F.cat]}
+              &nbsp;<span className="cls">{"\\documentclass{"+F.cls+"}"}</span>
+              {F.note ? <div className="note">{F.note}</div> : null}
+            </div>
+          </div>
+        </div>
+
+        {mobile && (
+          <div className="mobtabs">
+            <button className={"btn"+(pane==="edit"?"":" ghost")} onClick={()=>setPane("edit")}>✎ Editor</button>
+            <button className={"btn"+(pane==="out"?"":" ghost")} onClick={()=>setPane("out")}>⟨⟩ LaTeX</button>
+          </div>
+        )}
+
+        <div className="grid">
+          {/* EDITOR */}
+          <div className={"pane"+(hideEdit?" hide":"")}>
+            <section className="panel">
+              <h2><span className="num">1</span> Document &amp; Title</h2>
+              <div className="pbody">
+                <div className="ctlgrid">
+                  {(F.controls||[]).map(c=>(
+                    <div key={c.k}>
+                      <label>{c.l}</label>
+                      <select value={doc.ctl[c.k]||c.d} onChange={e=>setCtl(c.k,e.target.value)}>
+                        {c.ch.map(o=>(<option key={o} value={o}>{o}</option>))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <div className="field"><label>Title</label><input type="text" value={doc.title} onChange={e=>patch({title:e.target.value})} placeholder="A Concise Title for Your Work"/></div>
+                <div className="field"><label>Subtitle (optional)</label><input type="text" value={doc.subtitle} onChange={e=>patch({subtitle:e.target.value})} placeholder="An optional secondary line"/></div>
+                <div className="field"><label>Date</label><input type="text" value={doc.date} onChange={e=>patch({date:e.target.value})} placeholder="leave blank for \today"/></div>
+              </div>
+            </section>
+
+            {isBeamer && (
+              <section className="panel">
+                <h2><span className="num">★</span> Beamer Theme Studio</h2>
+                <div className="pbody">
+                  <div className="studio">
+                    <div>
+                      <label>Live preview</label>
+                      <div className={"mock"+(doc.bAspect?" wide":"")} dangerouslySetInnerHTML={{__html:mock}}/>
+                      <div className="ctlgrid" style={{marginTop:12}}>
+                        <div><label>Theme</label><select value={doc.bTheme} onChange={e=>patch({bTheme:e.target.value})}>{BTHEMES.map(o=>(<option key={o}>{o}</option>))}</select></div>
+                        <div><label>Aspect</label><select value={doc.bAspect} onChange={e=>patch({bAspect:e.target.value})}><option value="">4:3</option><option value="aspectratio=169">16:9</option></select></div>
+                      </div>
+                      <div className="ctlgrid">
+                        <div><label>Font theme</label><select value={doc.bFont} onChange={e=>patch({bFont:e.target.value})}>{BFONTS.map(o=>(<option key={o}>{o}</option>))}</select></div>
+                        <div><label>Inner theme</label><select value={doc.bInner} onChange={e=>patch({bInner:e.target.value})}>{BINNER.map(o=>(<option key={o}>{o}</option>))}</select></div>
+                        <div><label>Outer theme</label><select value={doc.bOuter} onChange={e=>patch({bOuter:e.target.value})}>{BOUTER.map(o=>(<option key={o}>{o}</option>))}</select></div>
+                      </div>
+                    </div>
+                    <div>
+                      <label>Color theme — click to apply</label>
+                      <div className="swatches">
+                        {Object.keys(BPAL).map(k=>{const p=BPAL[k];return (
+                          <div key={k} className={"sw"+(k===doc.bColor?" on":"")} title={k} onClick={()=>patch({bColor:k})}>
+                            <div className="chip"><span style={{flex:1,background:p.s}}/><span style={{width:"30%",background:p.a}}/></div>
+                            <div className="nm">{k}</div>
+                          </div>
+                        );})}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            <section className="panel">
+              <h2><span className="num">2</span> Authors</h2>
+              <div className="pbody">
+                {doc.authors.map((a,i)=>(
+                  <div className="item" key={i}>
+                    <div className="bar"><span className="lab">Author {i+1}</span>{moveBtns(i,doc.authors.length,moveAuthor)}</div>
+                    <div className="row two">
+                      <div><label>Name</label><input type="text" value={a.name} onChange={e=>updAuthor(i,"name",e.target.value)} placeholder="Jane Researcher"/></div>
+                      <div><label>Email</label><input type="text" value={a.email} onChange={e=>updAuthor(i,"email",e.target.value)} placeholder="jane@uni.edu"/></div>
+                    </div>
+                    <div><label>Affiliation / Institute</label><input type="text" value={a.aff} onChange={e=>updAuthor(i,"aff",e.target.value)} placeholder="Dept. of CS, Example University, City, Country"/></div>
+                  </div>
+                ))}
+                <button className="btn ghost full" onClick={addAuthor}>+ Add author</button>
+              </div>
+            </section>
+
+            {!isPres && (
+              <section className="panel">
+                <h2><span className="num">3</span> Abstract &amp; Keywords</h2>
+                <div className="pbody">
+                  <div className="field"><label>Abstract</label><textarea rows={5} value={doc.abstract} onChange={e=>patch({abstract:e.target.value})} placeholder="A short summary of the work…"/></div>
+                  <div className="field"><label>Keywords (comma separated)</label><input type="text" value={doc.keywords} onChange={e=>patch({keywords:e.target.value})} placeholder="latex, typesetting, automation"/></div>
+                </div>
+              </section>
+            )}
+
+            <section className="panel">
+              <h2><span className="num">{isPres?"3":"4"}</span> {isPres?"Slides":"Sections"}</h2>
+              <div className="pbody">
+                <div className="markhint" dangerouslySetInnerHTML={{__html: isPres
+                  ? `Each line = a bullet. Start with <code>-</code> for a sub-bullet. <code>**bold**</code>, <code>*italic*</code>.`
+                  : `Blank line = new paragraph. Lines starting with <code>-</code> become a bullet list. <code>**bold**</code>, <code>*italic*</code>.`}}/>
+                {doc.content.map((c,i)=>(
+                  <div className="item" key={i}>
+                    <div className="bar"><span className="lab">{isPres?"Slide":"Section"} {i+1}</span>{moveBtns(i,doc.content.length,moveContent)}</div>
+                    <div className="field"><label>{isPres?"Slide title":"Section heading"}</label><input type="text" value={c.title} onChange={e=>updContent(i,"title",e.target.value)} placeholder={isPres?"Motivation":"Introduction"}/></div>
+                    <div><label>{isPres?"Bullet points / content":"Body text"}</label><textarea rows={isPres?5:6} value={c.body} onChange={e=>updContent(i,"body",e.target.value)} placeholder={isPres?"First key point\nSecond key point\n- a supporting detail":"Write the paragraph here. Leave a blank line for a new paragraph."}/></div>
+                  </div>
+                ))}
+                <button className="btn ghost full" onClick={addContent}>{isPres?"+ Add slide":"+ Add section"}</button>
+              </div>
+            </section>
+
+            {!isPres && (
+              <section className="panel">
+                <h2><span className="num">5</span> References (optional)</h2>
+                <div className="pbody">
+                  <label>One reference per line</label>
+                  <textarea rows={4} value={doc.refs} onChange={e=>patch({refs:e.target.value})} placeholder={'J. Doe, "A study of things," J. of Things, 2024.'}/>
+                  <div className="hint">Each line becomes a numbered bibliography entry. Blank = no bibliography.</div>
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* OUTPUT */}
+          <div className={"pane"+(hideOut?" hide":"")}>
+            <div className="out">
+              <div className="outhead">
+                <span className="lbl"><span className="dot"/> Generated LaTeX</span>
+                <div className="actions">
+                  <button className="btn ghost" onClick={copy}>⧉ Copy</button>
+                  <button className="btn ghost" onClick={download}>↓ .tex</button>
+                  <button className="btn" onClick={overleaf}>↗ Overleaf</button>
+                </div>
+              </div>
+              <pre className="code"><code dangerouslySetInnerHTML={{__html:highlight(latex)}}/></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>Source targets pdfLaTeX / XeLaTeX. The Overleaf button uploads the snippet for an instant PDF.</footer>
+      <div className={"toast"+(toast?" show":"")}>{toast}</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  React.createElement(TeXForge)
+);
+</script>
+</body>
+</html>
