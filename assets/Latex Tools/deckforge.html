@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeckForge — AI slide builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --paper:#eceae3;--card:#fbfaf6;--ink:#1a1c24;--ink2:#54515f;--line:#d3cfc4;
+  --ind:#33357a;--ind2:#4a4ca0;--accentbg:#e9e8f2;
+  --shadow:0 1px 0 #fff8 inset,0 12px 32px -14px #25254a55;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --serif:"Spectral",Georgia,serif;--disp:"Fraunces","Spectral",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:var(--serif);color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 620px at 82% -12%,#f0eff8 0%,transparent 60%);}
+.top{padding:28px clamp(16px,4vw,56px) 16px;border-bottom:2px solid var(--ink);display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.brand h1{font-family:var(--disp);font-weight:900;font-size:clamp(28px,5vw,50px);margin:0;letter-spacing:-.02em;line-height:.95}
+.brand h1 .x{color:var(--ind)}
+.brand p{margin:6px 0 0;color:var(--ink2);font-style:italic;font-size:15px;max-width:62ch}
+.ribbon{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);background:var(--card);padding:7px 12px;border-radius:2px}
+.wrap{max-width:1480px;margin:0 auto;padding:clamp(16px,3vw,28px)}
+.layout{display:grid;grid-template-columns:minmax(340px,440px) 1fr;gap:26px;align-items:start}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);overflow:hidden}
+.panel>h2{font-family:var(--disp);font-weight:600;font-size:15px;margin:0;padding:13px 18px;border-bottom:1px solid var(--line);background:linear-gradient(var(--accentbg),var(--card));display:flex;align-items:center;justify-content:space-between;gap:9px}
+.pbody{padding:16px 18px}
+label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 6px}
+textarea,select,input{width:100%;font-family:var(--mono);font-size:12.5px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:5px;padding:10px 11px;transition:.12s}
+textarea{resize:vertical;line-height:1.6;min-height:340px;font-family:var(--mono)}
+select{font-size:13px}
+:focus{outline:none;border-color:var(--ind);box-shadow:0 0 0 3px #33357a22}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.toggle{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;color:var(--ink2);margin:4px 0 0}
+.toggle input{width:auto}
+.lc{text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink2)}
+.keyhint{font-family:var(--mono);font-size:10.5px;color:var(--ink2);margin-top:7px;line-height:1.55}
+.sep-hint{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--accentbg);border:1px solid var(--line);border-radius:5px;padding:9px 11px;margin-bottom:12px;line-height:1.7}
+.sep-hint code{background:#fff;border:1px solid var(--line);padding:1px 6px;border-radius:3px;color:var(--ind)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:11px 15px;border-radius:5px;transition:.15s}
+.btn:hover{background:var(--ind);border-color:var(--ind)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border-style:dashed}
+.btn.ghost:hover{background:var(--accentbg);color:var(--ind);border-color:var(--ind)}
+.btn.big{flex:1}
+.deckhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.deckhead .lbl{font-family:var(--disp);font-weight:600;font-size:17px;display:flex;align-items:center;gap:10px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ind);box-shadow:0 0 0 3px #33357a30}
+.prog{font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:54px 24px;text-align:center;color:var(--ink2);font-style:italic;background:var(--card)}
+.slides{display:grid;gap:22px}
+.scard{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.scard .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);background:linear-gradient(var(--accentbg),var(--card));flex-wrap:wrap}
+.scard .bar .n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ind)}
+.scard .bar .tools{display:flex;align-items:center;gap:6px}
+.scard .bar select{width:auto;font-size:11px;padding:5px 8px}
+.badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:20px;border:1px solid var(--line)}
+.badge.ai{color:#2e6b4f;border-color:#bcd8c8;background:#eef7f1}
+.badge.fallback{color:#8a5a1a;border-color:#e2cda6;background:#f8f0e0}
+.badge.pending{color:var(--ink2)}
+.badge.err{color:#9c3a2c;border-color:#e2b6ad;background:#f8e9e6}
+.ibtn{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink2);width:30px;height:30px;border-radius:5px;font-size:14px;display:grid;place-items:center;line-height:1}
+.ibtn:hover{border-color:var(--ind);color:var(--ind)}
+.ibtn:disabled{opacity:.4;cursor:default}
+.stage{padding:16px;display:grid;place-items:center;background:repeating-linear-gradient(45deg,#f3f1ea,#f3f1ea 10px,#efece4 10px,#efece4 20px)}
+.slide{width:100%;aspect-ratio:16/9;border-radius:4px;overflow:hidden;box-shadow:0 8px 24px -10px #0007;position:relative}
+.slide.r43{aspect-ratio:4/3}
+.skel{width:100%;height:100%;display:grid;place-items:center;color:#bbb;font-family:var(--mono);font-size:12px;background:#fff}
+.spin{width:18px;height:18px;border:2px solid #ccc;border-top-color:var(--ind);border-radius:50%;animation:sp .8s linear infinite;display:inline-block;vertical-align:-3px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.notes{padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2);font-style:italic;background:#fff}
+.notes b{font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);display:block;margin-bottom:3px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;letter-spacing:.05em;padding:11px 18px;border-radius:6px;transition:.25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;color:var(--ink2);font-size:12.5px;font-style:italic;padding:26px 16px 44px}
+/* ---- slide internal rendering (preview mirrors the .pptx) ---- */
+.sv{position:absolute;inset:0;display:flex;flex-direction:column;padding:5.2% 6%;font-family:var(--body-font)}
+.sv .stitle{font-family:var(--head-font);font-weight:600;font-size:clamp(15px,3vw,30px);line-height:1.1;color:var(--c-title);margin:0}
+.sv .srule{height:3px;width:64px;background:var(--c-accent);margin:2.4% 0 3%}
+.sv .scols{display:flex;gap:5%;flex:1;min-height:0}
+.sv .scol{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.sv ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2.4%}
+.sv li{position:relative;padding-left:1.3em;color:var(--c-body);font-size:clamp(10px,1.8vw,17px);line-height:1.3}
+.sv li.l1{margin-left:1.1em;font-size:clamp(9px,1.55vw,15px);opacity:.9}
+.sv li::before{content:"";position:absolute;left:.1em;top:.5em;width:.42em;height:.42em;background:var(--c-accent);border-radius:1px}
+.sv li.l1::before{background:var(--c-accent2);border-radius:50%}
+.sv .vis{flex:1;display:flex;align-items:center;justify-content:center;min-width:0}
+.sv .vis svg{width:100%;height:100%}
+.sv table{border-collapse:collapse;width:100%;font-size:clamp(8px,1.45vw,14px)}
+.sv th{font-family:var(--head-font);background:var(--c-accent);color:#fff;text-align:left;padding:.45em .6em;font-weight:600}
+.sv td{padding:.4em .6em;border-bottom:1px solid var(--c-line);color:var(--c-body)}
+.sv tr:nth-child(even) td{background:var(--c-zebra)}
+.sv.title-layout{justify-content:center;align-items:flex-start;text-align:left}
+.sv.title-layout .stitle{font-size:clamp(20px,4.4vw,42px);font-weight:900}
+.sv.title-layout .ssub{font-family:var(--body-font);color:var(--c-body);font-size:clamp(11px,2vw,20px);margin-top:2.5%;font-style:italic}
+.sv.title-layout .smeta{font-family:var(--mono);font-size:clamp(8px,1.4vw,13px);color:var(--c-accent);margin-top:5%;letter-spacing:.04em}
+.sv.section-layout{justify-content:center;background:var(--c-accent)}
+.sv.section-layout .stitle{color:#fff;font-size:clamp(20px,4.2vw,40px);font-weight:900}
+.sv.section-layout .srule{background:#fff}
+.sv.stat-layout{justify-content:center;align-items:center;text-align:center}
+.sv.stat-layout .statv{font-family:var(--head-font);font-weight:900;font-size:clamp(34px,9vw,90px);color:var(--c-accent);line-height:1}
+.sv.stat-layout .statl{font-family:var(--body-font);color:var(--c-body);font-size:clamp(11px,2.1vw,20px);margin-top:3%;max-width:80%}
+.sv.quote-layout{justify-content:center}
+.sv.quote-layout .qmark{font-family:var(--head-font);font-size:clamp(40px,8vw,80px);color:var(--c-accent);line-height:.4;height:.5em}
+.sv.quote-layout .qtext{font-family:var(--head-font);font-style:italic;font-size:clamp(13px,2.6vw,26px);color:var(--c-title);line-height:1.25}
+.sv.quote-layout .qattr{font-family:var(--mono);font-size:clamp(8px,1.5vw,14px);color:var(--c-accent);margin-top:3.5%}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>Deck<span class="x">Forge</span></h1>
+    <p>Paste your slide content — one block per slide. Claude (or your own ChatGPT / Gemini key) reads each block, picks a layout, and builds a chart, table, or diagram when it helps. Export a fully editable PowerPoint.</p>
+  </div>
+  <div class="ribbon">content in · .pptx out</div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <!-- INPUT -->
+    <section class="panel">
+      <h2>Slide content <span class="ribbon" id="libstat" style="border-radius:20px">loading…</span></h2>
+      <div class="pbody">
+        <div class="sep-hint">Separate slides with a line containing <code>---</code>. First line of each block becomes the title. Use <code>-</code> for bullets, <code>label: 12</code> rows for charts, commas/pipes for tables, and <code>A -&gt; B -&gt; C</code> for a process diagram.</div>
+        <textarea id="src" placeholder="Title of the deck&#10;A short subtitle&#10;Your Name · Affiliation&#10;---&#10;The Problem&#10;- First point&#10;- Second point&#10;---&#10;Throughput by stage&#10;Target ID: 1200&#10;Hit Discovery: 450&#10;Lead Optimization: 120"></textarea>
+        <div class="controls">
+          <div><label>Theme</label><select id="theme"><option value="ink">Ink (ivory · indigo)</option><option value="slate">Slate (dark · teal)</option><option value="sand">Sand (warm · clay)</option></select></div>
+          <div><label>Aspect</label><select id="aspect"><option value="16:9">16:9 widescreen</option><option value="4:3">4:3 standard</option></select></div>
+        </div>
+        <div class="controls">
+          <div><label>AI engine</label><select id="provider">
+            <option value="claude">Claude — in-app, no key</option>
+            <option value="openai">ChatGPT (OpenAI) — your key</option>
+            <option value="gemini">Google Gemini — your key</option>
+            <option value="none">No AI — rules only</option>
+          </select></div>
+          <div id="modelWrap" style="display:none"><label>Model</label><input id="model" type="text" placeholder="model name" autocomplete="off"></div>
+        </div>
+        <div id="keyWrap" style="display:none">
+          <label>API key <span class="lc">(stays in this browser tab — never stored or sent anywhere but the provider)</span></label>
+          <input id="apikey" type="password" placeholder="sk-…  /  AIza…" autocomplete="off">
+          <div class="keyhint" id="keyhint"></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn big" id="gen">⚡ Generate deck</button>
+          <button class="btn ghost" id="example">Load example</button>
+          <button class="btn ghost" id="clear">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <section>
+      <div class="deckhead">
+        <span class="lbl"><span class="dot"></span> Deck preview</span>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span class="prog" id="prog"></span>
+          <button class="btn" id="download" disabled>↓ Download .pptx</button>
+        </div>
+      </div>
+      <div id="deck"><div class="empty">Your slides will appear here. Paste content and hit <strong>Generate deck</strong>.</div></div>
+    </section>
+  </div>
+</div>
+
+<footer>Charts and tables export as native, editable PowerPoint objects — not images. Claude runs key-free inside this app; ChatGPT and Gemini use your own API key, kept only in this browser tab. Any AI choice is a starting point — tweak a slide and regenerate.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================ THEMES ============================ */
+const THEMES = {
+  ink:   { slideBg:"#fbf8f1", title:"#1c2433", body:"#33323a", accent:"#33357a", accent2:"#c2492f", line:"#ded9cd", zebra:"#f2eee4",
+           headFont:"Georgia", bodyFont:"Calibri", palette:["#33357a","#c2492f","#2e8b8b","#caa12f","#6b8f4e","#8a4f9e"] },
+  slate: { slideBg:"#16202b", title:"#f1f5f9", body:"#cdd8e2", accent:"#43c9b8", accent2:"#f2b705", line:"#34404d", zebra:"#1d2935",
+           headFont:"Georgia", bodyFont:"Calibri", palette:["#43c9b8","#f2b705","#7aa6ff","#ef7d7d","#b18cff","#86d46b"] },
+  sand:  { slideBg:"#efe7d7", title:"#352a1d", body:"#473c2d", accent:"#b06a26", accent2:"#5e7c3e", line:"#d8ccb4", zebra:"#e7dcc6",
+           headFont:"Georgia", bodyFont:"Calibri", palette:["#b06a26","#5e7c3e","#2f6f8f","#9c3a2c","#8a6d1f","#6a5acd"] },
+};
+const hx = c => c.replace("#","");
+
+/* ============================ PARSING ============================ */
+function parseBlocks(text){
+  return text.replace(/\r/g,"").split(/^\s*(?:---+|===+|\*\*\*+)\s*$/m)
+    .map(b=>b.trim()).filter(Boolean);
+}
+const stripBullet = l => l.replace(/^\s*(?:[-*•·‣]|\d+[.)])\s+/,"");
+const indentOf = l => { const m=l.match(/^(\s+)/); return m ? Math.min(2, Math.floor(m[1].replace(/\t/g,"  ").length/2)) : 0; };
+const isBullet = l => /^\s*(?:[-*•·‣]|\d+[.)])\s+/.test(l);
+const num = s => { const n=parseFloat(String(s).replace(/[, $%]/g,"")); return isNaN(n)?null:n; };
+
+function detectFlow(lines){
+  const joined = lines.join(" ");
+  if(/(->|→|⟶|=>)/.test(joined) && lines.length<=3){
+    const nodes = joined.split(/\s*(?:->|→|⟶|=>)\s*/).map(s=>stripBullet(s).trim()).filter(Boolean);
+    if(nodes.length>=2) return { type:"diagram", style:"flow", nodes, edges:[] };
+  }
+  const arrowLines = lines.filter(l=>/(->|→|⟶|=>)/.test(l));
+  if(arrowLines.length && arrowLines.length===lines.length){
+    const nodes=[]; const edges=[];
+    arrowLines.forEach(l=>{ const parts=l.split(/\s*(?:->|→|⟶|=>)\s*/).map(s=>stripBullet(s).trim()).filter(Boolean);
+      parts.forEach(p=>{ if(!nodes.includes(p)) nodes.push(p); });
+      for(let i=0;i<parts.length-1;i++) edges.push([nodes.indexOf(parts[i]),nodes.indexOf(parts[i+1])]); });
+    if(nodes.length>=2) return { type:"diagram", style:"flow", nodes, edges };
+  }
+  return null;
+}
+function detectTable(lines){
+  const pipes = lines.filter(l=>l.includes("|"));
+  if(pipes.length>=2){
+    const rows = pipes.filter(l=>!/^\s*\|?[\s:|-]+\|?\s*$/.test(l))
+      .map(l=>l.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|").map(c=>c.trim()));
+    if(rows.length>=2 && rows[0].length>=2) return { type:"table", headers:rows[0], rows:rows.slice(1) };
+  }
+  const csv = lines.filter(l=>l.split(",").length>=3);
+  if(csv.length>=2 && csv.length===lines.length){
+    const rows = csv.map(l=>l.split(",").map(c=>c.trim()));
+    const w = rows[0].length;
+    if(rows.every(r=>r.length===w)) return { type:"table", headers:rows[0], rows:rows.slice(1) };
+  }
+  return null;
+}
+function detectSeries(lines){
+  const pairs = [];
+  for(const l of lines){
+    let m = l.match(/^\s*(?:[-*•]\s*)?(.+?)\s*[:\t]\s*([-\d.,$%]+)\s*$/) ||
+            l.match(/^\s*(?:[-*•]\s*)?(.+?)\s+([-\d.,$%]+)\s*$/) ||
+            l.match(/^\s*(?:[-*•]\s*)?(.+?)\s*,\s*([-\d.,$%]+)\s*$/);
+    if(m && num(m[2])!==null && m[1].trim()) pairs.push([m[1].trim(), num(m[2])]); else return null;
+  }
+  if(pairs.length>=2){
+    return { type:"bar", categories:pairs.map(p=>p[0]), series:[{name:"Value",values:pairs.map(p=>p[1])}] };
+  }
+  return null;
+}
+
+/* heuristic structuring (used when AI off or unavailable) */
+function heuristicSlide(raw, idx, override){
+  const lines = raw.split("\n").map(l=>l.replace(/\s+$/,"")).filter(l=>l.trim()!=="");
+  const title = stripBullet(lines[0]||"Slide").replace(/^#+\s*/,"").trim();
+  const rest = lines.slice(1);
+  const body = rest.filter(l=>l.trim());
+
+  let visual = null;
+  const forced = override && override!=="auto" ? override : null;
+  if(forced==="none"){ visual=null; }
+  else {
+    const candidates = forced ? [] : [detectFlow(body), detectTable(body), detectSeries(body)].filter(Boolean);
+    visual = candidates[0] || null;
+    if(forced){
+      if(forced==="table"){ visual = detectTable(body) || tableFromLines(body); }
+      else if(forced==="diagram"){ visual = detectFlow(body) || { type:"diagram", style:"flow", nodes:body.map(stripBullet).slice(0,6), edges:[] }; }
+      else if(["bar","line","pie"].includes(forced)){ const s=detectSeries(body); if(s){ s.type=forced; if(forced==="pie"){ s.labels=s.categories; s.values=s.series[0].values; } visual=s; } }
+    }
+  }
+  let bullets = [];
+  if(!visual || (visual && visual.type==="diagram")){
+    const src = visual ? [] : body;
+    bullets = src.map(l=>({ text:stripBullet(l).trim(), level:indentOf(l) })).filter(b=>b.text);
+  } else {
+    bullets = body.filter(l=>isBullet(l)).map(l=>({text:stripBullet(l).trim(),level:indentOf(l)}));
+  }
+  let layout = "bullets";
+  if(idx===0 && !visual && body.length<=3) layout="title";
+  const struct = { title, layout, bullets, visual, notes:"" };
+  if(layout==="title"){ struct.subtitle = body[0]?stripBullet(body[0]):""; struct.meta = body[1]?stripBullet(body[1]):""; }
+  return struct;
+}
+function tableFromLines(lines){
+  const rows = lines.map(l=>stripBullet(l).split(/\s{2,}|\t|,|\|/).map(c=>c.trim()).filter(Boolean));
+  if(rows.length>=2) return { type:"table", headers:rows[0], rows:rows.slice(1) };
+  return null;
+}
+
+/* ============================ AI STRUCTURING ============================ */
+const SYS = `You are a presentation design engine. You receive the raw content of ONE slide and return ONLY a JSON object describing how to lay it out. No markdown, no backticks, no commentary.
+
+Schema:
+{
+ "title": string,
+ "subtitle": string (optional, mainly for title slides),
+ "meta": string (optional, e.g. author/affiliation for the title slide),
+ "layout": "title" | "section" | "bullets" | "two_column" | "stat" | "quote",
+ "bullets": [ { "text": string, "level": 0|1 } ],
+ "columns": [ [ {"text":string,"level":0|1} ], [ ... ] ]  (only for two_column),
+ "stat": { "value": string, "label": string }  (only for stat),
+ "quote": { "text": string, "attribution": string }  (only for quote),
+ "visual": null | one of:
+   { "type":"table", "headers":[string], "rows":[[string]] },
+   { "type":"bar"|"line", "categories":[string], "series":[{"name":string,"values":[number]}] },
+   { "type":"pie", "labels":[string], "values":[number] },
+   { "type":"diagram", "style":"flow"|"cycle"|"hierarchy", "nodes":[string], "edges":[[number,number]] },
+ "notes": string  (concise speaker notes)
+}
+
+Rules:
+- Keep bullets tight: max 6, max ~14 words each. Compress prose into crisp points.
+- Add a visual ONLY when it genuinely clarifies. Otherwise visual=null.
+- bar = compare categories; line = trend over an ordered axis; pie = parts of a whole (<=6 slices); table = multi-column or non-numeric structured data; diagram = a process/relationship (flow=sequential steps, cycle=loop, hierarchy=tree).
+- When a visual is present, you may keep 0-3 short bullets that frame it, or none.
+- Numbers in series/values must be numbers, not strings.
+- Use the "title" layout for an opening slide, "section" for a divider, "stat" for a single dominant number, "quote" for a quotation.
+- Return JSON only.`;
+
+const AI = {
+  claude: { label:"Claude" },
+  openai: { label:"ChatGPT", model:"gpt-4o-mini", hint:"Key from platform.openai.com. Models: gpt-4o-mini (cheap), gpt-4.1-mini, gpt-5-mini." },
+  gemini: { label:"Gemini", model:"gemini-2.5-flash", hint:"Key from aistudio.google.com. Models: gemini-2.5-flash, gemini-3-flash, gemini-3.5-flash." },
+};
+const getKey = () => ($("apikey").value||"").trim();
+const getModel = (p) => (($("model").value||"").trim() || AI[p].model);
+
+async function callClaude(sys,user){
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:sys,
+      messages:[{role:"user", content:user}] }) });
+  if(!res.ok) throw new Error("Claude API "+res.status);
+  const d = await res.json();
+  return (d.content||[]).map(c=>c.type==="text"?c.text:"").join("");
+}
+async function callOpenAI(sys,user){
+  const key=getKey(); if(!key) throw new Error("no_key");
+  const res = await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body: JSON.stringify({ model:getModel("openai"), max_tokens:1000, response_format:{type:"json_object"},
+      messages:[{role:"system",content:sys},{role:"user",content:user}] }) });
+  if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("OpenAI "+res.status+(t?": "+t.slice(0,140):"")); }
+  const d = await res.json();
+  return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || "";
+}
+async function callGemini(sys,user){
+  const key=getKey(); if(!key) throw new Error("no_key");
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(getModel("gemini"))+":generateContent?key="+encodeURIComponent(key);
+  const res = await fetch(url,{ method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ systemInstruction:{parts:[{text:sys}]},
+      contents:[{role:"user",parts:[{text:user}]}],
+      generationConfig:{responseMimeType:"application/json", maxOutputTokens:1024} }) });
+  if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("Gemini "+res.status+(t?": "+t.slice(0,140):"")); }
+  const d = await res.json();
+  const parts=(d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts)||[];
+  return parts.map(p=>p.text||"").join("");
+}
+async function aiStructure(raw, override){
+  let directive = "";
+  if(override && override!=="auto"){
+    directive = override==="none"
+      ? "\n\nConstraint: do NOT include any visual (visual = null)."
+      : `\n\nConstraint: the visual.type MUST be exactly "${override}". Construct the best "${override}" you can from the content.`;
+  }
+  const user = `Slide content:\n"""\n${raw}\n"""${directive}`;
+  const provider = $("provider").value;
+  let text;
+  if(provider==="openai") text = await callOpenAI(SYS, user);
+  else if(provider==="gemini") text = await callGemini(SYS, user);
+  else text = await callClaude(SYS, user);
+  const clean = (text||"").replace(/```json/gi,"").replace(/```/g,"").trim();
+  const obj = JSON.parse(clean);
+  if(!obj.bullets) obj.bullets = [];
+  if(obj.visual===undefined) obj.visual = null;
+  return obj;
+}
+
+/* ============================ PREVIEW RENDER ============================ */
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function bulletsHTML(arr){
+  if(!arr||!arr.length) return "";
+  return "<ul>"+arr.map(b=>`<li class="l${b.level?1:0}">${esc(b.text)}</li>`).join("")+"</ul>";
+}
+function svgBar(v,th,mode){
+  const cats=v.categories||[], series=v.series||[]; const W=400,H=260,pad=34,bw=W-pad*2,bh=H-pad*2;
+  const all=series.flatMap(s=>s.values); const max=Math.max(1,...all); const n=cats.length||1; const grp=bw/n;
+  let g="";
+  // axis
+  g+=`<line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="${th.line}"/>`;
+  g+=`<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="${th.line}"/>`;
+  if(mode==="line"){
+    series.forEach((s,si)=>{ const col=th.palette[si%th.palette.length];
+      const pts=s.values.map((val,i)=>{ const x=pad+grp*i+grp/2; const y=H-pad-(val/max)*bh; return [x,y]; });
+      g+=`<polyline fill="none" stroke="${col}" stroke-width="2.5" points="${pts.map(p=>p.join(",")).join(" ")}"/>`;
+      pts.forEach(p=>g+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${col}"/>`);
+    });
+  } else {
+    const sw=Math.min(grp*0.7, grp/Math.max(1,series.length))*(series.length>1?1:1);
+    series.forEach((s,si)=>{ const col=th.palette[si%th.palette.length]; const each=(grp*0.7)/series.length;
+      s.values.forEach((val,i)=>{ const x=pad+grp*i+(grp*0.15)+si*each; const hgt=(val/max)*bh; const y=H-pad-hgt;
+        g+=`<rect x="${x}" y="${y}" width="${each*0.86}" height="${Math.max(1,hgt)}" fill="${col}" rx="1.5"/>`; });
+    });
+  }
+  cats.forEach((c,i)=>{ const x=pad+grp*i+grp/2; g+=`<text x="${x}" y="${H-pad+13}" font-size="9" text-anchor="middle" fill="${th.body}" font-family="${th.bodyFont}">${esc(String(c).slice(0,9))}</text>`; });
+  if(series.length>1){ series.forEach((s,si)=>{ const col=th.palette[si%th.palette.length]; const lx=pad+si*78;
+    g+=`<rect x="${lx}" y="6" width="9" height="9" fill="${col}" rx="1"/><text x="${lx+13}" y="14" font-size="8.5" fill="${th.body}" font-family="${th.bodyFont}">${esc(s.name||"")}</text>`; }); }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+}
+function svgPie(v,th){
+  const labels=v.labels||[], values=v.values||[]; const W=400,H=260,cx=150,cy=130,r=98;
+  const total=values.reduce((a,b)=>a+(+b||0),0)||1; let a0=-Math.PI/2; let g="";
+  values.forEach((val,i)=>{ const frac=(+val||0)/total; const a1=a0+frac*Math.PI*2; const col=th.palette[i%th.palette.length];
+    const x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0), x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+    const large=frac>0.5?1:0;
+    g+=`<path d="M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 ${large} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z" fill="${col}"/>`;
+    a0=a1; });
+  labels.forEach((l,i)=>{ const ly=24+i*20; const col=th.palette[i%th.palette.length];
+    g+=`<rect x="278" y="${ly-9}" width="10" height="10" fill="${col}" rx="1"/><text x="294" y="${ly}" font-size="9.5" fill="${th.body}" font-family="${th.bodyFont}">${esc(String(l).slice(0,16))} (${Math.round(values[i]/total*100)}%)</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+}
+function svgDiagram(v,th){
+  const nodes=v.nodes||[]; const style=v.style||"flow"; const W=400,H=260;
+  let g=""; const col=th.accent, col2=th.accent2;
+  const box=(x,y,w,h,t,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill||'#fff'}" stroke="${col}" stroke-width="2"/>`+
+     `<text x="${x+w/2}" y="${y+h/2+3}" font-size="9.5" text-anchor="middle" fill="${th.title}" font-family="${th.bodyFont}">${esc(String(t).slice(0,18))}</text>`;
+  const arrow=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col2}" stroke-width="2" marker-end="url(#ah)"/>`;
+  g+=`<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="${col2}"/></marker></defs>`;
+  if(style==="cycle"){
+    const cx=200,cy=130,R=86; const n=nodes.length||1; const bw=78,bh=34;
+    const pos=nodes.map((_,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+R*Math.cos(a), cy+R*Math.sin(a)]; });
+    pos.forEach((p,i)=>{ const p2=pos[(i+1)%n]; g+=arrow(p[0],p[1],p2[0],p2[1]); });
+    pos.forEach((p,i)=>{ g+=box(p[0]-bw/2,p[1]-bh/2,bw,bh,nodes[i], i===0?th.zebra:'#fff'); });
+  } else if(style==="hierarchy"){
+    const bw=96,bh=34; g+=box(W/2-bw/2,18,bw,bh,nodes[0]||"",th.zebra);
+    const kids=nodes.slice(1); const n=kids.length||1; const gap=W/(n+1);
+    kids.forEach((t,i)=>{ const x=gap*(i+1)-bw/2, y=150; g+=arrow(W/2,52,x+bw/2,y); g+=box(x,y,bw,bh,t); });
+  } else { // flow, wrap rows of up to 3
+    const per=Math.min(3,nodes.length||1); const bw=104,bh=40; const rows=Math.ceil(nodes.length/per);
+    const gapx=(W-per*bw)/(per+1); const rowH=(H-20)/rows;
+    nodes.forEach((t,i)=>{ const r=Math.floor(i/per), cI=i%per; const inRow=Math.min(per, nodes.length-r*per);
+      const gx=(W-inRow*bw)/(inRow+1); const x=gx*(cI+1)+cI*bw; const y=14+r*rowH+(rowH-bh)/2;
+      g+=box(x,y,bw,bh,t, i===0?th.zebra:'#fff');
+      if(i>0 && i%per!==0){ const px=gx*(cI)+(cI-1)*bw+bw, py=y+bh/2; g+=arrow(px,py,x,py); }
+      else if(i>0){ /* row break: arrow from last of prev row down */ }
+    });
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+}
+function tableHTML(v){
+  const h=v.headers||[], rows=v.rows||[];
+  return `<table><thead><tr>${h.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>`+
+    rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")+`</tbody></table>`;
+}
+function visualHTML(v,th){
+  if(!v) return "";
+  if(v.type==="table") return tableHTML(v);
+  if(v.type==="bar") return svgBar(v,th,"bar");
+  if(v.type==="line") return svgBar(v,th,"line");
+  if(v.type==="pie") return svgPie(v,th);
+  if(v.type==="diagram") return svgDiagram(v,th);
+  return "";
+}
+function renderSlide(struct, themeKey){
+  const th=THEMES[themeKey]; const L=struct.layout||"bullets";
+  const styleVars=`--c-title:${th.title};--c-body:${th.body};--c-accent:${th.accent};--c-accent2:${th.accent2};--c-line:${th.line};--c-zebra:${th.zebra};--head-font:${th.headFont};--body-font:${th.bodyFont}`;
+  const bg=`background:${th.slideBg}`;
+  let inner="";
+  if(L==="title"){
+    inner=`<div class="sv title-layout" style="${styleVars}"><h1 class="stitle">${esc(struct.title)}</h1>`+
+      (struct.subtitle?`<div class="ssub">${esc(struct.subtitle)}</div>`:"")+
+      (struct.meta?`<div class="smeta">${esc(struct.meta)}</div>`:"")+`</div>`;
+  } else if(L==="section"){
+    inner=`<div class="sv section-layout" style="${styleVars}"><h1 class="stitle">${esc(struct.title)}</h1><div class="srule"></div></div>`;
+  } else if(L==="stat" && struct.stat){
+    inner=`<div class="sv stat-layout" style="${styleVars}"><div class="statv">${esc(struct.stat.value)}</div><div class="statl">${esc(struct.stat.label||struct.title)}</div></div>`;
+  } else if(L==="quote" && struct.quote){
+    inner=`<div class="sv quote-layout" style="${styleVars}"><div class="qmark">&ldquo;</div><div class="qtext">${esc(struct.quote.text)}</div>`+
+      (struct.quote.attribution?`<div class="qattr">— ${esc(struct.quote.attribution)}</div>`:"")+`</div>`;
+  } else if(L==="two_column" && struct.columns){
+    inner=`<div class="sv" style="${styleVars}"><h1 class="stitle">${esc(struct.title)}</h1><div class="srule"></div>`+
+      `<div class="scols"><div class="scol">${bulletsHTML(struct.columns[0])}</div><div class="scol">${bulletsHTML(struct.columns[1]||[])}</div></div></div>`;
+  } else {
+    const vis=visualHTML(struct.visual,th);
+    const left=bulletsHTML(struct.bullets);
+    let content;
+    if(vis && left) content=`<div class="scols"><div class="scol">${left}</div><div class="vis">${vis}</div></div>`;
+    else if(vis) content=`<div class="scols"><div class="vis">${vis}</div></div>`;
+    else content=`<div class="scols"><div class="scol">${left||""}</div></div>`;
+    inner=`<div class="sv" style="${styleVars}"><h1 class="stitle">${esc(struct.title)}</h1><div class="srule"></div>${content}</div>`;
+  }
+  return `<div class="slide ${$aspect()==='4:3'?'r43':''}" style="${bg}">${inner}</div>`;
+}
+
+/* ============================ PPTX EXPORT ============================ */
+function buildPptx(slides, themeKey, aspect, Ctor){
+  const C = Ctor || window.PptxGenJS;
+  const pptx = new C();
+  const th = THEMES[themeKey];
+  pptx.layout = aspect==="4:3" ? "LAYOUT_4x3" : "LAYOUT_16x9";
+  const PW = 10, PH = aspect==="4:3" ? 7.5 : 5.625;
+  const M = 0.55;
+  slides.forEach(st=>{
+    const s = pptx.addSlide(); s.background = { color: hx(th.slideBg) };
+    const L = st.layout||"bullets";
+    if(L==="title"){
+      s.addText(st.title||"", { x:M, y:PH*0.32, w:PW-2*M, h:1.1, fontFace:th.headFont, fontSize:40, bold:true, color:hx(th.title), align:"left" });
+      if(st.subtitle) s.addText(st.subtitle, { x:M, y:PH*0.32+1.05, w:PW-2*M, h:0.6, fontFace:th.bodyFont, fontSize:20, italic:true, color:hx(th.body) });
+      if(st.meta) s.addText(st.meta, { x:M, y:PH*0.32+1.75, w:PW-2*M, h:0.4, fontFace:th.bodyFont, fontSize:13, color:hx(th.accent) });
+      return;
+    }
+    if(L==="section"){
+      s.background={color:hx(th.accent)};
+      s.addText(st.title||"", { x:M, y:PH/2-0.8, w:PW-2*M, h:1.2, fontFace:th.headFont, fontSize:38, bold:true, color:"FFFFFF" });
+      s.addShape(pptx.ShapeType.rect, { x:M, y:PH/2+0.5, w:1.1, h:0.05, fill:{color:"FFFFFF"} });
+      return;
+    }
+    if(L==="stat" && st.stat){
+      s.addText(st.stat.value||"", { x:0.5, y:PH*0.28, w:PW-1, h:1.6, fontFace:th.headFont, fontSize:80, bold:true, color:hx(th.accent), align:"center" });
+      s.addText(st.stat.label||st.title||"", { x:1, y:PH*0.62, w:PW-2, h:0.9, fontFace:th.bodyFont, fontSize:20, color:hx(th.body), align:"center" });
+      return;
+    }
+    if(L==="quote" && st.quote){
+      s.addText("\u201C", { x:M, y:0.6, w:2, h:1.2, fontFace:th.headFont, fontSize:90, bold:true, color:hx(th.accent) });
+      s.addText(st.quote.text||"", { x:M+0.2, y:PH*0.32, w:PW-2*M-0.4, h:2, fontFace:th.headFont, fontSize:26, italic:true, color:hx(th.title) });
+      if(st.quote.attribution) s.addText("— "+st.quote.attribution, { x:M+0.2, y:PH*0.7, w:PW-2*M, h:0.5, fontFace:th.bodyFont, fontSize:14, color:hx(th.accent) });
+      return;
+    }
+    // header (title) for content layouts
+    s.addText(st.title||"", { x:M, y:0.4, w:PW-2*M, h:0.7, fontFace:th.headFont, fontSize:26, bold:true, color:hx(th.title) });
+    s.addShape(pptx.ShapeType.rect, { x:M, y:1.12, w:0.9, h:0.045, fill:{color:hx(th.accent)} });
+    const top=1.4, bodyH=PH-top-M;
+
+    if(L==="two_column" && st.columns){
+      addBullets(s, st.columns[0]||[], { x:M, y:top, w:(PW-2*M)/2-0.15, h:bodyH }, th);
+      addBullets(s, st.columns[1]||[], { x:PW/2+0.05, y:top, w:(PW-2*M)/2-0.15, h:bodyH }, th);
+      return;
+    }
+    const v=st.visual, hasBul=st.bullets&&st.bullets.length;
+    if(v && hasBul){
+      addBullets(s, st.bullets, { x:M, y:top, w:(PW-2*M)*0.42, h:bodyH }, th);
+      addVisual(pptx, s, v, { x:M+(PW-2*M)*0.46, y:top, w:(PW-2*M)*0.54, h:bodyH }, th);
+    } else if(v){
+      addVisual(pptx, s, v, { x:M+0.4, y:top, w:PW-2*M-0.8, h:bodyH }, th);
+    } else {
+      addBullets(s, st.bullets||[], { x:M, y:top, w:PW-2*M, h:bodyH }, th);
+    }
+  });
+  return pptx;
+}
+function addBullets(s, arr, box, th){
+  if(!arr||!arr.length) return;
+  const runs = arr.map(b=>({ text:b.text, options:{ bullet:{ indent:14 }, indentLevel:b.level?1:0,
+    fontFace:th.bodyFont, fontSize:b.level?14:17, color:hx(th.body), paraSpaceAfter:8 } }));
+  s.addText(runs, { x:box.x, y:box.y, w:box.w, h:box.h, valign:"top" });
+}
+function addVisual(pptx, s, v, box, th){
+  if(v.type==="table"){
+    const head=(v.headers||[]).map(c=>({ text:String(c), options:{ bold:true, color:"FFFFFF", fill:{color:hx(th.accent)}, fontFace:th.headFont } }));
+    const rows=(v.rows||[]).map(r=>r.map(c=>({ text:String(c), options:{ color:hx(th.body), fontFace:th.bodyFont } })));
+    s.addTable([head,...rows], { x:box.x, y:box.y, w:box.w, fontSize:12, border:{type:"solid",color:hx(th.line),pt:0.5}, align:"left", valign:"middle", autoPage:false });
+    return;
+  }
+  if(v.type==="bar"||v.type==="line"){
+    const data=(v.series||[]).map(se=>({ name:se.name||"", labels:v.categories||[], values:se.values||[] }));
+    const type=v.type==="line"?pptx.ChartType.line:pptx.ChartType.bar;
+    s.addChart(type, data, { x:box.x, y:box.y, w:box.w, h:box.h, chartColors:th.palette.map(hx),
+      showLegend:data.length>1, legendPos:"b", showTitle:false, catAxisLabelColor:hx(th.body), valAxisLabelColor:hx(th.body),
+      catAxisLabelFontSize:10, valAxisLabelFontSize:10, dataLabelColor:hx(th.body) });
+    return;
+  }
+  if(v.type==="pie"){
+    const data=[{ name:"", labels:v.labels||[], values:v.values||[] }];
+    s.addChart(pptx.ChartType.pie, data, { x:box.x, y:box.y, w:box.w, h:box.h, chartColors:th.palette.map(hx),
+      showLegend:true, legendPos:"r", showPercent:true, showTitle:false, dataLabelColor:"FFFFFF" });
+    return;
+  }
+  if(v.type==="diagram"){ addDiagram(pptx, s, v, box, th); return; }
+}
+function addDiagram(pptx, s, v, box, th){
+  const nodes=v.nodes||[], style=v.style||"flow"; const RR=pptx.ShapeType.roundRect, LN=pptx.ShapeType.line;
+  const arrow=(x1,y1,x2,y2)=>s.addShape(LN,{x:Math.min(x1,x2),y:Math.min(y1,y2),w:Math.abs(x2-x1)||0.01,h:Math.abs(y2-y1)||0.01,
+    line:{color:hx(th.accent2),width:1.5,endArrowType:"triangle"}, flipH:x2<x1, flipV:y2<y1});
+  const boxN=(x,y,w,h,t,first)=>{ s.addShape(RR,{x,y,w,h,fill:{color:first?hx(th.zebra):"FFFFFF"},line:{color:hx(th.accent),width:1.5},rectRadius:0.06});
+    s.addText(String(t),{x,y,w,h,align:"center",valign:"middle",fontFace:th.bodyFont,fontSize:12,color:hx(th.title)}); };
+  if(style==="cycle"){
+    const cx=box.x+box.w/2, cy=box.y+box.h/2, R=Math.min(box.w,box.h)/2-0.7; const n=nodes.length||1; const bw=1.5,bh=0.6;
+    const pos=nodes.map((_,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+R*Math.cos(a), cy+R*Math.sin(a)]; });
+    pos.forEach((p,i)=>{ const q=pos[(i+1)%n]; arrow(p[0],p[1],q[0],q[1]); });
+    pos.forEach((p,i)=>boxN(p[0]-bw/2,p[1]-bh/2,bw,bh,nodes[i],i===0));
+  } else if(style==="hierarchy"){
+    const bw=2,bh=0.6; boxN(box.x+box.w/2-bw/2, box.y, bw, bh, nodes[0]||"", true);
+    const kids=nodes.slice(1), n=kids.length||1, gap=box.w/(n+1);
+    kids.forEach((t,i)=>{ const x=box.x+gap*(i+1)-bw/2, y=box.y+box.h-bh; arrow(box.x+box.w/2, box.y+bh, x+bw/2, y); boxN(x,y,bw,bh,t,false); });
+  } else {
+    const per=Math.min(3,nodes.length||1), rows=Math.ceil(nodes.length/per); const bw=Math.min(2.4,(box.w-(per+1)*0.3)/per), bh=0.7;
+    const rowH=box.h/rows;
+    nodes.forEach((t,i)=>{ const r=Math.floor(i/per), cI=i%per, inRow=Math.min(per,nodes.length-r*per);
+      const gx=(box.w-inRow*bw)/(inRow+1); const x=box.x+gx*(cI+1)+cI*bw, y=box.y+r*rowH+(rowH-bh)/2;
+      boxN(x,y,bw,bh,t,i===0);
+      if(i>0 && cI!==0){ const px=x-gx, py=y+bh/2; arrow(px,py,x,py); }
+    });
+  }
+}
+
+/* ============================ APP ============================ */
+const $=id=>document.getElementById(id);
+const $aspect=()=>$("aspect").value;
+let deck=[]; // [{raw, struct, status, override}]
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1900); }
+
+const EXAMPLE = `AI-Assisted Drug Discovery
+A 2026 Pipeline Review
+Dr. A. Researcher · Lab for Computational Biology
+---
+The Problem
+Traditional discovery is slow and expensive.
+- 10–15 years from target to market
+- Costs exceed $2B per approved drug
+- ~90% of candidates fail in clinical trials
+---
+Pipeline Throughput by Stage
+Target ID: 1200
+Hit Discovery: 450
+Lead Optimization: 120
+Preclinical: 35
+Clinical: 8
+---
+Model Performance Comparison
+Model, Accuracy, F1
+Baseline, 0.71, 0.68
+GNN, 0.84, 0.82
+GNN + Transformer, 0.91, 0.90
+---
+Our Discovery Workflow
+Data Collection -> Featurization -> Model Training -> Candidate Ranking -> Wet-lab Validation
+---
+Key Takeaways
+- Computational screening cuts early-stage time by ~60%
+- Hybrid models beat single-architecture baselines
+- Human-in-the-loop validation remains essential`;
+
+const VIS_OPTS=[["auto","Auto"],["none","No visual"],["table","Table"],["bar","Bar"],["line","Line"],["pie","Pie"],["diagram","Diagram"]];
+
+function cardHTML(i){
+  const d=deck[i]; const th=$("theme").value;
+  const badge = d.status==="pending" ? `<span class="badge pending"><span class="spin"></span>analyzing</span>`
+    : d.status==="ai" ? `<span class="badge ai">✦ ${esc(d.engine||"AI")}</span>`
+    : d.status==="fallback" ? `<span class="badge fallback">rule-based</span>`
+    : d.status==="err" ? `<span class="badge err">error</span>` : "";
+  const opts=VIS_OPTS.map(([v,l])=>`<option value="${v}" ${d.override===v?"selected":""}>${l}</option>`).join("");
+  const body = d.status==="pending"
+    ? `<div class="stage"><div class="slide ${$aspect()==='4:3'?'r43':''}"><div class="skel"><span class="spin"></span>Designing slide…</div></div></div>`
+    : `<div class="stage">${renderSlide(d.struct,th)}</div>`+
+      (d.struct&&d.struct.notes?`<div class="notes"><b>Speaker notes</b>${esc(d.struct.notes)}</div>`:"");
+  return `<div class="scard" data-i="${i}">
+    <div class="bar"><span class="n">Slide ${i+1}</span>
+      <div class="tools">${badge}
+        <select title="Force a visual type" onchange="overrideSlide(${i},this.value)">${opts}</select>
+        <button class="ibtn" title="Regenerate" onclick="regenSlide(${i})">↻</button>
+      </div>
+    </div>${body}</div>`;
+}
+function renderDeck(){
+  const el=$("deck");
+  if(!deck.length){ el.innerHTML=`<div class="empty">Your slides will appear here. Paste content and hit <strong>Generate deck</strong>.</div>`; return; }
+  el.innerHTML=`<div class="slides">${deck.map((_,i)=>cardHTML(i)).join("")}</div>`;
+}
+function renderCard(i){
+  const node=document.querySelector(`.scard[data-i="${i}"]`);
+  if(node){ const tmp=document.createElement("div"); tmp.innerHTML=cardHTML(i); node.replaceWith(tmp.firstElementChild); }
+  else renderDeck();
+}
+function setProg(t){ $("prog").textContent=t||""; }
+
+async function structureOne(i){
+  const d=deck[i]; const provider=$("provider").value;
+  if(provider==="none"){ d.struct=heuristicSlide(d.raw,i,d.override); d.status="fallback"; d.engine=""; return; }
+  try{
+    d.struct=await aiStructure(d.raw, d.override); d.status="ai";
+    d.engine=(AI[provider]&&AI[provider].label)||"AI";
+  } catch(e){
+    d.struct=heuristicSlide(d.raw,i,d.override); d.status="fallback"; d.engine="";
+    if(e && e.message && e.message!=="no_key") deck._lastErr=e.message;
+  }
+}
+
+async function generate(){
+  const blocks=parseBlocks($("src").value);
+  if(!blocks.length){ toast("Add some slide content first"); return; }
+  const provider=$("provider").value;
+  if((provider==="openai"||provider==="gemini") && !getKey())
+    toast("No "+AI[provider].label+" key entered — building with rules");
+  deck=blocks.map(b=>({ raw:b, struct:null, status:"pending", override:"auto", engine:"" }));
+  $("download").disabled=true; $("gen").disabled=true;
+  renderDeck();
+  const usingAI = provider!=="none";
+  for(let i=0;i<deck.length;i++){
+    setProg(usingAI?`Designing slide ${i+1} of ${deck.length}…`:`Building ${i+1} of ${deck.length}…`);
+    await structureOne(i); renderCard(i);
+  }
+  setProg(`${deck.length} slides ready`);
+  $("gen").disabled=false; $("download").disabled=false;
+  if(deck._lastErr){ toast("AI call failed — used rules. "+String(deck._lastErr).slice(0,80)); deck._lastErr=null; }
+  else toast("Deck ready ✓");
+}
+async function regenSlide(i){
+  deck[i].status="pending"; renderCard(i);
+  await structureOne(i); renderCard(i); toast(`Slide ${i+1} updated`);
+}
+async function overrideSlide(i,val){
+  deck[i].override=val; deck[i].status="pending"; renderCard(i);
+  await structureOne(i); renderCard(i);
+}
+function download(){
+  if(!deck.length) return;
+  if(!window.PptxGenJS){ toast("PowerPoint library still loading…"); return; }
+  try{
+    const slides=deck.filter(d=>d.struct).map(d=>d.struct);
+    const pptx=buildPptx(slides, $("theme").value, $aspect());
+    const first=(slides[0]&&slides[0].title||"deckforge").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"deckforge";
+    pptx.writeFile({ fileName: first+".pptx" });
+    toast("Exporting .pptx…");
+  }catch(e){ toast("Export error: "+e.message); console.error(e); }
+}
+function reRenderPreviews(){ if(deck.length) renderDeck(); }
+
+window.regenSlide=regenSlide; window.overrideSlide=overrideSlide;
+$("gen").onclick=generate;
+$("download").onclick=download;
+$("example").onclick=()=>{ $("src").value=EXAMPLE; toast("Example loaded — hit Generate"); };
+$("clear").onclick=()=>{ $("src").value=""; deck=[]; renderDeck(); setProg(""); $("download").disabled=true; };
+$("theme").onchange=reRenderPreviews;
+$("aspect").onchange=reRenderPreviews;
+
+function syncProvider(){
+  const p=$("provider").value; const needsKey = (p==="openai"||p==="gemini");
+  $("keyWrap").style.display = needsKey?"block":"none";
+  $("modelWrap").style.display = needsKey?"block":"none";
+  if(needsKey){
+    if($("model").dataset.auto!=="0"){ $("model").value=AI[p].model; $("model").dataset.auto="1"; }
+    $("model").placeholder=AI[p].model;
+    $("keyhint").textContent=AI[p].hint;
+  }
+}
+$("provider").onchange=()=>{ $("model").dataset.auto="1"; $("model").value=""; syncProvider(); };
+$("model").oninput=()=>{ $("model").dataset.auto="0"; };
+syncProvider();
+
+// library status
+(function check(){ const el=$("libstat");
+  if(window.PptxGenJS){ el.textContent="pptx ready"; el.style.color="#2e6b4f"; el.style.borderColor="#bcd8c8"; }
+  else { el.textContent="loading lib…"; setTimeout(check,400); }
+})();
+renderDeck();
+</script>
+</body>
+</html>
