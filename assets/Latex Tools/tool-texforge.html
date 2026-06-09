@@ -24,7 +24,7 @@
     .id-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
     .id-title { font-size: .8rem; font-weight: 700; color: #fef3c7; letter-spacing: .04em; }
     .id-sub { font-size: .68rem; color: #fef3c7; opacity: .55; margin-left: 2px; letter-spacing: .02em; }
-    #root { height: calc(100vh - 38px); display: flex; flex-direction: column; overflow: hidden; }
+    #root { height: calc(100vh - 38px); display: flex; flex-direction: column; overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -139,17 +139,41 @@ const BPAL = {
 function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function tex(s){
   if(!s) return "";
-  const o = s.replace(/\\/g,"\\textbackslash{}").replace(/([&%$#_{}])/g,"\\$1").replace(/~/g,"\\textasciitilde{}").replace(/\^/g,"\\textasciicircum{}");
+  // Single-pass replacement prevents double-escaping (e.g. \→\textbackslash{} then {→\{ would corrupt the command)
+  const MAP={'\\':'\\textbackslash{}','~':'\\textasciitilde{}','^':'\\textasciicircum{}'};
+  const o = s.replace(/[\\&%$#_{}~^]/g, m => MAP[m] || ('\\'+m));
   return o.replace(/\*\*(.+?)\*\*/g,"\\textbf{$1}").replace(/\*(.+?)\*/g,"\\textit{$1}");
 }
 function bodyToTex(raw, bulletDefault){
   const lines=(raw||"").replace(/\r/g,"").split("\n"); let out=[],buf=[],items=null;
   const fp=()=>{ if(buf.length){ out.push(tex(buf.join(" ").trim())); buf=[]; } };
-  const fi=()=>{ if(items){ out.push("\\begin{itemize}\n"+items.map(t=>"  \\item "+t).join("\n")+"\n\\end{itemize}"); items=null; } };
-  lines.forEach(ln=>{ const t=ln.trim(); const b=/^[-*•]\s+/.test(t)||(bulletDefault&&t!=="");
+  const fi=()=>{
+    if(!items) return;
+    if(!bulletDefault){
+      // Normal mode: all bullet-marker lines are flat \items (strings)
+      out.push("\\begin{itemize}\n"+items.map(t=>"  \\item "+t).join("\n")+"\n\\end{itemize}");
+    } else {
+      // Beamer mode: plain lines = main \items; -/*/• lines = sub-\items nested inside the preceding main item
+      let r="\\begin{itemize}\n", subBuf=[];
+      const flushSubs=()=>{ if(subBuf.length){ r+="  \\begin{itemize}\n"+subBuf.map(s=>"    \\item "+s).join("\n")+"\n  \\end{itemize}\n"; subBuf=[]; } };
+      items.forEach(it=>{ if(it.sub){ subBuf.push(it.text); } else { flushSubs(); r+="  \\item "+it.text+"\n"; } });
+      flushSubs();
+      r+="\\end{itemize}";
+      out.push(r);
+    }
+    items=null;
+  };
+  lines.forEach(ln=>{
+    const t=ln.trim(); const isSub=/^[-*•]\s+/.test(t); const b=isSub||(bulletDefault&&t!=="");
     if(t===""){ fp(); fi(); return; }
-    if(b){ fp(); if(!items) items=[]; items.push(tex(t.replace(/^[-*•]\s+/,""))); }
-    else { fi(); buf.push(t); } });
+    if(b){
+      fp();
+      if(!items) items=[];
+      if(bulletDefault){ items.push({text:tex(t.replace(/^[-*•]\s+/,"")), sub:isSub}); }
+      else { items.push(tex(t.replace(/^[-*•]\s+/,""))); }
+    }
+    else { fi(); buf.push(t); }
+  });
   fp(); fi(); return out.join("\n\n");
 }
 const A = (S) => S.authors.filter(a=>a.name.trim());
@@ -523,13 +547,13 @@ function TeXForge(){
   /* actions */
   const copy = async () => { try{ await navigator.clipboard.writeText(latex); }catch{ const ta=document.createElement("textarea"); ta.value=latex; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); } setToast("LaTeX copied ✓"); };
   const download = () => { const blob=new Blob([latex],{type:"text/x-tex"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); const slug=(doc.title||"document").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"document"; a.download=slug+".tex"; a.click(); URL.revokeObjectURL(a.href); setToast("Downloaded "+a.download); };
-  const overleaf = () => { const f=document.createElement("form"); f.action="https://www.overleaf.com/docs"; f.method="post"; f.target="_blank"; f.style.display="none"; const i=document.createElement("input"); i.type="hidden"; i.name="snip"; i.value=latex; const e=document.createElement("input"); e.type="hidden"; e.name="engine"; e.value="pdflatex"; f.appendChild(i); f.appendChild(e); document.body.appendChild(f); f.submit(); f.remove(); setToast("Opening in Overleaf…"); };
+  const overleaf = () => { const f=document.createElement("form"); f.action="https://www.overleaf.com/docs"; f.method="post"; f.target="_blank"; f.style.display="none"; const i=document.createElement("input"); i.type="hidden"; i.name="snip"; i.value=latex; const e=document.createElement("input"); e.type="hidden"; e.name="engine"; e.value="pdflatex"; const n=document.createElement("input"); n.type="hidden"; n.name="snip_name"; n.value=(doc.title||"document")+".tex"; f.appendChild(i); f.appendChild(e); f.appendChild(n); document.body.appendChild(f); f.submit(); setTimeout(()=>f.remove(),500); setToast("Opening in Overleaf…"); };
 
-  const moveBtns = (i, len, move) => (
+  const moveBtns = (i, len, move, del) => (
     <div className="icons">
       <button className="ibtn" disabled={i===0} onClick={()=>move(i,-1)}>↑</button>
       <button className="ibtn" disabled={i===len-1} onClick={()=>move(i,1)}>↓</button>
-      <button className="ibtn del" disabled={len===1} onClick={()=> (move===moveAuthor?delAuthor:delContent)(i)}>✕</button>
+      <button className="ibtn del" disabled={len===1} onClick={()=>del(i)}>✕</button>
     </div>
   );
 
@@ -637,7 +661,7 @@ function TeXForge(){
               <div className="pbody">
                 {doc.authors.map((a,i)=>(
                   <div className="item" key={i}>
-                    <div className="bar"><span className="lab">Author {i+1}</span>{moveBtns(i,doc.authors.length,moveAuthor)}</div>
+                    <div className="bar"><span className="lab">Author {i+1}</span>{moveBtns(i,doc.authors.length,moveAuthor,delAuthor)}</div>
                     <div className="row two">
                       <div><label>Name</label><input type="text" value={a.name} onChange={e=>updAuthor(i,"name",e.target.value)} placeholder="Jane Researcher"/></div>
                       <div><label>Email</label><input type="text" value={a.email} onChange={e=>updAuthor(i,"email",e.target.value)} placeholder="jane@uni.edu"/></div>
@@ -667,7 +691,7 @@ function TeXForge(){
                   : `Blank line = new paragraph. Lines starting with <code>-</code> become a bullet list. <code>**bold**</code>, <code>*italic*</code>.`}}/>
                 {doc.content.map((c,i)=>(
                   <div className="item" key={i}>
-                    <div className="bar"><span className="lab">{isPres?"Slide":"Section"} {i+1}</span>{moveBtns(i,doc.content.length,moveContent)}</div>
+                    <div className="bar"><span className="lab">{isPres?"Slide":"Section"} {i+1}</span>{moveBtns(i,doc.content.length,moveContent,delContent)}</div>
                     <div className="field"><label>{isPres?"Slide title":"Section heading"}</label><input type="text" value={c.title} onChange={e=>updContent(i,"title",e.target.value)} placeholder={isPres?"Motivation":"Introduction"}/></div>
                     <div><label>{isPres?"Bullet points / content":"Body text"}</label><textarea rows={isPres?5:6} value={c.body} onChange={e=>updContent(i,"body",e.target.value)} placeholder={isPres?"First key point\nSecond key point\n- a supporting detail":"Write the paragraph here. Leave a blank line for a new paragraph."}/></div>
                   </div>
