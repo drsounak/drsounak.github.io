@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog &amp; Blog — Sounak Sadhukhan</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .blog-redirect-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      border: 1px solid #e0d4bc;
+      border-left: 4px solid #c9a96e;
+      border-radius: 4px;
+      padding: 32px 36px;
+      background: #fdf9f3;
+      margin: 32px 0 48px;
+    }
+    .blog-redirect-box .blog-label {
+      font-family: 'DM Mono', monospace, monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c9a96e;
+    }
+    .blog-redirect-box h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: #1a1b1e;
+      line-height: 1.25;
+      margin: 0;
+    }
+    .blog-redirect-box p {
+      font-size: 0.92rem;
+      color: #666;
+      line-height: 1.75;
+      max-width: 560px;
+      margin: 0;
+    }
+    .blog-redirect-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 24px;
+      background: #1a1b1e;
+      color: #fff;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .blog-redirect-btn:hover {
+      background: #3a3b40;
+      text-decoration: none;
+      transform: translateX(3px);
+    }
+    .blog-redirect-btn svg { flex-shrink: 0; }
+
+    /* Recent posts preview list */
+    .blog-preview-note {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 14px;
+    }
+    .blog-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .blog-preview-item {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f5efe4;
+      transition: padding-left 0.2s;
+    }
+    .blog-preview-item:last-child { border-bottom: none; }
+    .blog-preview-item:hover { padding-left: 7px; }
+
+    .bp-date {
+      font-size: 0.77rem;
+      font-weight: 600;
+      color: #c9a96e;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 72px;
+    }
+    .bp-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a1b1e;
+    }
+    .bp-title a { color: inherit; }
+    .bp-title a:hover { color: #8a6d3b; text-decoration: none; }
+    .bp-cat {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #bbb;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    /* setup note */
+    .setup-note {
+      background: #fdf6ea;
+      border: 1px solid #e0d4bc;
+      border-left: 3px solid #c9a96e;
+      border-radius: 3px;
+      padding: 13px 18px;
+      font-size: 0.83rem;
+      color: #888;
+      line-height: 1.7;
+      margin-top: 36px;
+    }
+    .setup-note strong { color: #1a1b1e; }
+    .setup-note code {
+      font-size: 0.79rem;
+      background: #f0e4cc;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: #8a6d3b;
+    }
+
+    @media (max-width: 600px) {
+      .blog-redirect-box { padding: 24px 20px; }
+      .bp-cat { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-name">Sounak Sadhukhan</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="research.html">Research</a>
+    <a href="blog.html" class="active">Blog</a>
+    <a href="resource.html">Resource</a>
+    <a href="cv.html">CV</a>
+  </div>
+  <button class="nav-ham" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mob-menu">
+  <a href="index.html">Home</a>
+  <a href="research.html">Research</a>
+  <a href="blog.html" class="active">Blog</a>
+  <a href="resource.html">Resource</a>
+  <a href="cv.html">CV</a>
+</div>
+
+<div class="page">
+
+  <h1 class="page-title">Blog</h1>
+
+  <!-- ═══════════ TOOLS SECTION ═══════════ -->
+  <h2 class="sec-heading">Tools</h2>
+  <p style="font-size:.88rem;color:#666;margin-bottom:18px;line-height:1.7">
+    Interactive tools for researchers and students — LaTeX table generation,
+    mathematical formula editing, and TikZ diagram building.
+    Each tool opens in a full-page interface.
+  </p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:48px">
+
+    <!-- LaTeX Table Generator -->
+    <a href="tool-latex-table.html" style="display:block;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;background:#fff;transition:box-shadow .2s,transform .2s;text-decoration:none">
+      <div style="font-size:1.5rem;margin-bottom:12px">📋</div>
+      <p style="font-family:'Crimson Pro',Georgia,serif;font-size:1.1rem;font-weight:600;color:#1a1b1e;margin-bottom:6px">LaTeX Table Generator</p>
+      <p style="font-size:.82rem;color:#888;line-height:1.6;margin-bottom:14px">Generate publication-quality LaTeX tables — booktabs, longtable, tabularx, multirow, colored, and more. Live preview included.</p>
+      <span style="font-size:.78rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Open Tool →</span>
+    </a>
+
+    <!-- Math Editor -->
+    <a href="tool-math-editor.html" style="display:block;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;background:#fff;transition:box-shadow .2s,transform .2s;text-decoration:none">
+      <div style="font-size:1.5rem;margin-bottom:12px">∑</div>
+      <p style="font-family:'Crimson Pro',Georgia,serif;font-size:1.1rem;font-weight:600;color:#1a1b1e;margin-bottom:6px">Math Formula Editor</p>
+      <p style="font-size:.82rem;color:#888;line-height:1.6;margin-bottom:14px">Write LaTeX math with live KaTeX rendering. Symbol toolbar for fractions, integrals, matrices, Greek letters, and more.</p>
+      <span style="font-size:.78rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Open Tool →</span>
+    </a>
+
+    <!-- TikZ Builder -->
+    <a href="tool-tikz.html" style="display:block;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;background:#fff;transition:box-shadow .2s,transform .2s;text-decoration:none">
+      <div style="font-size:1.5rem;margin-bottom:12px">✏️</div>
+      <p style="font-family:'Crimson Pro',Georgia,serif;font-size:1.1rem;font-weight:600;color:#1a1b1e;margin-bottom:6px">TikZ Diagram Builder</p>
+      <p style="font-size:.82rem;color:#888;line-height:1.6;margin-bottom:14px">Drag-and-drop shapes to build TikZ diagrams visually. Supports flowcharts, arrows, geometry, and exports clean LaTeX code.</p>
+      <span style="font-size:.78rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Open Tool →</span>
+    </a>
+
+    <!-- TeXForge -->
+    <a href="tool-texforge.html" style="display:block;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;background:#fff;transition:box-shadow .2s,transform .2s;text-decoration:none">
+      <div style="font-size:1.5rem;margin-bottom:12px">🔨</div>
+      <p style="font-family:'Crimson Pro',Georgia,serif;font-size:1.1rem;font-weight:600;color:#1a1b1e;margin-bottom:6px">TeXForge</p>
+      <p style="font-size:.82rem;color:#888;line-height:1.6;margin-bottom:14px">No-code LaTeX document builder — configure article, journal, conference, and presentation templates visually and export ready-to-compile code.</p>
+      <span style="font-size:.78rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Open Tool →</span>
+    </a>
+
+    <!-- TeXShift -->
+    <a href="tool-texshift.html" style="display:block;border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;background:#fff;transition:box-shadow .2s,transform .2s;text-decoration:none">
+      <div style="font-size:1.5rem;margin-bottom:12px">🔁</div>
+      <p style="font-family:'Crimson Pro',Georgia,serif;font-size:1.1rem;font-weight:600;color:#1a1b1e;margin-bottom:6px">TeXShift</p>
+      <p style="font-size:.82rem;color:#888;line-height:1.6;margin-bottom:14px">Journal-to-journal LaTeX reformatter — paste your source, pick a target (IEEE, ACM, Elsevier, Springer, AMS, SIAM…), and get reformatted LaTeX instantly.</p>
+      <span style="font-size:.78rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Open Tool →</span>
+    </a>
+
+  </div>
+
+  <h2 class="sec-heading">Blog Posts</h2>
+
+  <!-- ══ NEW: Full post hosted on this site ══ -->
+  <div style="border:1px solid #e0d4bc;border-left:3px solid #c9a96e;border-radius:5px;padding:22px 24px;margin-bottom:28px;background:#fff">
+    <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <span style="display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a6d3b;background:#fdf6ea;border:1px solid #e0d4bc;border-radius:3px;padding:2px 8px;margin-bottom:10px">Career Reflections</span>
+        <h3 style="font-family:'Crimson Pro',Georgia,serif;font-size:1.3rem;font-weight:600;color:#1a1b1e;margin-bottom:8px;line-height:1.3">
+          <a href="blog-industry-experience.html" style="color:#1a1b1e;transition:color .15s">
+            Fifteen Years Across Industry and Academia: What Each Chapter Taught Me
+          </a>
+        </h3>
+        <p style="font-size:.875rem;color:#666;line-height:1.7;margin-bottom:12px">
+          From optimising 14TB of telecom data at HP, to predicting highway incidents at IIT Kharagpur,
+          to mapping flood disaster risk at ISI Kolkata, to building demand forecasting models at PwC —
+          an honest account of what each role felt like from the inside, and the single thread that runs through all of it.
+        </p>
+        <a href="blog-industry-experience.html" style="font-size:.8rem;font-weight:700;color:#8a6d3b;letter-spacing:.03em">Read post → &nbsp;</a>
+        <span style="font-size:.78rem;color:#bbb">12 min read · June 2025</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main redirect box ── -->
+  <div class="blog-redirect-box">
+    <span class="blog-label">External Blog</span>
+    <h2>Research Notes, Projects &amp; Commentary</h2>
+    <p>
+      I write about ongoing research projects, work-in-progress ideas, and topics at the
+      intersection of Mathematical Oncology, Machine Learning, and Computational Biology.
+      All posts are published on my Google Blog.
+    </p>
+    <!--
+      TODO: Replace # below with your Google Blog URL.
+      Example: https://sounaksadhukhan.blogspot.com
+    -->
+    <a href="#" target="_blank" rel="noopener" class="blog-redirect-btn">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      Visit Blog →
+    </a>
+  </div>
+
+  <!-- ── Recent posts preview ── -->
+  <h2 class="sec-heading">Recent Posts</h2>
+  <p class="blog-preview-note">
+    A selection of recent posts — click any title to read on the blog.
+  </p>
+
+  <div class="blog-preview-list">
+    <!--
+      HOW TO UPDATE THIS LIST:
+      When you publish a new blog post, copy one of the rows below,
+      update the date, title, href (paste your Blogger post URL), and category.
+      You can also just delete all the rows below and leave the redirect box above.
+    -->
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Apr 2025</span>
+      <span class="bp-title">
+        <!-- TODO: Replace # with your Blogger post URL -->
+        <a href="#">Why Does Tumour Growth Stall? Avascular Phases in Cancer Progression</a>
+      </span>
+      <span class="bp-cat">Oncology</span>
+    </div>
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Mar 2025</span>
+      <span class="bp-title">
+        <a href="#">Explainability in Medical AI: Why Black-Box Models Are Not Enough</a>
+      </span>
+      <span class="bp-cat">Machine Learning</span>
+    </div>
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Feb 2025</span>
+      <span class="bp-title">
+        <a href="#">Fractals in Biology: How Tumour Blood Vessel Networks Defy Euclidean Geometry</a>
+      </span>
+      <span class="bp-cat">Oncology</span>
+    </div>
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Jan 2025</span>
+      <span class="bp-title">
+        <a href="#">Feature Selection in Biomedical Data: A Practical Guide to Mutual Information</a>
+      </span>
+      <span class="bp-cat">Machine Learning</span>
+    </div>
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Dec 2024</span>
+      <span class="bp-title">
+        <a href="#">How I Teach Soft Computing: Moving from Equations to Intuition</a>
+      </span>
+      <span class="bp-cat">Teaching</span>
+    </div>
+
+    <div class="blog-preview-item">
+      <span class="bp-date">Nov 2024</span>
+      <span class="bp-title">
+        <a href="#">From PwC to Academia: What Industry Data Science Taught Me About Research</a>
+      </span>
+      <span class="bp-cat">Career</span>
+    </div>
+
+  </div>
+
+  <div class="setup-note">
+    <strong>How to update this page:</strong>
+    Replace the <code>href="#"</code> in the "Visit Blog" button with your Google Blog URL.
+    Then update each post row: paste the direct Blogger post URL into <code>href="#"</code>,
+    change the date and title. To add a new post row, copy any <code>&lt;div class="blog-preview-item"&gt;</code>
+    block, paste it at the top of the list, and update the content.
+  </div>
+
+</div><!-- /page -->
+
+<footer class="footer">
+  &copy; 2025 Sounak Sadhukhan &nbsp;|&nbsp; Department of CSE, Techno International New Town, Kolkata
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>
